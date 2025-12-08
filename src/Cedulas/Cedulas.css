@@ -1,0 +1,261 @@
+.cedulas-page {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  font-family: 'Kulim Park', sans-serif;
+  background: #fff;
+  overflow: hidden;
+}
+
+
+/* Centrar badges en la columna */
+.tabla-cedulas td .cedula-badge {
+  display: inline-flex;       /* permite centrar contenido */
+  justify-content: center;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  min-width: 80px; /* opcional: ancho mínimo */
+}
+
+/* Colores según tipo de cédula */
+.cedula-badge.interna {
+  background-color: #ec2b95; /* morado */
+}
+
+.cedula-badge.resultados {
+  background-color: #000000 ; color: white; /* verde */
+}
+
+.cedula-badge.archivadas {
+  background-color: #7f8c8d; /* gris */
+}
+
+
+.main-content-inner-cedula {
+  width: 100%;
+  max-width: 1200px; 
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Escala proporcional del título */
+.page-title {
+  font-size: clamp(24px, 2.5vw, 36px);
+  font-weight: 700;
+  margin-bottom: 2%;
+  color: #000;
+  align-self: flex-start;
+}
+
+/* 🔹 Barra de filtros */
+.filtros-bar-cedula {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+  flex-wrap: nowrap; /* evita que los select se muevan a otra línea */
+}
+
+
+.filtro-combos-cedula {
+  display: flex;
+  gap: 1rem;
+  flex: 1; /* ocupa todo el espacio restante */
+}
+
+.select-filtro-cedula {
+  flex: 1;        /* todos los select ocupan el mismo espacio proporcional */
+  min-width: 200px; /* no se achiquen demasiado */
+}
+
+
+/* Barra de búsqueda */
+.filtro-busqueda {
+  position: relative;
+  flex: 1;
+  max-width: 250px;
+}
+
+.filtro-busqueda input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  font-size: clamp(12px, 1vw, 14px); /* escala con monitor */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border 0.3s ease;
+}
+
+.filtro-busqueda input:focus {
+  border-color: #18529D;
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: #18529D;
+  font-size: clamp(12px, 1vw, 14px);
+}
+
+/* 🔹 Tabla */
+.tabla-cedulas {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+  font-size: 1vw;
+}
+
+.tabla-cedulas th, .tabla-cedulas td {
+  padding: 1% 1.5%;
+  text-align: left;
+}
+
+.tabla-cedulas th {
+  background: #199532;
+  color: #fff;
+  font-weight: 600;
+}
+
+.tabla-cedulas tr:hover {
+  background: #f9f9f9;
+}
+
+
+
+
+
+
+
+
+
+.tabla-cedulas thead th:nth-child(5),
+.tabla-cedulas tbody td:nth-child(5) {
+    /* Si la columna 'Puesto' es la 5ta (cuando no hay checkbox), reduce su ancho */
+    width: 10%; /* Ejemplo: 10% del ancho de la tabla */
+    max-width: 150px; /* O usa un max-width */
+}
+
+
+/* 🔹 Botones */
+.btn-cedula, .btn-cedulaResultados {
+  width: clamp(140px, 10vw, 160px);
+  height: 50px;
+  border: none;
+  border-radius: 6px;
+  font-size: clamp(12px, 1vw, 14px);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-cedula {
+  background-color: #721995;
+  color: #fff;
+}
+
+.btn-cedula:hover {
+  background-color: #52126b;
+}
+
+.btn-cedulaResultados {
+  background-color: #199532;
+  color: #fff;
+}
+
+.btn-cedulaResultados:hover {
+  background-color: #147a28;
+}
+
+/* 🔹 Responsivo */
+@media (max-width: 1200px) {
+  .page-title {
+    font-size: 3vw;
+  }
+  .filtros-bar {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .filtro-combos, .filtro-busqueda {
+    max-width: 100%;
+  }
+  .tabla-cedulas {
+    font-size: 2vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 5vw;
+  }
+  .tabla-cedulas th, .tabla-cedulas td {
+    padding: 8px 10px;
+  }
+}
+
+
+.archivar-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 15px;
+}
+
+.btn-archivar-toggle {
+  background-color: #18529D;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-archivar-toggle:hover {
+  background-color: #133d76;
+}
+
+.btn-archivar {
+  background-color: #18529D;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-archivar:hover {
+  background-color: #133d76;
+}
+
+.botones-crear-cedula {
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  gap: 1rem; /* Espacio entre los botones */
+  margin-top: 1.5rem;
+}
+
+.btn-cedula,
+.btn-cedulaResultados {  
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+
+ 

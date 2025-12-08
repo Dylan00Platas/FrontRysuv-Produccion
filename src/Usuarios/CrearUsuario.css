@@ -1,0 +1,237 @@
+.crear-usuario-page {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  font-family: 'Kulim Park', sans-serif;
+  background: #FFF;
+  overflow: hidden;
+  margin-left: 5%
+}
+
+/* Main content */
+.main-content {
+  margin-left: 240px;
+  padding: 3% 5%;
+  width: calc(100vw - 240px);
+  overflow-y: auto;
+  color: #000;
+  
+}
+
+
+.page-title3 {
+  font-size: clamp(30px, 5vw, 50px); 
+  font-weight: 200;
+  color: #000;
+  font-family: "Kulim Park";
+  margin: 0;               /* quitar márgenes por defecto */
+  margin-bottom: 5%;
+
+}
+
+.page-title {
+  margin-left: -120px;
+  font-size: clamp(28px, 2.5vw, 48px);
+  font-weight: 400;
+  margin-bottom: 3%;
+  color: #000;
+  letter-spacing: 0.5px;
+}
+
+/* Formulario */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2% 3%;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-size: clamp(13px, 1.2vw, 18px);
+  font-weight: 600;
+  margin-bottom: 0.5vh;
+  color: #000;
+  text-align: left;
+}
+
+.form-input,
+.rol-select {
+  width: 100%;
+  height: clamp(32px, 3.5vh, 45px);
+  padding: 0.5vh 1vw;
+  font-size: clamp(12px, 1vw, 16px);
+  border: 1px solid #b0b0b0;
+  border-radius: 4px;
+  background: #fff;
+  color: #000;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+
+
+.password-input-container-usuario {
+  display: flex;             /* importante */
+  align-items: center;       /* centrado vertical */
+  width: 100%;
+  gap: 0.5rem;               /* separación mínima entre input y botón */
+}
+
+.password-input-usuario {
+  flex: 1;                   /* ocupa todo el espacio disponible */
+  height: clamp(32px, 3.5vh, 45px);
+  padding: 0.5vh 1vw;
+  font-size: clamp(12px, 1vw, 16px);
+  border: 1px solid #b0b0b0;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+
+.password-toggle-usuario {
+  height: clamp(32px, 3.5vh, 45px); /* igual altura que el input */
+  aspect-ratio: 1 / 1;               /* cuadrado perfecto */
+  background-color: #199532;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(14px, 1.5vw, 18px);
+  padding: 0;
+}
+
+.form-input:focus,
+.rol-select:focus {
+  outline: none;
+  border-color: #18529D;
+  box-shadow: 0 2px 6px rgba(24, 82, 157, 0.2);
+}
+
+/* Password */
+.password-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-input {
+  padding-right: 40px;
+}
+
+.password-toggle-usuario {
+  height: clamp(32px, 3.5vh, 15px);
+  width: 10%;
+  aspect-ratio: 1 / 1;
+  background-color: #199532;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(14px, 1.5vw, 18px);
+  padding: 0;
+
+  /* Ajuste vertical */
+  align-self: flex-start;    /* se pega al inicio del contenedor */
+             /* sube un 5% respecto al input */
+}
+
+.password-toggle svg {
+  width: 60%;
+  height: 60%;
+}
+
+/* Select rol */
+.rol-select {
+  appearance: none;
+  cursor: pointer;
+  background: #fff url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M70 100 L40 60 H100 Z' fill='%2319529D'/%3E%3C/svg%3E") no-repeat right 1em center;
+  background-size: clamp(10px, 1vw, 14px);
+}
+
+/* Botón */
+.action-buttons {
+  grid-column: span 3;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 2%;
+}
+
+.btn-crear {
+  width: clamp(140px, 12vw, 200px);
+  height: clamp(32px, 4vh, 45px);
+  background-color: #199532;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: clamp(13px, 1vw, 16px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+
+.btn-crear-usuario {
+  width: clamp(140px, 12vw, 200px);
+  height: clamp(32px, 4vh, 45px);
+  background-color: #199532;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: clamp(13px, 1vw, 16px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+ transform: translate(250%, 20%); 
+}
+
+.btn-crear-usuario:hover {
+  background-color: #147a28;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 15px 0;
+  }
+  .action-buttons {
+    grid-column: span 1;
+    justify-content: center;
+  }
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 0.85rem; 
+  margin-top: 4px;   
+  display: block;    
+}
+
+
+.btn-desactivar {
+  width: clamp(140px, 12vw, 200px);
+  height: clamp(32px, 4vh, 45px);
+  background-color: #BB0A21;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: clamp(13px, 1vw, 16px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+ transform: translate(250%, 20%); 
+}
+
+.btn-desactivar:hover {
+  background-color: #8f091b;
+}

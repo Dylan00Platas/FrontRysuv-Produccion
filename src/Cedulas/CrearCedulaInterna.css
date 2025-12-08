@@ -1,0 +1,299 @@
+.crear-cedula-page {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  font-family: 'Kulim Park';
+  background-color: #fff;
+}
+
+.main-content {
+  flex: 1; /* ocupa todo el espacio restante al sidebar */
+  padding: 40px 60px; /* agrega espacio a la izquierda y derecha */
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+
+
+.contenido-cedula {
+  flex: 1; /* ocupa todo el espacio restante */
+  display: flex;
+  justify-content: center; /* centra horizontalmente */
+  align-items: flex-start;
+  padding: 20px;
+  overflow: auto;
+}
+
+.contenido-cedula-inner {
+  width: 100%;
+  max-width: 1200px; /* límite */
+  margin-left: 10%;
+}
+
+
+.contenido-cedula-interna-inner {
+  width: 100%;
+  max-width: 1200px; /* límite */
+  margin-left: 0%;
+}
+
+
+.icon {
+  margin-right: 12px;     
+  font-size: 1.1rem;  
+}
+
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  flex-grow: 1;
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
+.sidebar ul li:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.tituloRyS {
+  font-size: 3.5rem;
+  margin-bottom: -3.2rem;
+  font-weight: 100;
+  position: relative;
+  top: -45px; 
+}
+
+
+.action-buttons { 
+
+  padding-bottom: 80px; /* agrega espacio real debajo */}
+
+
+.icon {
+  margin-right: 10px;
+}
+
+.logout {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  padding: 0.5rem;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+.logout:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-title {
+  font-size: 36px;
+  font-weight: 100;
+  margin-bottom: 20px;
+  color: #000;
+ padding-left: -30% !important;
+  padding-bottom: 2%;
+}
+
+.section-title {
+  grid-column: span 3;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #18529D;
+  justify-self: start;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* columnas flexibles */
+  gap: 20px 30px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #000;
+}
+
+.form-note {
+  font-size: 11px;
+  color: #555;
+  margin-top: 4px;
+  align-self: start;
+}
+
+.form-input,
+textarea {
+  width: 100%;   /* ocupa todo el ancho disponible de la celda */
+  max-width: 100%; 
+  height: 30px;
+  padding: 4px 6px;
+  font-size: 12px;
+  border: 1px solid #b0b0b0;
+  border-radius: 4px;
+  background: #fff;
+  color: #000;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+textarea.large-textarea {
+  width: 100%; /* también responsivo */
+  height: 100px;
+  resize: vertical;
+}
+
+.form-input:focus,
+textarea:focus {
+  outline: none;
+  border-color: #18529D;
+  box-shadow: 0 2px 6px rgba(24, 82, 157, 0.2);
+}
+
+
+
+.btn-guardar {
+  width: 160px;
+  height: 32px;
+  background-color: #199532;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-generar {
+  width: 160px;
+  height: 32px;
+  background-color: #721995;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-guardar,
+.btn-generar {
+  min-width: 160px;
+  height: 32px;
+}
+
+
+.btn-generar:hover {
+  background-color: #571372;
+}
+
+
+.btn-guardar:hover {
+  background-color: #147a28;
+}
+
+.tabla-competencias table {
+ width: 100%;
+   border-collapse: collapse;
+  font-size: 13px;
+   table-layout: fixed;
+}
+
+.hermes-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.hermes-input {
+  padding-right: 35px; /* deja espacio para la lupa */
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.search-icon:hover {
+  transform: scale(1.15);
+  color: #0056b3;
+}
+
+
+.tabla-competencias th,
+.tabla-competencias td {
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  text-align: left;
+   width: 33.33%;
+}
+
+.tabla-competencias th {
+  background-color: #18529D;
+  color: #fff;
+  font-weight: 600;
+}
+
+.tabla-competencias input {
+  width: 40%;
+  border: none;
+  background: transparent;
+  padding: 4px;
+  text-align: center;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.tabla-competencias input:focus {
+  outline: 0px solid #fff;
+  background: #fff;         
+}
+
+.select-cedula {
+  width: 36% !important;  /* ocupa toda la celda */
+}
+
+
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 15px 0;
+  }
+  .action-buttons {
+    justify-content: center;
+  }
+}
+

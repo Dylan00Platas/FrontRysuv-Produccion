@@ -1,0 +1,112 @@
+/* Contenedor general */
+.usuarios-page {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  font-family: 'Kulim Park', sans-serif;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  padding: 3% 4%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centra el contenido */
+  margin-left: 240px; /* espacio para el sidebar */
+}
+
+.page-title-usuarios {
+  font-size: clamp(60px, 2.5vw, 36px);
+  font-weight: 200;
+  color: #000;
+  align-self: flex-start; /* título alineado a la izquierda */
+  margin-left: 6%;
+}
+
+/* Encabezado con botón */
+.usuarios-header {
+  display: flex;
+  justify-content: flex-end; /* botón alineado a la derecha */
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 2%;
+  position: relative;
+}
+
+.btn-crearUsuario {
+  background-color: #199532;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: clamp(12px, 1vw, 15px);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: background 0.2s ease;
+}
+
+.btn-crearUsuario:hover {
+  background-color: #147a28;
+}
+
+/* Lista de usuarios */
+.usuarios-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 1200px;
+  font-size: clamp(20px, 1.2vw, 20px);
+}
+
+.usuarios-list li {
+  padding: 14px 18px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.usuarios-list li:hover {
+  background: #f9f9f9;
+}
+
+.usuarios-list li:last-child {
+  border-bottom: none;
+}
+
+/* 🔹 Responsivo */
+@media (max-width: 1200px) {
+  .page-title {
+    font-size: 3vw;
+  }
+  .usuarios-header {
+    justify-content: center;
+  }
+  .btn-crearUsuario {
+    width: 100%;
+    max-width: 300px;
+  }
+  .usuarios-list {
+    font-size: 2vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 5vw;
+  }
+  .usuarios-list li {
+    padding: 10px 12px;
+  }
+}

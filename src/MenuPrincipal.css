@@ -1,0 +1,74 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.menu-principal-page {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.contenido {
+  flex: 1;
+  margin-left: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.logo {
+  height: 50%;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+   animation: fadeIn 1.2s ease;
+}
+
+/* 🔹 Textos elegantes debajo del logo */
+.logo-texts {
+  margin-top: 1.5rem;
+  color: #444;
+  line-height: 1.4;
+  animation: fadeIn 1.2s ease;
+}
+
+.logo-texts p {
+  margin: 4px 0;
+}
+
+.logo-texts .linea1 {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.logo-texts .linea2 {
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+.logo-texts .linea3 {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+/* Animación sutil de aparición */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
