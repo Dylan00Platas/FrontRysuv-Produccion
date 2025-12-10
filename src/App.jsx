@@ -19,6 +19,7 @@ import CrearUsuario from './Usuarios/CrearUsuario';
 import EditarUsuario from "./Usuarios/EditarUsuario";
 import Agenda from "./Agenda/Agenda.jsx";
 import Usuarios from "./Usuarios/Usuarios";
+import GenerarOficio from "./Oficios/GenerarOficio.jsx";
 import { UsuarioProvider } from "./Auxiliares/UsuarioContext.jsx";
 import { useEffect } from "react";
 import Panorama from "./Panorama/Panorama.jsx";
@@ -51,6 +52,8 @@ function AnimatedRoutes() {
         <Route path="/editar-usuario" element={<EditarUsuario />} />
         <Route path="/panorama" element={<Panorama />} />
         <Route path="/agenda" element={<Agenda/>} />
+        <Route path="/generar-oficio" element={<GenerarOficio/>} />
+
 
 
       </Routes>

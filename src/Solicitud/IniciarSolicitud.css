@@ -135,11 +135,44 @@
     font-family: "kulim park";
 }
 
-.large-textarea-solicitud:focus {
+.large-textarea-solicitud2:focus {
   outline: none;
   border-color: #18529D;
   box-shadow: 0 2px 6px rgba(24, 82, 157, 0.2);
 }
+
+
+
+/* Textareas grandes */
+.large-textarea-solicitud2 {
+  width: 100%;
+  max-width: 80vw;
+  height: clamp(80px, 55vh, 300px);
+  padding: 0.5vh 1vw;
+  font-size: clamp(12px, 1vw, 16px);
+  resize: vertical;
+  box-sizing: border-box;
+    font-family: "kulim park";
+}
+
+.large-textarea-solicitu2:focus {
+  outline: none;
+  border-color: #2f3d50;
+  box-shadow: 0 2px 6px rgba(24, 82, 157, 0.2);
+}
+
+
+.large-textarea-solicitud3 {
+  width: 100%;
+  max-width: 80vw;
+  height: clamp(80px, 55vh, 200px);
+  padding: 0.5vh 1vw;
+  font-size: clamp(12px, 1vw, 16px);
+  resize: vertical;
+  box-sizing: border-box;
+    font-family: "kulim park";
+}
+
 
 /* Checkbox */
 .checkbox-group-solicitud {

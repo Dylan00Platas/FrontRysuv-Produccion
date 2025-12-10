@@ -1,4 +1,4 @@
-import { FaAddressCard, FaChartBar, FaEnvelope, FaSearch, FaUser, FaGlobeAmericas, FaRegCalendarAlt } from "react-icons/fa";
+import { FaAddressCard, FaChartBar, FaEnvelope, FaSearch, FaUser, FaGlobeAmericas, FaRegCalendarAlt, FaFileUpload } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 import { MdAddBox, MdAssignment } from "react-icons/md";
 import { useNavigate } from "react-router-dom";

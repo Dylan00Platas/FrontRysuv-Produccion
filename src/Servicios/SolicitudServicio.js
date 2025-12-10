@@ -293,16 +293,12 @@ async actualizarProcesoContratacionCedula(idProceso, formData, token) {
 
 async registrarControlVersion(formData, token) {
     try {
-        
         const datos = {
             FKIdProceso: formData.idProceso,
             jsonDatos: formData.jsonDatos,
             nombreCompleto: formData.nombreCompleto
         };
-
- 
         const datosLimpios = this.limpiarDatos(datos);
-
         return await this.api.request(
             "/procesoContratacion/control-version",
             "POST",
@@ -353,11 +349,53 @@ async eliminarProcesoPorID(idProceso, token) {
         return response; 
     } catch (err) {
         console.error("Error en eliminarProcesoPorID:", err);
-      
         throw err; 
     }
 }
+
+async registrarOficio(formData, token) {
+    try{
+        const datos ={ 
+            idOficio: formData.idOficio,
+            FKIdProcesoContratacion: formData.FKIdProcesoContratacion,
+            folio: formData.folio,
+            fecha: formData.fecha,
+            dirigido: formData.dirigido,
+            puestoDirigido: formData.puestoDirigido,
+            machote: formData.machote,
+            piePagina: formData.piePagina,
+            tipo: formData.tipo
+        };
+        const datosLimpios = this.limpiarDatos(datos);
+        return await this.api.request( 
+            "/procesoContratacion/oficio",
+            "POST",
+            datosLimpios,
+            token
+        );
+    }catch(err){
+        console.error("Error en registrarOficio:", err);
+        throw err;
+    }
 }
 
+async obtenerOficiosPorProceso(FKIdProcesoContratacion, token) {
+    try {
+        const response = await this.api.request(
+            `/procesoContratacion/oficios/${FKIdProcesoContratacion}`,
+            "GET",
+            null,
+            token
+        );
+        console.log("Respuesta del servidor: ", response);
+        if (!response || response.error) {
+            throw new Error(response?.mensaje || "Error al obtener oficios");
+        }
+        return response.oficios || [];
+    }catch(err){
+        console.error("Error en obtenerOficiosPorProceso:", err);
+        throw err;
+    }
+}
 
-
+}

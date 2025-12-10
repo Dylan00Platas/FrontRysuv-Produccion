@@ -89,7 +89,7 @@ function Agenda() {
     cargarEventos();
   }, []);
 
-  // Abrir modal al hacer clic en evento
+
   const handleEventClick = (info) => {
     setEventoSeleccionado({
       id: info.event.id,
@@ -118,7 +118,7 @@ const handleGuardarCambios = async () => {
 
     await servicio.editarSolicitud(eventoSeleccionado.id, payload, token);
 
-    // 🔥 AQUÍ ES DONDE TE FALTABA
+
     const colorFinal = eventoSeleccionado.atendioCita
       ? "#d11a2a"
       : mapColorEstado(Number(eventoSeleccionado.estado));
