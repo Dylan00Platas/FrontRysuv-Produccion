@@ -23,6 +23,8 @@ import GenerarOficio from "./Oficios/GenerarOficio.jsx";
 import { UsuarioProvider } from "./Auxiliares/UsuarioContext.jsx";
 import { useEffect } from "react";
 import Panorama from "./Panorama/Panorama.jsx";
+import VerOficios from "./Oficios/VerOficios.jsx";
+import VerDetallesOficio from "./Oficios/VerDetallesOficio.jsx";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -53,7 +55,8 @@ function AnimatedRoutes() {
         <Route path="/panorama" element={<Panorama />} />
         <Route path="/agenda" element={<Agenda/>} />
         <Route path="/generar-oficio" element={<GenerarOficio/>} />
-
+        <Route path="/ver-oficios" element={<VerOficios/>} />
+        <Route path="/ver-detalles-oficio" element={<VerDetallesOficio/>} />
 
 
       </Routes>

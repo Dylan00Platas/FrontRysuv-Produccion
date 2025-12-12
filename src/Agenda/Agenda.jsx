@@ -35,7 +35,7 @@ function Agenda() {
     }
   };
 
-  // Cargar solicitudes
+  
   useEffect(() => {
     async function cargarEventos() {
       try {
@@ -45,8 +45,9 @@ function Agenda() {
         const data = await servicio.obtenerSolicitudes(token);
         if (!data) return;
 
-      const nuevosEventos = Object.values(data)
-  .filter(s => s.fechaEntrevista)
+   const nuevosEventos = Object.values(data)
+  .filter(s => s.fechaEntrevista)               
+  .filter(s => s.FKIdEstadoProcesoContratacion !== 7)  
   .map(s => {
     const colorBase = s.atendioCita ? "#d11a2a" : mapColorEstado(s.FKIdEstadoProcesoContratacion);
 

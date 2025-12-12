@@ -331,7 +331,7 @@ useEffect(() => {
       setFormData((prev) => ({
         ...prev,
         idProceso: cedulaFromNav.idProceso || "",
-        hermesNotificacion: cedulaFromNav.folio || "",
+        hermesNotificacion: cedulaFromNav.hermesNotificacion || "",
         titular: cedulaFromNav.titularPlaza || "",
         edad: cedulaFromNav.edad || "",
         oficio: cedulaFromNav.oficioAutorizacionDeOcupacion || "",
@@ -352,7 +352,9 @@ useEffect(() => {
           `Puntuación de habilidades en Excel: ${cedulaFromNav.resultadoHabilidadesExcel || "N/A"
           } | ` +
           `Puntuación de habilidades en Word: ${cedulaFromNav.resultadoHabilidadesWord || "N/A"
-          }`,
+          } | ` +
+          `Puntuación de habilidades en Ortografía y redacción: ${cedulaFromNav.resultadoOrtografia || "N/A"
+          } `,
 
         FKIdProceso: cedulaFromNav.idProceso || "",
 
@@ -485,7 +487,9 @@ useEffect(() => {
           "Puntuación de habilidades de Excel: " +
           (proceso.resultadoHabilidadesExcel || "N/A") +
           " Puntuación de habilidades de Word: " +
-          (proceso.resultadoHabilidadesWord || "N/A"),
+          (proceso.resultadoHabilidadesWord || "N/A") +
+          "Puntuación de habilidades en Ortografía y redacción: " +
+          (proceso.resultadoOrtografia || "N/A"),
         temporalidad:
           proceso.FKIdTemporalDefinitiva === 1
             ? "1"
@@ -565,7 +569,7 @@ useEffect(() => {
 
   const handleGenerarPDF = async () => {
 
-    const existingPdfBytes = await fetch("/plantilla_editable_resultados3.pdf").then(
+    const existingPdfBytes = await fetch("/CedulaResultadosEditable.pdf").then(
       (res) => res.arrayBuffer()
     );
     const pdfDoc = await PDFDocument.load(existingPdfBytes);
@@ -590,7 +594,7 @@ if (typeof handleCrearGraficas === "function") {
       formData.temporalidad == 1 ? "Temporal" : "Definitiva"
     );
     form.getTextField("nombre").setText(formData.nombre);
-    form.getTextField("edad").setText(formData.edad);
+    form.getTextField("edad").setText(formData.edad+" años");
     form.getTextField("educacion").setText(formData.educacion);
     form.getTextField("experiencia").setText(formData.experiencia);
     form.getTextField("sobresaliente").setText(formData.sobresaliente);
@@ -1083,10 +1087,18 @@ useEffect(() => {
                   type="text"
                   className="form-input"
                   value={formData[key]}
-                  onChange={(e) => handleInputChange(key, e.target.value)}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (key === "edad") {
+                      value = value.replace(/\D/g, "");
+                      value = value.slice(0, 3);
+                    }
+                    handleInputChange(key, value);
+                  }}
                 />
               </div>
             ))}
+
 
             {tipoProceso === 1 && (
               <>

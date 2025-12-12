@@ -82,6 +82,7 @@ const toggleAvaladoPor = (valor) => {
     avaladoPor: "",
     fechaAsignacionAnalista: "",
     citaVirtual: false,
+    observaciones: "",  
   });
 
 
@@ -181,6 +182,7 @@ const toggleAvaladoPor = (valor) => {
               solicitudSeleccionada.citaVirtual === 1
                 ? true
                 : false,
+            observaciones: solicitudSeleccionada.observaciones || "",
           });
           setPermiteAsignarAnalista(true);
         }
@@ -490,7 +492,14 @@ const handleEliminar = async () => {
               />
             </div>
 
-
+            <div className="form-group" style={{ gridColumn: "1 / -1" }}>
+              <label className="form-label-evaluacionl">Observaciones registro</label>
+              <textarea
+                className="form-input textarea-large"
+                value={formData.observaciones}
+                onChange={(e) => handleInputChange("observaciones", e.target.value)}
+              />
+            </div>
 
               {permiteAsignarAnalista && (
                 <div className="form-group analista-combobox">

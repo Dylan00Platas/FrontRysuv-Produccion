@@ -1,6 +1,9 @@
 import { useState, useContext, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Sidebar from "../Componentes/Sidebar";
 import { UsuarioContext } from "../Auxiliares/UsuarioContext.jsx";
+import { oficio51y52, oficio41y42, oficio43Licencia, oficioCita, oficio43Medica, copiaCarbon} from "../Auxiliares/Oficio51y52.js";
+import SolicitudServicio from "../Servicios/SolicitudServicio.js";
 
 function GenerarOficio() {
   const { usuario } = useContext(UsuarioContext);
@@ -9,55 +12,104 @@ function GenerarOficio() {
 
   const [tipoOficio, setTipoOficio] = useState(""); // ⬅ Nuevo estado
 
-  const [formData, setFormData] = useState({
-    folio: "",
-    plaza: "",
-    motivo: "",
-    titularPlaza: "",
-    categoriaOrigen: "",
-    categoriaAutorizada: "",
-    candidato: "",
+const datosProceso = JSON.parse(sessionStorage.getItem("datosOficio") || "{}");
 
-    folioOficio: "",
-    fechaOficio: "",
-    destinatario: "",
-    puestoDestinatario: "",
-    cuerpo: "",
-    copiaCarbon: ""
-  });
+
+const solicitudServicio = new SolicitudServicio();
+
+
+
+ const [formData, setFormData] = useState({
+  idProcesoContratacion: datosProceso.idProcesoContratacion || "",
+  folio: datosProceso.folio || "",
+  plaza: datosProceso.plaza || "",
+  motivo: datosProceso.motivo || "",
+  titularPlaza: datosProceso.titularPlaza || "",
+  categoriaOrigen: datosProceso.categoriaOrigen || "",
+  categoriaAutorizada: datosProceso.categoriaAutorizada || "",
+  candidato: datosProceso.candidato || "",
+   cuerpo: "",
+  copiaCarbon: ""  //
+  
+});
+
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  /* ========================================================================
-     CUANDO SE CAMBIE EL TIPO DE OFICIO, LLENAR AUTOMÁTICAMENTE EL CUERPO
-     ======================================================================== */
-  useEffect(() => {
-    if (tipoOficio === "5.1 y 5.2") {
-      const texto = `
-En respuesta a la petición recibida a través del Sistema de Administración y Seguimiento de Correspondencia (Hermes) identificada con el folio ${formData.folio}, en relación a la ocupación temporal de la plaza ${formData.plaza}, misma que deriva del ${formData.motivo} del C. ${formData.titularPlaza} quien ocupaba la plaza con categoría ${formData.categoriaOrigen}, al respecto, con fundamento en los artículos 210 y 211 del Estatuto General de la Universidad Veracruzana, para no interferir en el desarrollo de las actividades sustantivas y el cumplimiento de resultados de la Dependencia, se autoriza la ocupación temporal de la plaza como suplente con categoría de ${formData.categoriaAutorizada} al C. ${formData.candidato} a partir del 15 de octubre y hasta el 31 de diciembre de 2025; lo anterior, en tanto se efectúa el proceso, conforme a lo indicado en los numerales 1.4, 5.1 y 5.2 de los “Lineamientos para la ocupación de plazas vacantes del personal administrativo de Confianza” para ocupar la plaza de manera definitiva. No omito mencionar que no se reconocerán compromisos contraídos previos a la presente autorización ni los que excedan el periodo reconocido formalmente.
+useEffect(() => {
+  let texto = "";
 
-Se adjunta cédula de resultados.
+  if (tipoOficio === "5.1 y 5.2") {
+    texto = oficio51y52(formData);
+  }
 
-Por lo anterior, atentamente se solicita, realizar el movimiento de alta en el Subsistema de Recursos Humanos, tal como se establece en la Guía para la captura de movimientos de alta de personal en SsRH.
+  if (tipoOficio === "4.1 y 4.2") {
+    texto = oficio41y42(formData);
+  }
 
-Sin más por el momento, aprovecho la ocasión para enviarle saludos cordiales.
-      `;
 
-      setFormData((prev) => ({
-        ...prev,
-        cuerpo: texto.trim()
-      }));
-    }
-  }, [tipoOficio, formData.folio, formData.plaza, formData.motivo, formData.titularPlaza, formData.categoriaOrigen, formData.categoriaAutorizada, formData.candidato]);
+   if (tipoOficio === "4.3(Licencia)") {
+    texto = oficio43Licencia(formData);
+  }
+
+
+
+   if (tipoOficio === "4.3(Medica)") {
+    texto = oficio43Medica(formData);
+  }
+
+   if (tipoOficio === "Cita") {
+    texto = oficioCita(formData);
+  }
+
+  if (texto) {
+    setFormData(prev => ({ ...prev, cuerpo: texto }));
+  }
+
+  if (formData.copiaCarbon.trim() === "") {
+  setFormData(prev => ({ ...prev, copiaCarbon: copiaCarbon() }));
+}
+
+}, [
+  tipoOficio,
+  formData.folio,
+  formData.plaza,
+  formData.motivo,
+  formData.titularPlaza,
+  formData.categoriaOrigen,
+  formData.categoriaAutorizada,
+  formData.candidato
+]);
+
+
+
+
+
 
   /* ======================================================================== */
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+      
 
-    console.log("Datos del oficio:", formData);
+  try {
+    const datosBackend = {
+      FKIdProcesoContratacion: formData.idProcesoContratacion,
+      folio: formData.folioOficio,
+      fecha: formData.fechaOficio,
+      dirigido: formData.destinatario,
+      puestoDirigido: formData.puestoDestinatario,
+      machote: formData.cuerpo,
+      piePagina: formData.copiaCarbon,
+      tipo: tipoOficio
+    };
+    const token = sessionStorage.getItem("token");
+    const respuesta = await solicitudServicio.registrarOficio(datosBackend, token);
+    
+
+    console.log("Respuesta backend:", respuesta);
 
     setMensaje({
       texto: "✅ Oficio guardado correctamente",
@@ -67,7 +119,18 @@ Sin más por el momento, aprovecho la ocasión para enviarle saludos cordiales.
     setTimeout(() => {
       setMensaje({ texto: "", tipo: "" });
     }, 2500);
-  };
+
+  } catch (error) {
+    console.error("Error al registrar oficio", error);
+
+    setMensaje({
+      texto: "❌ Error al guardar el oficio",
+      tipo: "error",
+    });
+  }
+};
+
+
 
   return (
     <div className="iniciar-solicitud-page">
@@ -98,6 +161,11 @@ Sin más por el momento, aprovecho la ocasión para enviarle saludos cordiales.
               <option value="">Seleccione una opción</option>
               <option value="5.1 y 5.2">5.1 y 5.2</option>
               <option value="4.1 y 4.2">4.1 y 4.2</option>
+               <option value="4.3(Licencia)">4.3 (Licencia)</option>
+               <option value="4.3(Medica)">4.3(Médica)</option>
+                <option value="Cita">Cita</option>
+
+
             </select>
           </div>
 

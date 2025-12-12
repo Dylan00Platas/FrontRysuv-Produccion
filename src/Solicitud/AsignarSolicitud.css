@@ -23,8 +23,6 @@
   width: 180px;
 }
 
-
-
 .analista-combobox {
   grid-column: 1 / span 3;
   margin-top: 30px;
@@ -82,10 +80,6 @@ font-size: clamp(25px, 30vw, 40px);
   grid-template-columns: 1fr 1fr 1fr;
   gap: 20px 30px;
 }
-
-
-
-
 
 .form-group {
   display: flex;
@@ -278,3 +272,12 @@ font-size: clamp(25px, 30vw, 40px);
   color: #fff;
   box-shadow: 0 2px 6px rgba(24, 82, 157, 0.25);
 }
+
+/* 🔥 Textarea grande y ancho completo */
+.form-input.textarea-large {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 120px !important; /* Ajusta a tu gusto */
+  resize: vertical; /* Permite agrandarlo manualmente */
+}
+

@@ -420,3 +420,35 @@ textarea.large-textarea {
 
 
 
+.btn-crear-oficio {
+ 
+  background-color: #18529D;
+width: 160px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-crear-oficio:hover {
+  background-color: #133c72;
+}
+
+.btn-ver-oficios {
+  background-color: #189d5f;
+width: 160px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-ver-oficios:hover {
+  background-color: #147447;
+}

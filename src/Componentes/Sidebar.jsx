@@ -81,6 +81,7 @@ function Sidebar({ tipoAcceso }) {
             <li onClick={irEstadisticas}><FaChartBar className="icon" /> Estadísticas</li>
             <li onClick={irNoBeneficiados}><FaAddressCard className="icon" /> No Beneficiados</li>
             <li onClick={irPanorama}><FaGlobeAmericas class="icon" />   Panorama</li>
+             <li onClick={irAgenda}><FaRegCalendarAlt className="icon" /> Agenda</li>
 
           </>
         )}

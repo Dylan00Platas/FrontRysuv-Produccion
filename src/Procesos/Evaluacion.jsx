@@ -510,6 +510,57 @@ function Evaluacion() {
               <button type="submit" className="btn-guardar">
                 Guardar
               </button>
+
+
+<button
+  type="button"
+  className="btn-crear-oficio"
+  onClick={() => {
+    const data = {
+      idProcesoContratacion: formData.idProcesoContratacion,
+      folio: formData.folio,
+      plaza: formData.numPlaza,
+      motivo: formData.motivo,
+      titularPlaza: formData.titular,
+      categoriaOrigen: formData.categoria,
+      categoriaAutorizada: formData.categoriaAutorizada,
+      candidato: formData.candidato
+    };
+
+   const token = localStorage.getItem("token");
+    sessionStorage.setItem("token", token || "");
+    sessionStorage.setItem("datosOficio", JSON.stringify(data));
+
+    window.open("/generar-oficio", "_blank");
+  }}
+>
+  Crear Oficio
+</button>
+
+
+<button
+  type="button"
+  className="btn-ver-oficios"
+  onClick={() => {
+    const idProceso = formData.idProcesoContratacion;
+    const token = localStorage.getItem("token") || "";
+
+    // Guardar en sessionStorage
+    sessionStorage.setItem("token", token);
+    sessionStorage.setItem(
+      "datosVerOficios",
+      JSON.stringify({ idProceso })
+    );
+
+    // Abrir nueva pestaña / ventana
+    window.open("/ver-oficios", "_blank");
+  }}
+>
+  Ver Oficios
+</button>
+
+
+
             </div>
           </form>
         )}
@@ -782,6 +833,27 @@ function Evaluacion() {
               <button type="submit" className="btn-guardar">
                 Guardar
               </button>
+
+              <button
+  type="button"
+  className="btn-crear-oficio"
+  onClick={() =>
+    navigate("/generar-oficio", {
+      state: {
+        folio: formData.folio,
+        plaza: formData.numPlaza,
+        motivo: formData.motivo,
+        titularPlaza: formData.titular,
+        categoriaOrigen: formData.categoria,
+        categoriaAutorizada: formData.categoriaAutorizada,
+        candidato: formData.candidato
+      }
+    })
+  }
+>
+  Crear Oficio
+</button>
+
             </div>
           </form>
         )}

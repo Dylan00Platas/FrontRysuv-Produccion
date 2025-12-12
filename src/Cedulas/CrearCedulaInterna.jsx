@@ -89,7 +89,7 @@ function CrearCedulaInterna() {
 
       setFormData((prev) => ({
         ...prev,                  
-        hermes: cedulaFromNav.folio || "",
+        hermes: cedulaFromNav.hermesNotificacion || "",
         numeroPlaza: cedulaFromNav.numeroPlaza || "",
         nombre: cedulaFromNav.candidato || "",
         puesto: cedulaFromNav.puesto || "",
@@ -304,7 +304,7 @@ useEffect(() => {
       const form = pdfDoc.getForm();
 
       form.getTextField("nombre").setText(formData.nombre || "");
-      form.getTextField("edad").setText(formData.edad || "");
+      form.getTextField("edad").setText(formData.edad+" años" || "");
       form.getTextField("hermes").setText(formData.hermes || "");
       form.getTextField("numeroPlaza").setText(formData.numeroPlaza || "");
       form.getTextField("fechaElaboracion").setText(formData.fechaElaboracion || "");
@@ -490,8 +490,13 @@ useEffect(() => {
                 type="text"
                 className="form-input"
                 value={formData.edad}
-                onChange={(e) => handleInputChange("edad", e.target.value)}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/\D/g, "");
+                  value = value.slice(0, 3);
+                  handleInputChange("edad", value);
+                }}
               />
+
             </div>
 
             <div className="form-group">

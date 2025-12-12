@@ -2,7 +2,7 @@ import { useEffect, useState,useContext} from 'react';
 import { useNavigate } from "react-router-dom";
 import CatalogoDependencia from '../Auxiliares/CatalogoDependencia.js';
 import Sidebar from '../Componentes/Sidebar';
-import { FaChartBar, FaEnvelope, FaSearch, FaUser } from 'react-icons/fa';
+import { FaChartBar, FaEnvelope, FaSearch, FaUser,FaUserLock  } from 'react-icons/fa';
 import { IoLogOutOutline } from 'react-icons/io5';
 import { MdAddBox, MdAssignment } from 'react-icons/md';
 import SolicitudServicio from '../Servicios/SolicitudServicio.js';
@@ -11,7 +11,7 @@ import { UsuarioContext } from "../Auxiliares/UsuarioContext.jsx";
 
 function IniciarSolicitud() {
   const navigate = useNavigate();
-    const [tipoSolicitud, setTipoSolicitud] = useState("asignacion");
+    const [tipoSolicitud, setTipoSolicitud] = useState("");
     const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
     const token = localStorage.getItem("token"); 
   const { usuario } = useContext(UsuarioContext); 
@@ -223,13 +223,13 @@ const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
         }
       }
     }, [formData.lineamiento]);
-
+  
 
  return (
   <div className="iniciar-solicitud-page">
-  <Sidebar tipoAcceso={usuario.FKidTipoAcceso} /> 
-    <main className="main-content-solicitud">
 
+    <main className="main-content-solicitud">
+<Sidebar tipoAcceso={usuario.FKidTipoAcceso} /> 
       
       {/* 🔹 Mensaje flotante */}
       {mensaje.texto && (
@@ -245,14 +245,30 @@ const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
           value={tipoSolicitud}
           onChange={(e) => setTipoSolicitud(e.target.value)}
         >
+            <option value="" disabled> Seleccionar tipo de solicitud</option>
           <option value="asignacion">Asignación</option>
           <option value="requisicion">Requisición</option>
           <option value="bolsa">Bolsa de Trabajo</option>
         </select>
       </div>
 
-      <form className="form-grid" onSubmit={handleSubmit}>
+    <div className="form-wrapper">
+
+        {tipoSolicitud === "" && (
+    <div className="glass-overlay-lock">
+      <div className="lock-content">
+        <FaUserLock className="lock-icon" />
+        <p>Selecciona un tipo de solicitud para continuar</p>
+      </div>
+    </div>
+  )}
+
+  <form className="form-grid" onSubmit={handleSubmit}>
+
         
+
+
+
 
         {/* Campos comunes para ambos tipos */}
                 <h3 className="section-title">Datos generales de la vacante</h3>
@@ -268,7 +284,14 @@ const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
                   handleInputChange('folio', e.target.value);
                   e.target.setCustomValidity('');
                 }}
-              />
+                disabled={tipoSolicitud === "asignacion"}                    
+                style={{
+                  backgroundColor: tipoSolicitud === "asignacion" ? '#e0e0e0' : 'white',
+                  color: 'black'
+                }}    
+                placeholder={tipoSolicitud === "asignacion" ? "Este campo está bloqueado para asignación" : ""}               
+                    
+              />              
             </div>
 
             <div className="form-group">
@@ -753,8 +776,10 @@ const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
       </div>
 
     </div>
+    
   ))}
 </div>
+
           </>
         )}
 
@@ -762,6 +787,10 @@ const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
             <button type="submit" className="btn-guardar-solicitud">Guardar</button>
           </div>
         </form>
+      </div>
+
+
+
       </main>
     </div>
   );
