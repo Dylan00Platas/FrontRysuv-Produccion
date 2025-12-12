@@ -9,7 +9,7 @@ import { PDFDocument, StandardFonts } from "pdf-lib";
 function VerDetallesOficio() {
   const { usuario } = useContext(UsuarioContext);
 
-  // Datos cargados desde sessionStorage (cuando el usuario seleccionó un oficio)
+
   const datos = JSON.parse(sessionStorage.getItem("detallesOficio") || "{}");
 
   const [formData, setFormData] = useState({
@@ -24,7 +24,7 @@ function VerDetallesOficio() {
 
 const handleGenerarPDF = async () => {
   try {
-    const pdfUrl = "/oficio_editable_final.pdf";  // 👉 Vite carga desde /public
+    const pdfUrl = "/oficioEditable.pdf";  
     const fontUrl = "/gill.TTF";
 
     const response = await fetch(pdfUrl);
