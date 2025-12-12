@@ -101,7 +101,7 @@ const handleGenerarPDF = async () => {
           <div className="form-group-solicitud">
             <label className="form-label-solicitud">Fecha del oficio</label>
             <input
-              type="date"
+              type="text"
               className="form-input-solicitud"
               value={formData.fechaOficio}
               readOnly
