@@ -9,6 +9,7 @@ const authService = new AuthService();
 
 function InicioSesion() {
   const navigate = useNavigate();
+
   const [usuario, setUsuario] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const [error, setError] = useState("");
@@ -44,27 +45,23 @@ function InicioSesion() {
         setError("Las credenciales son inválidas");
       }
     } catch (err) {
-
-      if (err instanceof TypeError && (err.message.includes("NetworkError") || err.message.includes("Failed to fetch"))) {
+      if (
+        err instanceof TypeError &&
+        (err.message.includes("NetworkError") ||
+          err.message.includes("Failed to fetch"))
+      ) {
         setError("Error de conexión: El servidor no está disponible.");
-
-      } else if (err && typeof err === 'object' && err.mensaje) {
+      } else if (err && typeof err === "object" && err.mensaje) {
         setError(err.mensaje);
-
-      } else if (err instanceof Error && err.message && !err.message.includes("[object Object]")) {
+      } else if (
+        err instanceof Error &&
+        err.message &&
+        !err.message.includes("[object Object]")
+      ) {
         setError(err.message);
-
       } else {
         setError("Las credenciales son inválidas");
       }
-    }
-  };
-
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleLogin();
     }
   };
 
@@ -72,9 +69,17 @@ function InicioSesion() {
     <div className="inicio-sesion-page">
       <div className="login-container">
         <h2>RySUV</h2>
-        <form onKeyDown={handleKeyDown}>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
+        >
           <input
             type="text"
+            name="username"
+            autoComplete="username"
             placeholder="Usuario"
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
@@ -84,33 +89,34 @@ function InicioSesion() {
           <div className="password-input-container-login">
             <input
               type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete="current-password"
               placeholder="Contraseña"
               value={contrasenia}
               onChange={(e) => setContrasenia(e.target.value)}
               required
               className="password-input-login"
             />
+
             <button
               type="button"
               className="password-toggle-login"
               onClick={togglePassword}
+              tabIndex={-1}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
 
-          <button type="button" onClick={handleLogin}>
-            Entrar
-          </button>
+          <button type="submit">Entrar</button>
         </form>
 
         {mensaje && <div className="alerta exito">{mensaje}</div>}
         {error && <div className="alerta error">{error}</div>}
 
         <div className="copyright">
-          ©  IconBle Team 2025
+          © Dyma Team 2025
         </div>
-
       </div>
     </div>
   );

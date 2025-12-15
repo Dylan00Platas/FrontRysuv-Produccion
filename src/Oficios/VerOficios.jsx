@@ -42,7 +42,7 @@ function VerOficios() {
           id: o.idOficio ?? idx,
           tipo: o.tipo || "Sin tipo",
           dirigido: o.dirigido || "Sin destinatario",
-          fecha: o.fecha ? o.fecha.substring(0, 10) : "Sin fecha",
+          fecha: o.fecha || "Sin fecha",
           folio: o.folio || "",
           machote: o.machote || "",
           piePagina: o.piePagina || "",

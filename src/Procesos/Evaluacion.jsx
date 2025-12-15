@@ -512,30 +512,33 @@ function Evaluacion() {
               </button>
 
 
-<button
-  type="button"
-  className="btn-crear-oficio"
-  onClick={() => {
-    const data = {
-      idProcesoContratacion: formData.idProcesoContratacion,
-      folio: formData.folio,
-      plaza: formData.numPlaza,
-      motivo: formData.motivo,
-      titularPlaza: formData.titular,
-      categoriaOrigen: formData.categoria,
-      categoriaAutorizada: formData.categoriaAutorizada,
-      candidato: formData.candidato
-    };
+{usuario.FKidTipoAcceso !== 2 && (
+  <button
+    type="button"
+    className="btn-crear-oficio"
+    onClick={() => {
+      const data = {
+        idProcesoContratacion: formData.idProcesoContratacion,
+        folio: formData.folio,
+        plaza: formData.numPlaza,
+        motivo: formData.motivo,
+        titularPlaza: formData.titular,
+        categoriaOrigen: formData.categoria,
+        categoriaAutorizada: formData.categoriaAutorizada,
+        candidato: formData.candidato
+      };
 
-   const token = localStorage.getItem("token");
-    sessionStorage.setItem("token", token || "");
-    sessionStorage.setItem("datosOficio", JSON.stringify(data));
+      const token = localStorage.getItem("token");
+      sessionStorage.setItem("token", token || "");
+      sessionStorage.setItem("datosOficio", JSON.stringify(data));
 
-    window.open("/generar-oficio", "_blank");
-  }}
->
-  Crear Oficio
-</button>
+      window.open("/generar-oficio", "_blank");
+    }}
+  >
+    Crear Oficio
+  </button>
+)}
+
 
 
 <button
@@ -834,12 +837,13 @@ function Evaluacion() {
                 Guardar
               </button>
 
-              <button
-  type="button"
-  className="btn-crear-oficio"
-  onClick={() =>
-    navigate("/generar-oficio", {
-      state: {
+          {usuario.FKidTipoAcceso !== 2 && (
+  <button
+    type="button"
+    className="btn-crear-oficio"
+    onClick={() => {
+      const data = {
+        idProcesoContratacion: formData.idProcesoContratacion,
         folio: formData.folio,
         plaza: formData.numPlaza,
         motivo: formData.motivo,
@@ -847,12 +851,19 @@ function Evaluacion() {
         categoriaOrigen: formData.categoria,
         categoriaAutorizada: formData.categoriaAutorizada,
         candidato: formData.candidato
-      }
-    })
-  }
->
-  Crear Oficio
-</button>
+      };
+
+      const token = localStorage.getItem("token");
+      sessionStorage.setItem("token", token || "");
+      sessionStorage.setItem("datosOficio", JSON.stringify(data));
+
+      window.open("/generar-oficio", "_blank");
+    }}
+  >
+    Crear Oficio
+  </button>
+)}
+
 
             </div>
           </form>
