@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "../Componentes/Sidebar";
 import { UsuarioContext } from "../Auxiliares/UsuarioContext.jsx";
-import { oficio51y52, oficio41y42, oficio43Licencia, oficioCita, oficio43Medica, copiaCarbon} from "../Auxiliares/Oficio51y52.js";
+import { oficio51y52, oficio41y42, oficio43Licencia, oficioCita, oficio43Medica, copiaCarbon } from "../Auxiliares/Oficio51y52.js";
 import SolicitudServicio from "../Servicios/SolicitudServicio.js";
 
 function GenerarOficio() {
@@ -12,76 +12,76 @@ function GenerarOficio() {
 
   const [tipoOficio, setTipoOficio] = useState(""); // ⬅ Nuevo estado
 
-const datosProceso = JSON.parse(sessionStorage.getItem("datosOficio") || "{}");
+  const datosProceso = JSON.parse(sessionStorage.getItem("datosOficio") || "{}");
 
 
-const solicitudServicio = new SolicitudServicio();
+  const solicitudServicio = new SolicitudServicio();
 
 
 
- const [formData, setFormData] = useState({
-  idProcesoContratacion: datosProceso.idProcesoContratacion || "",
-  folio: datosProceso.folio || "",
-  plaza: datosProceso.plaza || "",
-  motivo: datosProceso.motivo || "",
-  titularPlaza: datosProceso.titularPlaza || "",
-  categoriaOrigen: datosProceso.categoriaOrigen || "",
-  categoriaAutorizada: datosProceso.categoriaAutorizada || "",
-  candidato: datosProceso.candidato || "",
-   cuerpo: "",
-  copiaCarbon: ""  //
-  
-});
+  const [formData, setFormData] = useState({
+    idProcesoContratacion: datosProceso.idProcesoContratacion || "",
+    folio: datosProceso.folio || "",
+    plaza: datosProceso.plaza || "",
+    motivo: datosProceso.motivo || "",
+    titularPlaza: datosProceso.titularPlaza || "",
+    categoriaOrigen: datosProceso.categoriaOrigen || "",
+    categoriaAutorizada: datosProceso.categoriaAutorizada || "",
+    candidato: datosProceso.candidato || "",
+    cuerpo: "",
+    copiaCarbon: ""  //
+
+  });
 
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-useEffect(() => {
-  let texto = "";
+  useEffect(() => {
+    let texto = "";
 
-  if (tipoOficio === "5.1 y 5.2") {
-    texto = oficio51y52(formData);
-  }
+    if (tipoOficio === "5.1 y 5.2") {
+      texto = oficio51y52(formData);
+    }
 
-  if (tipoOficio === "4.1 y 4.2") {
-    texto = oficio41y42(formData);
-  }
-
-
-   if (tipoOficio === "4.3(Licencia)") {
-    texto = oficio43Licencia(formData);
-  }
+    if (tipoOficio === "4.1 y 4.2") {
+      texto = oficio41y42(formData);
+    }
 
 
+    if (tipoOficio === "4.3 (Licencia)") {
+      texto = oficio43Licencia(formData);
+    }
 
-   if (tipoOficio === "4.3(Medica)") {
-    texto = oficio43Medica(formData);
-  }
 
-   if (tipoOficio === "Cita") {
-    texto = oficioCita(formData);
-  }
 
-  if (texto) {
-    setFormData(prev => ({ ...prev, cuerpo: texto }));
-  }
+    if (tipoOficio === "4.3 (Medica)") {
+      texto = oficio43Medica(formData);
+    }
 
-  if (formData.copiaCarbon.trim() === "") {
-  setFormData(prev => ({ ...prev, copiaCarbon: copiaCarbon() }));
-}
+    if (tipoOficio === "Cita") {
+      texto = oficioCita(formData);
+    }
 
-}, [
-  tipoOficio,
-  formData.folio,
-  formData.plaza,
-  formData.motivo,
-  formData.titularPlaza,
-  formData.categoriaOrigen,
-  formData.categoriaAutorizada,
-  formData.candidato
-]);
+    if (texto) {
+      setFormData(prev => ({ ...prev, cuerpo: texto }));
+    }
+
+    if (formData.copiaCarbon.trim() === "") {
+      setFormData(prev => ({ ...prev, copiaCarbon: copiaCarbon() }));
+    }
+
+  }, [
+    tipoOficio,
+    formData.folio,
+    formData.plaza,
+    formData.motivo,
+    formData.titularPlaza,
+    formData.categoriaOrigen,
+    formData.categoriaAutorizada,
+    formData.candidato
+  ]);
 
 
 
@@ -90,45 +90,45 @@ useEffect(() => {
 
   /* ======================================================================== */
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-      
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const datosBackend = {
-      FKIdProcesoContratacion: formData.idProcesoContratacion,
-      folio: formData.folioOficio,
-      fecha: formData.fechaOficio,
-      dirigido: formData.destinatario,
-      puestoDirigido: formData.puestoDestinatario,
-      machote: formData.cuerpo,
-      piePagina: formData.copiaCarbon,
-      tipo: tipoOficio
-    };
-    const token = sessionStorage.getItem("token");
-    const respuesta = await solicitudServicio.registrarOficio(datosBackend, token);
-    
 
-    console.log("Respuesta backend:", respuesta);
+    try {
+      const datosBackend = {
+        FKIdProcesoContratacion: formData.idProcesoContratacion,
+        folio: formData.folioOficio,
+        fecha: formData.fechaOficio,
+        dirigido: formData.destinatario,
+        puestoDirigido: formData.puestoDestinatario,
+        machote: formData.cuerpo,
+        piePagina: formData.copiaCarbon,
+        tipo: tipoOficio
+      };
+      const token = sessionStorage.getItem("token");
+      const respuesta = await solicitudServicio.registrarOficio(datosBackend, token);
 
-    setMensaje({
-      texto: "✅ Oficio guardado correctamente",
-      tipo: "exito",
-    });
 
-    setTimeout(() => {
-      setMensaje({ texto: "", tipo: "" });
-    }, 2500);
+      console.log("Respuesta backend:", respuesta);
 
-  } catch (error) {
-    console.error("Error al registrar oficio", error);
+      setMensaje({
+        texto: "✅ Oficio guardado correctamente",
+        tipo: "exito",
+      });
 
-    setMensaje({
-      texto: "❌ Error al guardar el oficio",
-      tipo: "error",
-    });
-  }
-};
+      setTimeout(() => {
+        setMensaje({ texto: "", tipo: "" });
+      }, 2500);
+
+    } catch (error) {
+      console.error("Error al registrar oficio", error);
+
+      setMensaje({
+        texto: "❌ Error al guardar el oficio",
+        tipo: "error",
+      });
+    }
+  };
 
 
 
@@ -161,9 +161,10 @@ const handleSubmit = async (e) => {
               <option value="">Seleccione una opción</option>
               <option value="5.1 y 5.2">5.1 y 5.2</option>
               <option value="4.1 y 4.2">4.1 y 4.2</option>
-               <option value="4.3(Licencia)">4.3 (Licencia)</option>
-               <option value="4.3(Medica)">4.3(Médica)</option>
-                <option value="Cita">Cita</option>
+              <option value="4.3 (Licencia)">4.3 (Licencia)</option>
+              <option value="4.3 (Medica)">4.3 (Médica)</option>
+              <option value="Cita">Cita</option>
+              <option value="Otros">Otros</option>
 
 
             </select>
@@ -303,13 +304,13 @@ const handleSubmit = async (e) => {
               onChange={(e) => handleInputChange("copiaCarbon", e.target.value)}
             />
           </div>
-
-          <div className="form-group-solicitud" style={{ gridColumn: "span 3", textAlign: "center" }}>
-            <button type="submit" className="btn-guardar">
-              Guardar
-            </button>
+          <div className="action-buttons">
+            <div className="form-group-solicitud" style={{ gridColumn: "span 3", textAlign: "center" }}>
+              <button type="submit" className="btn-guardar">
+                Guardar
+              </button>
+            </div>
           </div>
-
         </form>
       </main>
     </div>

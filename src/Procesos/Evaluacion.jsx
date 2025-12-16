@@ -865,6 +865,28 @@ function Evaluacion() {
 )}
 
 
+<button
+  type="button"
+  className="btn-ver-oficios"
+  onClick={() => {
+    const idProceso = formData.idProcesoContratacion;
+    const token = localStorage.getItem("token") || "";
+
+    // Guardar en sessionStorage
+    sessionStorage.setItem("token", token);
+    sessionStorage.setItem(
+      "datosVerOficios",
+      JSON.stringify({ idProceso })
+    );
+
+    // Abrir nueva pestaña / ventana
+    window.open("/ver-oficios", "_blank");
+  }}
+>
+  Ver Oficios
+</button>
+
+
             </div>
           </form>
         )}
