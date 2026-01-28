@@ -1,4 +1,4 @@
-import { FaAddressCard, FaChartBar, FaEnvelope, FaSearch, FaUser, FaGlobeAmericas, FaRegCalendarAlt, FaFileUpload } from "react-icons/fa";
+import { FaAddressCard, FaChartBar, FaEnvelope, FaSearch, FaUser, FaGlobeAmericas, FaRegCalendarAlt, FaFileUpload,FaTasks  } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 import { MdAddBox, MdAssignment } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ function Sidebar({ tipoAcceso }) {
   const irCedulas = () => navigate("/cedulas");
   const irMenu = () => navigate("/menu");
   const irAgenda = () => navigate("/agenda");
-
+  const irSeguimientoHermes = () => navigate("/seguimiento-hermes");
 
 
 
@@ -55,7 +55,8 @@ function Sidebar({ tipoAcceso }) {
             <li onClick={irPanorama}><FaGlobeAmericas class="icon" />   Panorama</li>
             <li onClick={irNoBeneficiados}><FaAddressCard className="icon" /> No Beneficiados</li>
             <li onClick={irUsuarios}><FaUser className="icon" /> Usuarios</li>
-             <li onClick={irAgenda}><FaRegCalendarAlt className="icon" /> Agenda</li>
+            <li onClick={irAgenda}><FaRegCalendarAlt className="icon" /> Agenda</li>
+            <li onClick={irSeguimientoHermes}><FaTasks className="icon"/> Seguimiento Hermes</li>
           
 
           </>

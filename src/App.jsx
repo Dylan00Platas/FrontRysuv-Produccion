@@ -25,6 +25,7 @@ import { useEffect } from "react";
 import Panorama from "./Panorama/Panorama.jsx";
 import VerOficios from "./Oficios/VerOficios.jsx";
 import VerDetallesOficio from "./Oficios/VerDetallesOficio.jsx";
+import SeguimientoHermes from "./SeguimientoHermes/SeguimientoHermes.jsx";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -57,6 +58,7 @@ function AnimatedRoutes() {
         <Route path="/generar-oficio" element={<GenerarOficio/>} />
         <Route path="/ver-oficios" element={<VerOficios/>} />
         <Route path="/ver-detalles-oficio" element={<VerDetallesOficio/>} />
+        <Route path="/seguimiento-hermes" element={<SeguimientoHermes/>} />
 
 
       </Routes>

@@ -85,7 +85,7 @@ return (
             <p className="linea1">Secretaría de Administración y Finanzas</p>
             <p className="linea2">Dirección General de Recursos Humanos</p>
             <p className="linea3">Departamento de Evaluación y Desarrollo de Personal</p>
-            <p className="linea4">Oficina de Evaluación y Proyectos de Recursos Humanos</p>
+            <p className="linea3">Oficina de Evaluación y Proyectos de Recursos Humanos</p>
           </div>
         </div>
       </main>
