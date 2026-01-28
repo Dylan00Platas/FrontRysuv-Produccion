@@ -52,13 +52,11 @@ function Sidebar({ tipoAcceso }) {
             <li onClick={irProcesos}><FaSearch className="icon" />  Evaluaciones</li>
             <li onClick={irCedulas}><MdAssignment className="icon" /> Cédulas</li>
             <li onClick={irEstadisticas}><FaChartBar className="icon" /> Estadísticas</li>
-            <li onClick={irPanorama}><FaGlobeAmericas class="icon" />   Panorama</li>
+            <li onClick={irPanorama}><FaGlobeAmericas className="icon" />   Panorama</li>
             <li onClick={irNoBeneficiados}><FaAddressCard className="icon" /> No Beneficiados</li>
             <li onClick={irUsuarios}><FaUser className="icon" /> Usuarios</li>
             <li onClick={irAgenda}><FaRegCalendarAlt className="icon" /> Agenda</li>
             <li onClick={irSeguimientoHermes}><FaTasks className="icon"/> Seguimiento Hermes</li>
-          
-
           </>
         )}
 
@@ -81,15 +79,15 @@ function Sidebar({ tipoAcceso }) {
             <li onClick={irCedulas}><MdAssignment className="icon" /> Cédulas</li>
             <li onClick={irEstadisticas}><FaChartBar className="icon" /> Estadísticas</li>
             <li onClick={irNoBeneficiados}><FaAddressCard className="icon" /> No Beneficiados</li>
-            <li onClick={irPanorama}><FaGlobeAmericas class="icon" />   Panorama</li>
-             <li onClick={irAgenda}><FaRegCalendarAlt className="icon" /> Agenda</li>
-
+            <li onClick={irPanorama}><FaGlobeAmericas className="icon" />   Panorama</li>
+            <li onClick={irAgenda}><FaRegCalendarAlt className="icon" /> Agenda</li>
+            <li onClick={irSeguimientoHermes}><FaTasks className="icon"/> Seguimiento Hermes</li>
           </>
         )}
 
          {tipoAcceso === 4 && (
           <>
-                      <li onClick={irPanorama}><FaGlobeAmericas class="icon" />   Panorama</li>
+                      <li onClick={irPanorama}><FaGlobeAmericas className="icon" />   Panorama</li>
 
             <li onClick={irIniciarSolicitud}><MdAddBox className="icon" /> Iniciar Solicitud</li>
             <li onClick={irSolicitudes}><FaEnvelope className="icon" /> Ver Solicitudes</li>
@@ -97,6 +95,7 @@ function Sidebar({ tipoAcceso }) {
             <li onClick={irCedulas}><MdAssignment className="icon" /> Cédulas</li>
             <li onClick={irEstadisticas}><FaChartBar className="icon" /> Estadísticas</li>
             <li onClick={irNoBeneficiados}><FaAddressCard className="icon" /> No Beneficiados</li>
+            <li onClick={irSeguimientoHermes}><FaTasks className="icon"/> Seguimiento Hermes</li>
           </>
         )}
       </ul>

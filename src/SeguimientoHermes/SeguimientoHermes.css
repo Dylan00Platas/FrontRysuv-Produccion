@@ -139,3 +139,20 @@
 }
 
 
+.fila-filtros select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-size: 12px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  background-color: white;
+}
+
+.col-folio {
+  width: 300px;       /* Ajusta el ancho como quieras */
+}
+
+.col-folio input {
+  white-space: nowrap; /* Evita que el folio se rompa en varias líneas */
+}

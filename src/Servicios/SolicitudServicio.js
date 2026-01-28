@@ -398,4 +398,51 @@ async obtenerOficiosPorProceso(FKIdProcesoContratacion, token) {
     }
 }
 
+    async registrarSeguimientoHermes(registros, token) {
+        try {
+            const datos = registros.map(r => ({
+            folio: r.Folio,
+            fechaRecepcion: r["Fecha de Recepción"],
+            importancia: r.Importancia,
+            tipoEnvio: r["Tipo de Envío"],
+            requiereRespuesta: r["Requiere Respuesta"] === "Sí",
+            solicita: r.Solicita,
+            entidadDependencia: r["Entidad/Dependencia"],
+            asunto: r.Asunto,
+            estatus: r.Estatus,
+            acciones: r.Acciones
+            }));
+
+            const datosLimpios = datos.map(d => this.limpiarDatos(d));
+
+            return await this.api.request(
+            "/procesoContratacion/seguimiento-hermes",
+            "POST",
+            { registros: datosLimpios },
+            token
+            );
+        } catch (err) {
+            console.error("Error en registrarSeguimientoHermes:", err);
+            throw err;
+        }
+    }
+
+    async obtenerTodosSeguimientoHermes(token) {
+        try{
+            const response = await this.api.request(
+                "/procesoContratacion/obtencion-seguimiento-hermes",
+                "GET",
+                null,
+                token
+            );
+            if (!response || response.error) {
+                throw new Error(response?.mensaje || "Error al obtener los seguimientos Hermes");
+            }
+            return response.seguimientos || response; 
+        }catch(error){
+            console.error("Error en obtenerTodosSeguimientoHermes:", error);
+            throw error;
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ import Sidebar from "../Componentes/Sidebar";
 import { UsuarioContext } from "../Auxiliares/UsuarioContext.jsx";
 import "./SeguimientoHermes.css";
 import { FaSearch } from "react-icons/fa";
+import SolicitudServicio from "../Servicios/SolicitudServicio.js";
 
 
 const columnas = [
@@ -22,6 +23,20 @@ function SeguimientoHermes() {
   const { usuario } = useContext(UsuarioContext);
   const [registros, setRegistros] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const solicitudServicio = new SolicitudServicio();
+  const mapearRegistro = (r) => ({
+    folio: r.Folio,
+    fechaRecepcion: r["Fecha de Recepción"],
+    importancia: r.Importancia,
+    tipoEnvio: r["Tipo de Envío"],
+    requiereRespuesta: r["Requiere Respuesta"],
+    solicita: r.Solicita,
+    entidadDependencia: r["Entidad/Dependencia"],
+    asunto: r.Asunto,
+    estatus: r.Estatus,
+    acciones: r.Acciones
+  });
+
   
  const [filtros, setFiltros] = useState(
   columnas.reduce((acc, col) => {
@@ -51,22 +66,36 @@ const getOpcionesColumna = (col) => {
 };
 
   useEffect(() => {
-    // Datos de ejemplo
-    setRegistros([
-      {
-        Folio: "F001",
-        "Fecha de Recepción": "2026-01-27",
-        Importancia: "Alta",
-        "Tipo de Envío": "Correo",
-        "Requiere Respuesta": "Sí",
-        Solicita: "Juan Pérez",
-        "Entidad/Dependencia": "UV - Administración",
-        Asunto: "Solicitud de Información",
-        Estatus: "Pendiente",
-        Acciones: "Revisar"
+    const cargarSeguimientoHermes = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const data = await solicitudServicio.obtenerTodosSeguimientoHermes(token);
+
+        // 🔹 Adaptar backend → tabla
+        const registrosMapeados = data.map(r => ({
+          "Folio": r.folio ?? "",
+          "Fecha de Recepción": r.fechaRecepcion ?? "",
+          "Importancia": r.importancia ?? "",
+          "Tipo de Envío": r.tipoEnvio ?? "",
+          "Requiere Respuesta": r.requiereRespuesta ? "Sí" : "No",
+          "Solicita": r.solicita ?? "",
+          "Entidad/Dependencia": r.entidadDependencia ?? "",
+          "Asunto": r.asunto ?? "",
+          "Estatus": r.estatus ?? "",
+          "Acciones": r.acciones ?? ""
+        }));
+
+        setRegistros(registrosMapeados);
+      } catch (error) {
+        console.error("Error al cargar Seguimiento Hermes:", error);
+        alert("No se pudieron cargar los registros de Seguimiento Hermes");
       }
-    ]);
+    };
+
+    cargarSeguimientoHermes();
   }, []);
+
+
 
   const handleChange = (rowIndex, colName, value) => {
     const nuevos = [...registros];
@@ -118,14 +147,12 @@ const getOpcionesColumna = (col) => {
   };
 
   const registrosFiltrados = registros.filter((reg) => {
-  // 🔎 BÚSQUEDA GENERAL
   const coincideBusqueda =
     searchTerm.trim() === "" ||
     columnas.some((col) =>
       reg[col]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
-
-  // 🎛️ FILTROS POR COLUMNA
+    
   const coincideFiltros = columnas.every((col) => {
     if (columnasSinFiltro.includes(col)) return true;
     if (filtros[col] === "Todos") return true;
@@ -143,6 +170,22 @@ const getOpcionesColumna = (col) => {
     }, {});
     setFiltros(filtrosReset);
   };
+
+  const handleGuardarTodos = async () => {
+    const token= localStorage.getItem("token");
+    try {
+      await solicitudServicio.registrarSeguimientoHermes(
+        registros,
+        token
+      );
+      alert("Registros guardados correctamente");
+    } catch (err) {
+      console.error(err);
+      alert("Error al guardar registros");
+    }
+  };
+
+
 
 
   return (
@@ -167,13 +210,9 @@ const getOpcionesColumna = (col) => {
             </div>
           </div>
             <div className="seguimiento-actions">
-              <button
-                className="btn-guardar"
-                onClick={() => alert(JSON.stringify(registros, null, 2))}
-              >
+              <button className="btn-guardar" onClick={handleGuardarTodos}>
                 Guardar Todos
               </button>
-
               <button
                 className="btn-limpiar"
                 onClick={limpiarFiltros}
@@ -188,7 +227,9 @@ const getOpcionesColumna = (col) => {
            <thead>
                 <tr>
                     {columnas.map((col) => (
-                    <th key={col}>{col}</th>
+                      <th key={col} className={col === "Folio" ? "col-folio" : ""}>
+                        {col}
+                      </th>
                     ))}
                 </tr>
 
@@ -218,26 +259,22 @@ const getOpcionesColumna = (col) => {
             {registrosFiltrados.map((reg, rowIndex) => (
                 <tr key={rowIndex}>
                 {columnas.map((col) => (
-                    <td key={col}>
-                      {["Asunto", "Acciones"].includes(col) ? (
-                        <textarea
-                          value={reg[col]}
-                          onChange={(e) =>
-                            handleChange(rowIndex, col, e.target.value)
-                          }
-                          className="celda-multilinea"
-                          rows={1}
-                        />
-                      ) : (
-                        <input
-                          type="text"
-                          value={reg[col]}
-                          onChange={(e) =>
-                            handleChange(rowIndex, col, e.target.value)
-                          }
-                        />
-                      )}
-                    </td>
+                  <td key={col} className={col === "Folio" ? "col-folio" : ""}>
+                    {["Asunto", "Acciones"].includes(col) ? (
+                      <textarea
+                        value={reg[col]}
+                        onChange={(e) => handleChange(rowIndex, col, e.target.value)}
+                        className="celda-multilinea"
+                        rows={1}
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        value={reg[col]}
+                        onChange={(e) => handleChange(rowIndex, col, e.target.value)}
+                      />
+                    )}
+                  </td>
                 ))}
                 </tr>
             ))}
