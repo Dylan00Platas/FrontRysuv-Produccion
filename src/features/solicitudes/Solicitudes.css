@@ -1,0 +1,198 @@
+.solicitudes-page {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  font-family: "Kulim Park", sans-serif;
+  background: #fff;
+  overflow: hidden;
+}
+
+.page-header2 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0; /* quitar padding extra */
+  width: 100%;
+  max-width: 1200px; /* igual que tabla y filtros */
+  margin-left: auto; /* centrar el bloque dentro de main-content */
+  margin-right: auto;
+  margin-bottom: 5%;
+}
+
+.page-title2 {
+  font-size: clamp(30px, 5vw, 50px);
+  font-weight: 200;
+  color: #000;
+  font-family: "Kulim Park";
+  margin: 0; /* quitar márgenes por defecto */
+}
+/* Sidebar igual a otros módulos */
+.sidebar {
+  width: clamp(180px, 15vw, 240px);
+  background: linear-gradient(to bottom, #01317a, #0265c9, #006eff);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(0.8rem, 1.5vw, 1.2rem);
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.titulo {
+  font-size: clamp(1rem, 1.2vw, 1.3rem);
+  margin-bottom: clamp(1rem, 2vw, 2rem);
+}
+
+.logout {
+  background: none;
+  border: none;
+  color: white;
+  font-size: clamp(1rem, 1.1vw, 1.2rem);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  padding: clamp(0.5rem, 1vw, 0.7rem);
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+.logout:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Contenido principal */
+.main-content {
+  margin-left: clamp(180px, 15vw, 240px);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  width: calc(100vw - clamp(180px, 15vw, 240px));
+  overflow-y: auto;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* <-- aquí cambiamos */
+}
+
+.page-title {
+  font-size: clamp(20px, 2.2vw, 32px);
+  font-weight: 700;
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+  color: #000;
+  align-self: flex-start;
+  margin-left: -6% !important;
+}
+
+/*  Barra de filtros */
+.filtros-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+  gap: clamp(0.8rem, 1.5vw, 1.2rem);
+  width: 100%;
+  max-width: 1200px;
+}
+
+.filtro-estado {
+  flex: 1;
+  min-width: 200px;
+  max-width: 25%;
+}
+
+.filtro-busqueda {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 30%;
+  min-width: 220px;
+}
+
+.filtro-busqueda input {
+  padding: clamp(6px, 1vw, 10px) clamp(10px, 1vw, 14px) clamp(6px, 1vw, 10px)
+    32px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: clamp(12px, 1vw, 15px);
+  width: 100%;
+  transition: border 0.3s ease;
+}
+
+.filtro-busqueda input:focus {
+  border-color: #18529d;
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: #18529d;
+  font-size: clamp(12px, 1vw, 15px);
+}
+
+/*  Tabla */
+.tabla-solicitudes {
+  width: 100%;
+  max-width: 1200px;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  font-size: clamp(14px, 1.2vw, 20px);
+}
+
+.tabla-solicitudes th,
+.tabla-solicitudes td {
+  padding: clamp(8px, 1vw, 14px) clamp(10px, 1vw, 16px);
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.tabla-solicitudes th {
+  background: #199532;
+  color: #fff;
+  font-weight: 600;
+}
+
+.tabla-solicitudes tr:hover {
+  background: #f9f9f9;
+}
+
+.tabla-solicitudes tr:last-child td {
+  border-bottom: none;
+}
+
+/*  Responsivo */
+@media (max-width: 900px) {
+  .filtros-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filtro-estado,
+  .filtro-busqueda {
+    max-width: 100%;
+  }
+}
+
+.mensaje-vacio-container {
+  text-align: center;
+  margin-top: 50px;
+  padding: 40px;
+  background-color: #f8f9fa; /* Un fondo gris muy claro */
+  border: 1px dashed #199532; /* Un borde punteado sutil */
+  border-radius: 8px; /* Bordes redondeados */
+  color: #6c757d; /* Un color de texto más suave */
+}
+
+.mensaje-vacio-container h2 {
+  margin-top: 0;
+  color: #18529d; /* Un color más oscuro para el título */
+}

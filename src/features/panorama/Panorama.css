@@ -1,0 +1,191 @@
+.panorama-page {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  font-family: "Kulim Park", sans-serif;
+  background: #fff;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  padding: 3% 4%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.main-content-inner {
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Separador entre secciones */
+.section-divider {
+  border: none;
+  border-top: 2px solid #ccc;
+  margin: 2rem 0;
+  width: 100%;
+}
+
+/* Tablas */
+.tabla-panorama {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  font-size: 1vw;
+  margin-bottom: 1rem;
+}
+
+.tabla-panorama th,
+.tabla-panorama td {
+  padding: 1% 1.5%;
+  text-align: left;
+}
+
+.tabla-panorama th {
+  background: #199532;
+  color: #fff;
+  font-weight: 600;
+}
+
+.tabla-panorama tr:hover {
+  background: #f9f9f9;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .tabla-panorama {
+    font-size: 2.5vw;
+  }
+}
+/*  Botones flotantes de navegación */
+.floating-buttons {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.floating-buttons button {
+  background-color: #18529d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease-in-out;
+  font-family: "Kulim Park", sans-serif;
+}
+
+.floating-buttons button:hover {
+  background-color: #123c72;
+  transform: scale(1.05);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .floating-buttons {
+    flex-direction: row;
+    top: auto;
+    bottom: 15px;
+    right: 50%;
+    transform: translateX(50%);
+  }
+
+  .floating-buttons button {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+}
+
+.boton-guardar,
+.boton-exportar {
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Kulim Park", sans-serif;
+  transition: 0.2s;
+}
+
+.boton-guardar:hover {
+  background-color: #007bff;
+}
+
+.boton-exportar {
+  background-color: #008000;
+}
+
+.boton-exportar:hover {
+  background-color: #00a000;
+}
+
+.estado-badge {
+  display: inline-block;
+
+  padding: 4px 10px;
+
+  border-radius: 12px;
+
+  font-size: 0.85em;
+
+  font-weight: 600;
+
+  text-transform: capitalize;
+
+  color: #fff;
+}
+
+.estado-badge.citado {
+  background-color: #3498db;
+}
+
+.estado-badge.evaluado {
+  background-color: #199532;
+}
+
+.estado-badge.enprocesamiento {
+  background-color: #a244f0;
+}
+
+.estado-badge.enrevisión {
+  background-color: #e67e22;
+}
+
+.estado-badge.enfirma {
+  background-color: #3416a0;
+}
+
+.estado-badge.notificado {
+  background-color: rgb(189, 23, 87);
+}
+
+.estado-badge.cancelado {
+  background-color: #e74c3c;
+}
+
+.estado-badge.terminado {
+  background-color: #7f8c8d;
+}
+
+.estado-badge.poriniciar {
+  background-color: #f1c40f;
+  color: #000;
+}
+
+.proceso-row {
+  transition: background 0.3s ease;
+}

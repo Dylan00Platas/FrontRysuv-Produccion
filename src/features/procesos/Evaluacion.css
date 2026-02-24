@@ -1,0 +1,437 @@
+.evaluacion-page {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  font-family: "Kulim Park", sans-serif;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.main-content-evaluacion {
+  flex: 1;
+  padding: 3% 5%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-left: 15%; /* deja espacio para el sidebar */
+}
+
+.page-header-evaluacion {
+  display: flex;
+  justify-content: space-between; /* título a la izq, combo a la der */
+  align-items: center; /* los centra verticalmente en la misma línea */
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.page-title-evaluacion {
+  font-size: clamp(45px, 3vw, 50px);
+  font-weight: 300;
+  color: #000;
+  margin: 0; /* elimina márgenes extra */
+}
+
+.page-header {
+  position: relative; /* permite posicionamiento relativo de los hijos */
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1%;
+  top: 2%; /* distancia desde la parte superior del contenedor en % */
+  left: -4%; /* se mantiene alineado a la izquierda */
+  margin: 0;
+}
+
+.label-opcion-evaluacion {
+  font-size: 2.5rem;
+  font-weight: 200;
+  color: #18529d;
+  text-transform: capitalize;
+  margin-left: 5px;
+}
+
+.page-titleEvaluacion {
+  font-size: 50px;
+  font-weight: 100;
+  margin-bottom: 40px;
+  color: #000;
+  letter-spacing: 0.5px;
+  margin-bottom: 1%;
+  top: 2%; /* distancia desde la parte superior del contenedor en % */
+  left: -3%; /* se mantiene alineado a la izquierda */
+  margin: 0;
+}
+
+.combo-header-evaluacion {
+  width: clamp(150px, 15vw, 250px);
+  height: clamp(32px, 3vh, 40px);
+  padding: 0.5vh 1vw;
+  font-size: clamp(13px, 1vw, 16px);
+  border: 1px solid #b0b0b0;
+  border-radius: 4px;
+  background: #fff;
+  color: #000;
+  transition: all 0.2s ease-in-out;
+}
+
+.section-title {
+  grid-column: span 3;
+  font-size: 20px;
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #18529d;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px 30px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label-evaluacion {
+  font-size: clamp(13px, 1.2vw, 18px);
+  font-weight: 400;
+  margin-bottom: 6px;
+  color: #000;
+}
+
+.form-input,
+textarea {
+  width: 100%;
+  min-width: 230px;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background: #fff;
+  color: #000;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+textarea:focus {
+  border-color: #18529d;
+  box-shadow: 0 4px 10px rgba(24, 82, 157, 0.15);
+}
+
+textarea.large-textarea {
+  width: 90%;
+  height: 100px;
+  resize: vertical;
+}
+
+.action-buttons {
+  grid-column: span 3;
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-guardar,
+.btn-continuar,
+.btn-retroceder {
+  width: 160px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-guardar {
+  background-color: #199532;
+  color: #fff;
+}
+
+.btn-guardar:hover {
+  background-color: #147a28;
+}
+
+.btn-retroceder,
+.btn-continuar {
+  background-color: #721995;
+  color: #fff;
+}
+
+.btn-retroceder:hover,
+.btn-continuar:hover {
+  background-color: #420d57;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center; /* el checkbox se queda alineado */
+  gap: 6px;
+}
+
+.checkbox-label {
+  position: relative;
+  top: -50px;
+  right: -60px;
+}
+
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 15px 0;
+  }
+  .action-buttons {
+    justify-content: center;
+  }
+}
+
+.form-input-evaluacion,
+textarea {
+  width: 100%;
+  height: clamp(32px, 3vh, 45px); /* altura flexible */
+  min-width: 220px;
+  padding: 0.5vh 1vw;
+  font-size: clamp(12px, 1vw, 16px); /* tamaño del texto según pantalla */
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  background: #fff;
+  color: #000;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+textarea.large-textarea {
+  width: 100%;
+  max-width: 60vw; /* límite para pantallas grandes */
+  height: clamp(90px, 12vh, 160px); /* altura dinámica */
+  padding: 0.5vh 1vw;
+  font-size: clamp(12px, 1vw, 16px);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.identificador-candidato-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: #18529d;
+  border: 2px solid #bbd3f5;
+  border-radius: 8px;
+  width: 20%;
+}
+
+.identificador-candidato-label {
+  font-weight: bold;
+  color: #fff;
+  margin-right: 10px;
+}
+
+.identificador-candidato-valor {
+  color: #fff;
+  font-family: monospace;
+  font-size: 1.1rem;
+}
+
+.full-row {
+  grid-column: span 3;
+}
+
+/* === BOTÓN INLINE === */
+/* Botón fijo en esquina inferior derecha */
+.btn-version-control-fixed {
+  position: fixed;
+  bottom: 20px; /* a la misma altura que los action-buttons */
+  right: 20px;
+  display: flex;
+  width: 50px;
+  align-items: center;
+  gap: 8px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  z-index: 1000; /* que quede sobre otros elementos */
+}
+
+.btn-version-control-fixed:hover {
+  background-color: #218838;
+  transform: scale(1.03);
+}
+
+.icono-reloj {
+  font-size: 1.2rem;
+}
+/* Fondo oscuro translúcido */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+/* Contenedor principal del popup */
+.popup-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 16px;
+  width: 70%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Tarjeta JSON mejorada */
+.json-card {
+  background-color: #fefefe;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border-left: 5px solid #18529d;
+}
+
+/* Lista legible de campos */
+.json-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.json-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #e0e0e0;
+  font-family: "Kulim Park", sans-serif;
+  font-size: 0.95rem;
+}
+
+.json-list li:last-child {
+  border-bottom: none;
+}
+
+/* Clave en negrita y color */
+.json-key {
+  font-weight: 600;
+  color: #18529d;
+  margin-right: 10px;
+}
+
+/* Valor con color neutro */
+.json-value {
+  color: #333;
+  text-align: right;
+}
+
+/* Encabezado de cada tarjeta */
+.json-card h4 {
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000;
+}
+
+/* Formato legible del JSON */
+.json-pretty {
+  background-color: #dfdfdf;
+  color: #000000;
+  padding: 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "kulim park", monospace;
+  font-size: 0.9rem;
+}
+
+/* Botón cerrar */
+.btn-cerrar-popup {
+  margin-top: 15px;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-cerrar-popup:hover {
+  background-color: #c9302c;
+}
+
+/* Animación entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.json-card {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.json-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.btn-crear-oficio {
+  background-color: #18529d;
+  width: 160px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-crear-oficio:hover {
+  background-color: #133c72;
+}
+
+.btn-ver-oficios {
+  background-color: #189d5f;
+  width: 160px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-ver-oficios:hover {
+  background-color: #147447;
+}

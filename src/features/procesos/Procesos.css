@@ -1,0 +1,313 @@
+.procesos-page {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  font-family: "Kulim Park", sans-serif;
+  background: #fff;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1; /* ocupa todo el espacio restante al sidebar */
+  padding: 3% 4%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centra todo horizontalmente */
+}
+
+.alert-icon {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.alert-icon.orange {
+  color: orange;
+  animation: pulse 1.5s infinite;
+}
+
+.alert-icon.red {
+  color: red;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.main-content-inner {
+  width: 100%;
+  max-width: 1200px; /* ancho máximo igual que la cédula */
+}
+
+.page-title {
+  font-size: clamp(
+    24px,
+    2.5vw,
+    36px
+  ); /* escala proporcionalmente, límite mínimo y máximo */
+  font-weight: 700;
+  margin-bottom: 2%;
+  color: #000;
+  align-self: flex-start; /* mantiene el título alineado a la izquierda */
+}
+
+/*  Barra de filtros */
+.filtros-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  margin-bottom: 2%;
+  gap: 2%;
+}
+
+.filtro-analista {
+  flex: 1;
+  min-width: 200px;
+  max-width: 25%;
+}
+
+.filtro-busqueda {
+  flex: 2; /* ← aumenta el espacio ocupado */
+  min-width: 300px;
+  max-width: 50%; /* ← puede usar hasta la mitad del contenedor */
+}
+
+.filtro-busqueda input {
+  width: 100%;
+  padding: 8px 12px 8px 36px;
+  font-size: 1vw;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border 0.3s ease;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 1.2vw;
+  color: #18529d;
+}
+
+/*  Tabla */
+.tabla-procesos {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  font-size: 1vw;
+}
+
+.tabla-procesos th,
+.tabla-procesos td {
+  padding: 1% 1.5%;
+  text-align: left;
+}
+
+.tabla-procesos th {
+  background: #199532;
+  color: #fff;
+  font-weight: 600;
+}
+
+.tabla-procesos tr:hover {
+  background: #f9f9f9;
+}
+
+/*  Responsivo */
+@media (max-width: 1200px) {
+  .page-title {
+    font-size: 3vw;
+  }
+  .filtros-bar {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .filtro-analista,
+  .filtro-busqueda {
+    max-width: 100%;
+  }
+  .tabla-procesos {
+    font-size: 2vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 5vw;
+  }
+  .tabla-procesos th,
+  .tabla-procesos td {
+    padding: 8px 10px;
+  }
+}
+
+.filtros-combobox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5%;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.filtros-combobox > div {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filtros-combobox label {
+  font-size: clamp(12px, 1vw, 15px);
+  font-weight: 600;
+  color: #18529d;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.search-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 7.5%;
+  width: 100%;
+}
+
+.search-input-container input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/*  Fila con franja de color lateral */
+
+.proceso-row {
+  position: relative;
+  background: #fff;
+  transition: background 0.3s ease;
+}
+
+.proceso-row:hover {
+  background: #f9f9f9;
+}
+
+.estado-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: #fff;
+}
+
+.estado-badge.citado {
+  background-color: #3498db;
+}
+
+.estado-badge.evaluado {
+  background-color: #199532;
+}
+
+.estado-badge.inicioprocesamiento {
+  background-color: #a244f0;
+}
+
+.estado-badge.procesamientooficio {
+  background-color: #f0445b;
+}
+
+.estado-badge.finprocesamiento {
+  background-color: #a244f0;
+}
+
+.estado-badge.enrevisión {
+  background-color: #e67e22;
+}
+
+.estado-badge.enfirma {
+  background-color: #3416a0;
+}
+
+.estado-badge.notificado {
+  background-color: rgb(189, 23, 87);
+}
+
+.estado-badge.cancelado {
+  background-color: #e74c3c;
+}
+
+.estado-badge.terminado {
+  background-color: #7f8c8d;
+}
+
+.estado-badge.poriniciar {
+  background-color: #f1c40f;
+  color: #000;
+}
+
+.proceso-row {
+  transition: background 0.3s ease;
+}
+
+/* 🟦 Citado */
+
+.proceso-row.citado {
+  background: linear-gradient(to left, rgba(52, 152, 219, 0.25) 0%, #fff 0%);
+}
+
+/* 🟨 Evaluado */
+
+.proceso-row.evaluado {
+  background: linear-gradient(to left, rgba(241, 196, 15, 0.25) 0%, #fff 50%);
+}
+
+/* 🟪 En procesamiento */
+.proceso-row.inicioprocesamiento {
+  background: linear-gradient(to left, rgba(155, 89, 182, 0.25) 0%, #fff 50%);
+}
+
+/* 🟧 En revisión */
+.proceso-row.enrevision {
+  background: linear-gradient(to left, rgba(230, 126, 34, 0.25) 0%, #fff 50%);
+}
+
+/* 🟩 En firma */
+.proceso-row.enfirma {
+  background: linear-gradient(to left, rgba(22, 160, 133, 0.25) 0%, #fff 50%);
+}
+
+/* 🟩 Notificado */
+.proceso-row.notificado {
+  background: linear-gradient(to left, rgba(39, 174, 96, 0.25) 0%, #fff 50%);
+}
+
+/* 🔴 Cancelado */
+.proceso-row.cancelado {
+  background: linear-gradient(to left, rgba(231, 76, 60, 0.25) 0%, #fff 50%);
+}
+
+/* ⚫ Terminado */
+.proceso-row.terminado {
+  background: linear-gradient(to left, rgba(127, 140, 141, 0.25) 0%, #fff 50%);
+}
+
+/* ⚪ Por iniciar */
+.proceso-row.poriniciar {
+  background: linear-gradient(to left, rgba(189, 195, 199, 0.25) 0%, #fff 50%);
+}
