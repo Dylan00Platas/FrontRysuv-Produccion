@@ -1,5 +1,11 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family:
+    Kulim Park,
+    system-ui,
+    Avenir,
+    Helvetica,
+    Arial,
+    sans-serif;
   font-synthesis: none;
   line-height: 1.5;
   text-rendering: optimizeLegibility;
