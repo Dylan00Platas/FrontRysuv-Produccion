@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService.js";
 import {
@@ -12,7 +12,7 @@ import {
 } from "@/utils/Oficio51y52.js";
 
 function GenerarOficio() {
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
 
@@ -126,7 +126,7 @@ function GenerarOficio() {
 
   return (
     <div className="iniciar-solicitud-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content-solicitud">
         {mensaje.texto && (

@@ -3,7 +3,8 @@ import { FaSearch } from "react-icons/fa";
 
 import "./SeguimientoHermes.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
-import { UserContext } from "@/utils/UserContext.jsx";
+import SolicitudService from "@/services/SolicitudService.js";
+import UserContext from "@/utils/UserContext.jsx";
 
 const columnas = [
   "Folio",
@@ -19,10 +20,10 @@ const columnas = [
 ];
 
 function SeguimientoHermes() {
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const [registros, setRegistros] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const SolicitudService = new SolicitudService();
+  const solicitudService = new SolicitudService();
 
   const [filtros, setFiltros] = useState(
     columnas.reduce((acc, col) => {
@@ -45,7 +46,7 @@ function SeguimientoHermes() {
       try {
         const token = localStorage.getItem("token");
         const data =
-          await SolicitudService.obtenerTodosSeguimientoHermes(token);
+          await solicitudService.obtenerTodosSeguimientoHermes(token);
 
         //  Adaptar backend → tabla
         const registrosMapeados = data.map((r) => ({
@@ -133,7 +134,7 @@ function SeguimientoHermes() {
   const handleGuardarTodos = async () => {
     const token = localStorage.getItem("token");
     try {
-      await SolicitudService.registrarSeguimientoHermes(registros, token);
+      await solicitudService.registrarSeguimientoHermes(registros, token);
       alert("Registros guardados correctamente");
     } catch (err) {
       console.error(err);
@@ -143,7 +144,7 @@ function SeguimientoHermes() {
 
   return (
     <div className="seguimiento-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content">
         <div className="seguimiento-header">

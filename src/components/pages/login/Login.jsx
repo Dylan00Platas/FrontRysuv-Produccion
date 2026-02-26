@@ -52,6 +52,7 @@ function Login() {
           err.message.includes("Failed to fetch"))
       ) {
         setError("Error de conexión: El servidor no está disponible.");
+        console.error("Error de conexión:", err);
       } else if (err && typeof err === "object" && err.mensaje) {
         setError(err.mensaje);
       } else if (

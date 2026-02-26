@@ -1,6 +1,6 @@
 export default class APIClient {
-  constructor() {
-    this.API_URL = import.meta.env.VITE_API_URL;
+  constructor(baseUrl) {
+    this.baseUrl = baseUrl;
   }
 
   async request(endpoint, method = "GET", token = null, body = null) {
@@ -18,26 +18,26 @@ export default class APIClient {
       options.body = JSON.stringify(body);
     }
 
-    const response = await fetch(`${this.API_URL}${endpoint}`, options);
+    const response = await fetch(`${this.baseUrl}${endpoint}`, options);
+
+    const rawText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(rawText); // Intentar parsear como JSON
+    } catch {
+      data = rawText; // Si falla, usar el texto plano
+    }
 
     if (!response.ok) {
-      let errorText;
-      try {
-        // Intentar parsear como JSON
-        const errorData = await response.json();
-        errorText =
-          errorData.mensaje ||
-          errorData.error ||
-          JSON.stringify(errorData, null, 2);
-      } catch {
-        // Si no es JSON, usar texto plano
-        errorText = await response.text();
-      }
+      const errorText =
+        (typeof data === "object" && data?.mensaje) ||
+        (typeof data === "object" && data?.error) ||
+        (typeof data === "string" ? data : JSON.stringify(data));
 
-      console.error("❌ Error del servidor:", errorText);
+      console.error("Error del servidor:", errorText);
       throw new Error(errorText || `Error HTTP ${response.status}`);
     }
 
-    return response.json();
+    return data;
   }
 }

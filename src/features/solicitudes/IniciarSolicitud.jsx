@@ -1,17 +1,18 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaUserLock, FaSearch } from "react-icons/fa";
 
 import "./IniciarSolicitud.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function IniciarSolicitud() {
   const navigate = useNavigate();
   const [tipoSolicitud, setTipoSolicitud] = useState("");
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
   const token = localStorage.getItem("token");
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
 
@@ -238,7 +239,7 @@ function IniciarSolicitud() {
   return (
     <div className="iniciar-solicitud-page">
       <main className="main-content-solicitud">
-        <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+        <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
         {/*  Mensaje flotante */}
         {mensaje.texto && (

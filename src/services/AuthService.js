@@ -3,14 +3,14 @@ import APIClient from "./connection/APIClient.js";
 
 export default class AuthService {
   constructor() {
-    this.api = new APIClient(import.meta.env.VITE_API_URL);
+    this.api = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
   }
 
   async login(usuario, contrasenia) {
     try {
       let hashedPassword = await EncryptData.sha256(contrasenia);
 
-      const data = await this.api.request("/acceso/login", "POST", {
+      const data = await this.api.request("/login", "POST", null, {
         usuario,
         contrasenia: hashedPassword,
       });
@@ -51,11 +51,7 @@ export default class AuthService {
         );
       }
 
-      if (err.message) {
-        throw new Error(err.message);
-      } else {
-        throw new Error("Error desconocido al iniciar sesión");
-      }
+      throw new Error(err.message || "Error desconocido al iniciar sesión");
     }
   }
 

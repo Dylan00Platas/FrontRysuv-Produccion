@@ -1,9 +1,9 @@
-import ClienteAPI from "@/services/connection/APIClient.js";
+import APIClient from "@/services/connection/APIClient.js";
 
 export default class CatalogoCedula {
   static cedulas = [];
   constructor() {
-    this.api = new ClienteAPI(import.meta.env.VITE_API_URL);
+    this.api = new APIClient(import.meta.env.VITE_API_CATALOGO_URL);
   }
 
   async cargarCedulas(token) {

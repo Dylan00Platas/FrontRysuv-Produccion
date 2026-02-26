@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 
 import "./Usuarios.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
-import UsuarioServicio from "@/services/UsuarioService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UsuarioService from "@/services/UsuarioService.js";
+import UserContext from "@/utils/UserContext.jsx";
 
 function Usuarios() {
   const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
-  const { usuario } = useContext(UserContext);
-  const usuarioServicio = new UsuarioServicio();
+  const { currentUser } = useContext(UserContext);
+  const usuarioServicio = new UsuarioService();
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -42,7 +42,7 @@ function Usuarios() {
 
   return (
     <div className="usuarios-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
       <main className="main-content">
         <div className="page-header2">
           <h1 className="page-title2">Usuarios</h1>

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { UserContext } from "./UserContext.jsx";
+import UserContext from "./UserContext.jsx";
 
 const UserProvider = ({ children }) => {
-  const [usuario, setUser] = useState(null);
+  const [currentUser, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const UserProvider = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ usuario, setUser }}>
+    <UserContext.Provider value={{ currentUser, setUser }}>
       {children}
     </UserContext.Provider>
   );

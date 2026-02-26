@@ -6,14 +6,14 @@ import Select from "react-select";
 import "./Solicitudes.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function Solicitudes() {
   const navigate = useNavigate();
   const [solicitudes, setSolicitudes] = useState([]);
   const [solicitudesRaw, setSolicitudesRaw] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const handleEditarSolicitud = (solicitudAdaptada) => {
     // Buscamos la solicitud completa por id
@@ -42,7 +42,6 @@ function Solicitudes() {
         const servicio = new SolicitudService();
         const data = await servicio.obtenerSolicitudes(token);
 
-        // ✅ Guardamos la data completa
         setSolicitudesRaw(data);
 
         //  Filtramos solo solicitudes sin analista asignado
@@ -98,7 +97,7 @@ function Solicitudes() {
 
   return (
     <div className="solicitudes-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content">
         <div className="page-header2">

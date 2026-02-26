@@ -10,10 +10,10 @@ import listPlugin from "@fullcalendar/list";
 import "./Agenda.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function Agenda() {
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const [eventos, setEventos] = useState([]);
 
   // Estado para modal
@@ -190,7 +190,7 @@ function Agenda() {
 
   return (
     <div className="agenda-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="agenda-main">
         <div className="page-header2">
@@ -207,7 +207,7 @@ function Agenda() {
             ]}
             initialView="dayGridMonth"
             eventDrop={handleEventDrop}
-            editable={usuario.FKidTipoAcceso !== 2}
+            editable={currentUser.FKidTipoAcceso !== 2}
             eventDurationEditable={false}
             locale={esLocale}
             headerToolbar={{

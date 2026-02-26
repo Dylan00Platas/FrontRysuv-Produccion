@@ -1,18 +1,18 @@
 import Constantes from "@/utils/Constantes.js";
-import ClienteAPI from "./connection/APIClient.js";
+import APIClient from "./connection/APIClient.js";
 
 export default class CedulaService {
   constructor() {
-    this.api = new ClienteAPI(import.meta.env.VITE_API_URL);
+    this.api = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
   }
 
   async obtenerCompetenciasPorClasificacionCedula(id, token) {
     try {
       const response = await this.api.request(
-        `/cedula/competencia/${id}`,
+        `/competencia/${id}`,
         "GET",
-        null,
         token,
+        null,
       );
 
       if (response.error) {
@@ -46,7 +46,7 @@ export default class CedulaService {
       FKIdClasificacionCedula: formData.cedulaSeleccionada,
     };
     const datosLimpios = this.limpiarDatos(datos);
-    return await this.api.request("/cedula", "POST", datosLimpios, token);
+    return await this.api.request("/", "POST", token, datosLimpios);
   }
 
   async registrarCedulaResultados(formData, token) {
@@ -82,7 +82,7 @@ export default class CedulaService {
       "JSON que se enviará a /cedula:",
       JSON.stringify(datosLimpios, null, 2),
     );
-    return await this.api.request("/cedula", "POST", datosLimpios, token);
+    return await this.api.request("/", "POST", token, datosLimpios);
   }
 
   async archivarCedula(idCedula, token) {
@@ -92,12 +92,7 @@ export default class CedulaService {
 
     const datosLimpios = this.limpiarDatos(datos);
 
-    return await this.api.request(
-      `/cedula/${idCedula}`,
-      "PUT",
-      datosLimpios,
-      token,
-    );
+    return await this.api.request(`/${idCedula}`, "PUT", token, datosLimpios);
   }
 
   limpiarDatos(obj) {
@@ -137,12 +132,7 @@ export default class CedulaService {
       resultadoPorcentaje,
     };
     const datosLimpios = this.limpiarDatos(datos);
-    return await this.api.request(
-      "/cedula/resultado",
-      "POST",
-      datosLimpios,
-      token,
-    );
+    return await this.api.request("/resultado", "POST", token, datosLimpios);
   }
 
   async obtenerDatoInicialesCedula(idProcesoContratacion, token) {
@@ -151,10 +141,10 @@ export default class CedulaService {
     };
     try {
       const response = await this.api.request(
-        "/procesoContratacion/busqueda",
+        "/busqueda",
         "POST",
-        datos,
         token,
+        datos,
       );
       if (response.error) {
         throw new Error(
@@ -171,10 +161,10 @@ export default class CedulaService {
   async obtenerTodasCedulasDisponibles(token) {
     try {
       const response = await this.api.request(
-        "/cedula/obtencionCedulas",
+        "/obtencionCedulas",
         "GET",
-        null,
         token,
+        null,
       );
       if (!response || response.error) {
         throw new Error(response?.mensaje || "Error al obtener cédulas");
@@ -189,10 +179,10 @@ export default class CedulaService {
   async obtenerCedulaResultadosPorProceso(IdProceso, token) {
     try {
       const response = await this.api.request(
-        `/cedula/competencia-resultados/${IdProceso}`,
+        `/competencia-resultados/${IdProceso}`,
         "GET",
-        null,
         token,
+        null,
       );
 
       // ✅ Verifica si el backend devuelve el objeto directamente o dentro de response.data
@@ -213,10 +203,10 @@ export default class CedulaService {
   async obtenerCedulaPorId(FKIdProceso, token) {
     try {
       const response = await this.api.request(
-        `/cedula/busqueda/${FKIdProceso}`,
+        `/busqueda/${FKIdProceso}`,
         "GET",
-        null,
         token,
+        null,
       );
 
       console.log(
@@ -241,12 +231,7 @@ export default class CedulaService {
 
   async obtenerCedulasActivas(token) {
     try {
-      const response = await this.api.request(
-        "/cedula/activas",
-        "GET",
-        null,
-        token,
-      );
+      const response = await this.api.request("/activas", "GET", token, null);
       console.log(
         "🔍 Respuesta completa del servidor (obtenerCedulasActivas):",
         response,
@@ -279,10 +264,10 @@ export default class CedulaService {
 
     try {
       const response = await this.api.request(
-        "/cedula/externa",
+        "/externa",
         "POST",
-        datosLimpios,
         token,
+        datosLimpios,
       );
 
       if (!response || response.error) {
@@ -305,10 +290,10 @@ export default class CedulaService {
       }
 
       const response = await this.api.request(
-        `/cedula/externa/${FKIdCedula}`,
+        `/externa/${FKIdCedula}`,
         "GET",
-        null,
         token,
+        null,
       );
 
       console.log(

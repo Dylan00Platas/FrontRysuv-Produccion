@@ -5,10 +5,10 @@ import { PDFDocument, StandardFonts } from "pdf-lib";
 import * as fontkit from "fontkit";
 
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function VerDetallesOficio() {
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const datos = JSON.parse(sessionStorage.getItem("detallesOficio") || "{}");
 
@@ -221,7 +221,7 @@ function VerDetallesOficio() {
 
   return (
     <div className="iniciar-solicitud-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content-solicitud">
         <div className="page-header-solicitud">

@@ -6,12 +6,12 @@ import "./Evaluacion.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
 import EvaluacionServicio from "@/services/EvaluacionService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function Evaluacion() {
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
-  const { usuario } = useContext(UserContext);
-  const soloLectura = usuario.FKidTipoAcceso === 2;
+  const { currentUser } = useContext(UserContext);
+  const soloLectura = currentUser.FKidTipoAcceso === 2;
   const procesoSeleccionado = location.state || {};
   const [step, setStep] = useState(1);
   const evaluacionServicio = new EvaluacionServicio();
@@ -318,7 +318,7 @@ function Evaluacion() {
 
   return (
     <div className="evaluacion-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />{" "}
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />{" "}
       <main className="main-content-evaluacion">
         {mensaje.texto && (
           <div className={`mensaje-flotante ${mensaje.tipo}`}>
@@ -572,7 +572,7 @@ function Evaluacion() {
                 Guardar
               </button>
 
-              {usuario.FKidTipoAcceso !== 2 && (
+              {currentUser.FKidTipoAcceso !== 2 && (
                 <button
                   type="button"
                   className="btn-crear-oficio"
@@ -958,7 +958,7 @@ function Evaluacion() {
                 Guardar
               </button>
 
-              {usuario.FKidTipoAcceso !== 2 && (
+              {currentUser.FKidTipoAcceso !== 2 && (
                 <button
                   type="button"
                   className="btn-crear-oficio"

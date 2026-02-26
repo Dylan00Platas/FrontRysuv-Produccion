@@ -14,12 +14,12 @@ import CedulaService from "@/services/CedulaService.js";
 import SolicitudService from "@/services/SolicitudService.js";
 import ManageFiles from "@/utils/ManageFiles";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function CrearConstancia() {
   const [showHelp, setShowHelp] = useState(false);
   const navigate = useNavigate();
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const fechaActual = new Date();
   const dia = fechaActual.getDate().toString().padStart(2, "0");
@@ -918,7 +918,7 @@ function CrearConstancia() {
 
   return (
     <div className="crear-constancia-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
       <main className="main-content">
         {mensaje.texto && (
           <div className={`mensaje-flotante ${mensaje.tipo}`}>

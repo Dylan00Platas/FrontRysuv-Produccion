@@ -1,9 +1,9 @@
 import { EncryptData } from "@/utils/EncryptData.js";
-import ClienteAPI from "./connection/APIClient.js";
+import APIClient from "./connection/APIClient.js";
 
-export default class UsuarioServicio {
+export default class UsuarioService {
   constructor() {
-    this.api = new ClienteAPI(import.meta.env.VITE_API_URL);
+    this.api = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
   }
 
   async crearUsuario(formData, token) {
@@ -19,7 +19,7 @@ export default class UsuarioServicio {
       datos.segundoApellido = formData.segundoApellido;
     }
 
-    return await this.api.request("/acceso", "POST", datos, token);
+    return await this.api.request("/", "POST", token, datos);
   }
 
   async actualizarUsuario(formData, token) {
@@ -39,26 +39,20 @@ export default class UsuarioServicio {
     }
 
     console.log("Datos a enviar:", datos);
-    console.log("URL:", `/acceso/${formData.idAcceso}`);
+    console.log("URL:", `/${formData.idAcceso}`);
     console.log("Token:", token);
 
-    return await this.api.request(
-      `/acceso/${formData.idAcceso}`,
-      "PUT",
-      datos,
-      token,
-    );
+    return await this.api.request(`/${formData.idAcceso}`, "PUT", token, datos);
   }
 
   async obtenerUsuarios(token) {
     try {
-      const response = await this.api.request(
-        "/acceso/usuarios",
-        "GET",
-        null,
-        token,
-      );
+      const response = await this.api.request("/usuarios", "GET", token, null);
       if (!response || response.error) {
+        console.error(
+          "Error en obtenerUsuarios:",
+          response?.mensaje || "Error desconocido",
+        );
         throw new Error(response?.mensaje || "Error al obtener usuarios");
       }
       return response.usuarios;
@@ -71,10 +65,10 @@ export default class UsuarioServicio {
   async desactivarUsuario(idAcceso, token) {
     try {
       const response = await this.api.request(
-        `/acceso/usuario/${idAcceso}`,
+        `/usuario/${idAcceso}`,
         "PUT",
-        {},
         token,
+        {},
       );
 
       if (!response || response.error) {
@@ -90,12 +84,7 @@ export default class UsuarioServicio {
 
   async obtenerAnalistas(token) {
     try {
-      const response = await this.api.request(
-        "/acceso/analistas",
-        "GET",
-        null,
-        token,
-      );
+      const response = await this.api.request("/analistas", "GET", token, null);
       if (!response || response.error) {
         throw new Error(response?.mensaje || "Error al obtener analistas");
       }
@@ -106,6 +95,7 @@ export default class UsuarioServicio {
     }
   }
 
+  // TODO-Desarrollo: Mapear roles a FKIdTipoAcceso de forma dinámica (ej. obteniendo los tipos de acceso desde el backend)
   mapRolAFK(rol) {
     switch (rol) {
       case "admin":

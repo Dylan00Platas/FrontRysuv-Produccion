@@ -1,17 +1,17 @@
-import ClienteAPI from "./connection/APIClient.js";
+import APIClient from "./connection/APIClient.js";
 
 export default class NoBeneficiadoService {
   constructor() {
-    this.api = new ClienteAPI(import.meta.env.VITE_API_URL);
+    this.api = new APIClient(import.meta.env.VITE_API_PROCESO_CONTRATACION_URL);
   }
 
   async ObtenerTodosLosNoBeneficiados(token) {
     try {
       const response = await this.api.request(
-        "/procesoContratacion/noBeneficiados",
+        "/noBeneficiados",
         "GET",
-        null,
         token,
+        null,
       );
 
       if (!response || response.error) {

@@ -1,39 +1,36 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import "./MainMenu.css";
+import uvBlanco from "@/assets/uvBlanco.png";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function MainMenu() {
   const logoRef = useRef(null);
-  const { currentUser } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext); // TODO
   const [isBouncing, setIsBouncing] = useState(false);
 
   const [pos, setPos] = useState({ x: 200, y: 200 });
-  const [dir, setDir] = useState({ dx: 2, dy: 2 });
+  const dirRef = useRef({ dx: 2, dy: 2 });
 
   useEffect(() => {
     if (!isBouncing) return;
 
     const move = () => {
-      setPos((prev) => {
-        let newX = prev.x + dir.dx;
-        let newY = prev.y + dir.dy;
+      const { dx, dy } = dirRef.current;
 
+      setPos((prev) => {
         const logo = logoRef.current;
         if (!logo) return prev;
 
-        const logoRect = logo.getBoundingClientRect();
+        let newX = prev.x + dx;
+        let newY = prev.y + dy;
 
+        const logoRect = logo.getBoundingClientRect();
         const maxX = window.innerWidth - logoRect.width;
         const maxY = window.innerHeight - logoRect.height;
 
-        let newDx = dir.dx;
-        let newDy = dir.dy;
-
-        if (newX <= 0 || newX >= maxX) newDx = -newDx;
-        if (newY <= 0 || newY >= maxY) newDy = -newDy;
-
-        setDir({ dx: newDx, dy: newDy });
+        if (newX <= 0 || newX >= maxX) dirRef.current.dx *= -1;
+        if (newY <= 0 || newY >= maxY) dirRef.current.dy *= -1;
 
         return {
           x: Math.min(Math.max(newX, 0), maxX),
@@ -44,7 +41,7 @@ function MainMenu() {
 
     const interval = setInterval(move, 10);
     return () => clearInterval(interval);
-  }, [isBouncing, dir]);
+  }, [isBouncing]);
 
   const handleDoubleClick = () => {
     setIsBouncing(true);
@@ -53,7 +50,7 @@ function MainMenu() {
       logoRef.current.style.transition = "transform 0.3s ease";
       logoRef.current.style.transform = "scale(0.7)";
       setTimeout(() => {
-        logoRef.current.style.transition = "";
+        if (logoRef.current) logoRef.current.style.transition = "";
       }, 300);
     }
   };
@@ -67,7 +64,7 @@ function MainMenu() {
         <div className="logo-container">
           <img
             ref={logoRef}
-            src="/recursos/Logo.png"
+            src={uvBlanco}
             alt="Logo UV"
             className={`logo ${isBouncing ? "bouncing" : ""}`}
             onDoubleClick={handleDoubleClick}

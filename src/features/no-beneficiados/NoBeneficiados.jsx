@@ -6,11 +6,11 @@ import "./NoBeneficiados.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import NoBeneficiadoService from "@/services/NoBeneficiadoService.js";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function NoBeneficiados() {
   const navigate = useNavigate();
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const [filtros, setFiltros] = useState({
     region: null,
@@ -84,7 +84,7 @@ function NoBeneficiados() {
 
   return (
     <div className="nobeneficiados-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
       {/* Main content */}
       <main className="main-content">
         <div className="page-header2">

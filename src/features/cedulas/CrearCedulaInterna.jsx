@@ -12,13 +12,13 @@ import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
 import CatalogoCedula from "@/utils/CatalogoCedulas.js";
 import SolicitudService from "@/services/SolicitudService.js";
 import Constantes from "@/utils/Constantes.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function CrearCedulaInterna() {
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
   const [showHelp, setShowHelp] = useState(false);
 
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const [procesoCargado, setProcesoCargado] = useState(null);
 
   const cedulaFromNav = location.state?.cedula || null;
@@ -428,7 +428,7 @@ function CrearCedulaInterna() {
 
   return (
     <div className="crear-cedula-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
       <main className="main-content">
         {/*  Mensaje flotante */}
         {mensaje.texto && (

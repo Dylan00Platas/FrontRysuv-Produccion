@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function VerOficios() {
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   const datosSesion = sessionStorage.getItem("datosVerOficios");
@@ -79,7 +79,7 @@ function VerOficios() {
 
   return (
     <div className="solicitudes-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content">
         <div className="page-header2">

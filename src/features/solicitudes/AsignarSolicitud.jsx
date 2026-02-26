@@ -6,7 +6,7 @@ import "./AsignarSolicitud.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import CatalogoCedula from "@/utils/CatalogoCedulas.js";
 import UsuarioServicio from "@/services/UsuarioService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 const FAMILIA_KEYWORDS = {
   "N1. Académico Administrativo": "académico administrativo",
@@ -27,7 +27,7 @@ function AsignarSolicitud() {
   const usuarioServicio = new UsuarioServicio();
   const SolicitudService = new SolicitudService();
   const token = localStorage.getItem("token");
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
   const [permiteAsignarAnalista, setPermiteAsignarAnalista] = useState(true);
   const [funcionesOptions, setFuncionesOptions] = useState([]);
@@ -298,7 +298,7 @@ function AsignarSolicitud() {
 
   return (
     <div className="asignar-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content">
         {/*  Mensaje flotante */}

@@ -7,10 +7,10 @@ import "./Panorama.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService";
 import CedulaService from "@/services/CedulaService";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function Panorama() {
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   //  Estados de Evaluaciones

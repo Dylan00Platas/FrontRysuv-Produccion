@@ -6,10 +6,10 @@ import Select from "react-select";
 import "./cedulas.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import CedulaService from "@/services/CedulaService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function Cedulas() {
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
 
   const navigate = useNavigate();
@@ -249,7 +249,7 @@ function Cedulas() {
   return (
     <div className="cedulas-page">
       <main className="main-content">
-        <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+        <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
         {mensaje.texto && (
           <div className={`mensaje-flotante ${mensaje.tipo}`}>

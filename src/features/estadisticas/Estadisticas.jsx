@@ -22,8 +22,8 @@ import "./Estadisticas.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
 import SolicitudService from "@/services/SolicitudService.js";
-import UserService from "@/services/UsuarioService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UsuarioService from "@/services/UsuarioService.js";
+import UserContext from "@/utils/UserContext.jsx";
 
 function Estadisticas() {
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ function Estadisticas() {
     { value: "Todos", label: "Todos" },
   ]);
 
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const [analistaFiltroEval, setAnalistaFiltroEval] = useState({
     value: "Todos",
@@ -431,7 +431,7 @@ function Estadisticas() {
 
   return (
     <div className="estadisticas-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
       {/* Main Content */}
       <main className="main-content-estadisticas">
         <div className="page-header">

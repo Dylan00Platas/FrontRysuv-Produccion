@@ -1,8 +1,8 @@
-import ClienteAPI from "./connection/APIClient.js";
+import APIClient from "./connection/APIClient.js";
 
 export default class EvaluacionServicio {
   constructor() {
-    this.api = new ClienteAPI(import.meta.env.VITE_API_URL);
+    this.api = new APIClient(import.meta.env.VITE_API_PROCESO_CONTRATACION_URL);
   }
 
   async registrarEvaluacion(idProceso, formData, token) {
@@ -60,10 +60,10 @@ export default class EvaluacionServicio {
       };
       const datosLimpios = this.limpiarDatos(datos);
       return await this.api.request(
-        `/procesoContratacion/${idProceso}`,
+        `/${idProceso}`,
         "PUT",
-        datosLimpios,
         token,
+        datosLimpios,
       );
     } catch (err) {
       console.error("Error en registrarEvaluacion:", err);

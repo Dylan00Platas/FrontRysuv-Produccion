@@ -1,14 +1,14 @@
 import { BrowserRouter } from "react-router-dom";
-import UsuarioProvider from "./utils/UserProvider.jsx";
+import UserProvider from "./utils/UserProvider.jsx";
 import AppRoutes from "./AppRoutes.jsx";
 import "./App.css";
 
 function App() {
   return (
     <BrowserRouter>
-      <UsuarioProvider>
+      <UserProvider>
         <AppRoutes />
-      </UsuarioProvider>
+      </UserProvider>
     </BrowserRouter>
   );
 }

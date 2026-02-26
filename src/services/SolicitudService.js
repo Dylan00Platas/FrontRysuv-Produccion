@@ -1,8 +1,8 @@
-import ClienteAPI from "./connection/APIClient.js";
+import APIClient from "./connection/APIClient.js";
 
 export default class SolicitudService {
   constructor() {
-    this.api = new ClienteAPI(import.meta.env.VITE_API_URL);
+    this.api = new APIClient(import.meta.env.VITE_API_PROCESO_CONTRATACION_URL);
   }
 
   async crearSolicitudAsignacionRequisicion(formData, token, tipoSolicitud) {
@@ -31,12 +31,7 @@ export default class SolicitudService {
       fechaEntrevista: formData.fechaCita,
     };
     const datosLimpios = this.limpiarDatos(datos);
-    return await this.api.request(
-      "/procesoContratacion",
-      "POST",
-      datosLimpios,
-      token,
-    );
+    return await this.api.request("/", "POST", token, datosLimpios);
   }
 
   async crearSolicitudBolsaTrabajo(formData, token, tipoSolicitud) {
@@ -83,12 +78,7 @@ export default class SolicitudService {
       categoriaAutorizadaOficio: formData.categoriaAutorizada,
     };
     const datosLimpios = this.limpiarDatos(datos);
-    return await this.api.request(
-      "/procesoContratacion",
-      "POST",
-      datosLimpios,
-      token,
-    );
+    return await this.api.request("/", "POST", token, datosLimpios);
   }
 
   limpiarDatos(obj) {
@@ -161,10 +151,10 @@ export default class SolicitudService {
   async obtenerSolicitudes(token) {
     try {
       const response = await this.api.request(
-        "/procesoContratacion/busqueda/procesos",
+        "/busqueda/procesos/",
         "GET",
-        null,
         token,
+        null,
       );
 
       if (!response || response.error) {
@@ -238,10 +228,10 @@ export default class SolicitudService {
       const datosLimpios = this.limpiarDatos(datos);
 
       return await this.api.request(
-        `/procesoContratacion/${idProceso}`,
+        `/${idProceso}`,
         "PUT",
-        datosLimpios,
         token,
+        datosLimpios,
       );
     } catch (err) {
       console.error("Error en editarSolicitud:", err);
@@ -262,10 +252,10 @@ export default class SolicitudService {
       console.log("Payload (JSON):", datosLimpios);
 
       return await this.api.request(
-        `/procesoContratacion/${idProceso}`,
+        `/${idProceso}`,
         "PUT",
-        datosLimpios,
         token,
+        datosLimpios,
       );
     } catch (err) {
       console.error("Error en editarSolicitud:", err);
@@ -288,10 +278,10 @@ export default class SolicitudService {
       };
       const datosLimpios = this.limpiarDatos(datos);
       return await this.api.request(
-        `/procesoContratacion/${idProceso}`,
+        `/${idProceso}`,
         "PUT",
-        datosLimpios,
         token,
+        datosLimpios,
       );
     } catch (err) {
       console.error("Error en editarCamposBasicos:", err);
@@ -308,10 +298,10 @@ export default class SolicitudService {
       };
       const datosLimpios = this.limpiarDatos(datos);
       return await this.api.request(
-        "/procesoContratacion/control-version",
+        "/control-version",
         "POST",
-        datosLimpios,
         token,
+        datosLimpios,
       );
     } catch (err) {
       console.error("Error en registrarControlVersion:", err);
@@ -321,10 +311,10 @@ export default class SolicitudService {
   async ObtenerVersionesPorID(FKIdProceso, token) {
     try {
       const response = await this.api.request(
-        `/procesoContratacion/busqueda/control-version/${FKIdProceso}`,
+        `/busqueda/control-version/${FKIdProceso}`,
         "GET",
-        null,
         token,
+        null,
       );
 
       console.log("Respuesta cruda del backend en servicio:", response);
@@ -346,10 +336,10 @@ export default class SolicitudService {
   async eliminarProcesoPorID(idProceso, token) {
     try {
       const response = await this.api.request(
-        `/procesoContratacion/eliminacion/${idProceso}`,
+        `/eliminacion/${idProceso}`,
         "DELETE",
-        null,
         token,
+        null,
       );
 
       if (!response || response.error) {
@@ -377,12 +367,7 @@ export default class SolicitudService {
         tipo: formData.tipo,
       };
       const datosLimpios = this.limpiarDatos(datos);
-      return await this.api.request(
-        "/procesoContratacion/oficio",
-        "POST",
-        datosLimpios,
-        token,
-      );
+      return await this.api.request("/oficio", "POST", token, datosLimpios);
     } catch (err) {
       console.error("Error en registrarOficio:", err);
       throw err;
@@ -392,10 +377,10 @@ export default class SolicitudService {
   async obtenerOficiosPorProceso(FKIdProcesoContratacion, token) {
     try {
       const response = await this.api.request(
-        `/procesoContratacion/oficios/${FKIdProcesoContratacion}`,
+        `/oficios/${FKIdProcesoContratacion}`,
         "GET",
-        null,
         token,
+        null,
       );
       console.log("Respuesta del servidor: ", response);
       if (!response || response.error) {
@@ -425,12 +410,9 @@ export default class SolicitudService {
 
       const datosLimpios = datos.map((d) => this.limpiarDatos(d));
 
-      return await this.api.request(
-        "/procesoContratacion/seguimiento-hermes",
-        "POST",
-        { registros: datosLimpios },
-        token,
-      );
+      return await this.api.request("/seguimiento-hermes", "POST", token, {
+        registros: datosLimpios,
+      });
     } catch (err) {
       console.error("Error en registrarSeguimientoHermes:", err);
       throw err;
@@ -440,10 +422,10 @@ export default class SolicitudService {
   async obtenerTodosSeguimientoHermes(token) {
     try {
       const response = await this.api.request(
-        "/procesoContratacion/obtencion-seguimiento-hermes",
+        "/obtencion-seguimiento-hermes",
         "GET",
-        null,
         token,
+        null,
       );
       if (!response || response.error) {
         throw new Error(

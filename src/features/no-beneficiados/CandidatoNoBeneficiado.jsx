@@ -2,10 +2,10 @@ import { useState, useEffect, useContext } from "react";
 
 import "./CandidatoNoBeneficiado.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function CandidatoNoBeneficiado() {
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -44,7 +44,7 @@ function CandidatoNoBeneficiado() {
 
   return (
     <div className="candidato-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
       <main className="main-content">
         <div className="page-header2">
           <h1 className="page-title2">Candidato No Beneficiado</h1>

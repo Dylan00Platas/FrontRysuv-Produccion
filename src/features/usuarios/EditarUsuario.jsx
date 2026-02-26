@@ -5,13 +5,13 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./CrearUsuario.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import UsuarioServicio from "@/services/UsuarioService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function EditarUsuario() {
   const navigate = useNavigate();
   const location = useLocation();
   const usuarioAEditar = location.state?.usuario || null;
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
 
@@ -114,7 +114,7 @@ function EditarUsuario() {
 
   return (
     <div className="crear-usuario-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content-evaluacion">
         {/*  Mensaje flotante */}

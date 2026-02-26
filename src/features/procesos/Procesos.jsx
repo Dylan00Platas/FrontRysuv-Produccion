@@ -5,8 +5,9 @@ import Select from "react-select";
 
 import "./Procesos.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar";
-import UsuarioServicio from "@/services/UsuarioService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UsuarioService from "@/services/UsuarioService.js";
+import SolicitudService from "@/services/SolicitudService.js";
+import UserContext from "@/utils/UserContext.jsx";
 
 function Procesos() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ function Procesos() {
   const [procesosRaw, setProcesosRaw] = useState([]);
   const [analistas, setAnalistas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
 
   const [analistaOptions, setAnalistaOptions] = useState([
     { value: "Todos", label: "Todos" },
@@ -38,10 +39,10 @@ function Procesos() {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const SolicitudService = new SolicitudService();
-        const usuarioServicio = new UsuarioServicio();
+        const solicitudService = new SolicitudService();
+        const usuarioServicio = new UsuarioService();
 
-        const data = await SolicitudService.obtenerSolicitudes(token);
+        const data = await solicitudService.obtenerSolicitudes(token);
         setProcesosRaw(data);
 
         const analistasData = await usuarioServicio.obtenerAnalistas(token);
@@ -180,7 +181,7 @@ function Procesos() {
 
   return (
     <div className="procesos-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content">
         <div className="page-header2">

@@ -5,10 +5,10 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./CrearUsuario.css";
 import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
 import UsuarioServicio from "@/services/UsuarioService.js";
-import { UserContext } from "@/utils/UserContext.jsx";
+import UserContext from "@/utils/UserContext.jsx";
 
 function CrearUsuario() {
-  const { usuario } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -80,7 +80,7 @@ function CrearUsuario() {
 
   return (
     <div className="crear-usuario-page">
-      <Sidebar tipoAcceso={usuario.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
       {/* Main Content */}
       <main className="main-content-evaluacion">
         {/*  Mensaje flotante */}
