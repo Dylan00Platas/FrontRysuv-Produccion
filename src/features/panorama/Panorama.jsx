@@ -268,7 +268,7 @@ function Panorama() {
 
   return (
     <div className="panorama-page">
-      <Sidebar tipoAcceso={usuario?.FKidTipoAcceso} />
+      <Sidebar tipoAcceso={currentUser?.FKidTipoAcceso} />
       <main className="main-content">
         <div className="page-header2">
           <h1 className="page-title2">Panorama Global</h1>

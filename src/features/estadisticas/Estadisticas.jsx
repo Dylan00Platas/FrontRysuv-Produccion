@@ -60,7 +60,7 @@ function Estadisticas() {
   });
   const [searchTermSolicitudes, setSearchTermSolicitudes] = useState("");
 
-  const SolicitudService = new SolicitudService();
+  const solicitudService = new SolicitudService();
   const token = localStorage.getItem("token");
 
   //  Estados para los contadores
@@ -267,7 +267,7 @@ function Estadisticas() {
       try {
         const token = localStorage.getItem("token");
         const SolicitudService = new SolicitudService();
-        const usuarioServicio = new UserService();
+        const usuarioServicio = new UsuarioService();
 
         //  Traer solicitudes
         const data = await SolicitudService.obtenerSolicitudes(token);
