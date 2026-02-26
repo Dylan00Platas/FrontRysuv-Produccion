@@ -24,7 +24,7 @@
     "fontkit": "^2.0.4",
     "framer-motion": "^12.23.24",
     "html2canvas": "^1.4.1",
-    "jspdf": "^3.0.3",
+    "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.2",
     "pdf-lib": "^1.17.1",
     "react": "^19.1.1",
