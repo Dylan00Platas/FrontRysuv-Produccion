@@ -268,8 +268,8 @@ function IniciarSolicitud() {
         <div className="form-wrapper">
           {tipoSolicitud === "" && (
             <div className="glass-overlay-lock">
+              <FaUserLock className="lock-icon" />
               <div className="lock-content">
-                <FaUserLock className="lock-icon" />
                 <p>Selecciona un tipo de solicitud para continuar</p>
               </div>
             </div>

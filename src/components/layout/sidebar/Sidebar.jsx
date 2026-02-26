@@ -38,14 +38,14 @@ function Sidebar({ tipoAcceso }) {
 
   return (
     <aside className="sidebar">
-      <div
+      <button
         className="tituloRyS-contenedor"
         onClick={irMenu}
-        style={{ cursor: "pointer" }}
+        aria-label="Abrir menú de RySUV"
       >
         <h2 className="tituloRyS">RySUV</h2>
-        <img src={uvBlanco} alt="Logo UV" className="logoUV" />
-      </div>
+        <img src={uvBlanco} alt="Logo Universidad" className="logoUV" />
+      </button>
 
       <div className="subtextos"></div>
 
