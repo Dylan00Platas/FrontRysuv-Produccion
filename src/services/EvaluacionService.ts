@@ -1,5 +1,5 @@
-import { IRegistrarEvaluacion } from "@/interfaces/evaluaciones/RegistrarEvaluacion.js";
-import APIClient from "./connection/APIClient.js";
+import APIClient from "./connection/APIClient";
+import IRegistrarEvaluacion from "@/interfaces/evaluaciones/RegistrarEvaluacion";
 
 export default class EvaluacionServicio {
   private api: APIClient = new APIClient(

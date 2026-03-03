@@ -1,11 +1,10 @@
 // TODO-Desarrollo: Verificar iinterfaces con el backend y no el servidor
-
 import APIClient from "./connection/APIClient";
-import ISolicitud from "@/interfaces/solicitudes/Solicitud";
-import IActualizarSolicitud from "@/interfaces/solicitudes/ActualizarSolicitud";
 import IActualizarProcesoContratacionCedula from "@/interfaces/solicitudes/ActualizarProcesoContratacionCedula";
+import IActualizarSolicitud from "@/interfaces/solicitudes/ActualizarSolicitud";
 import IRegistrarOficio from "@/interfaces/solicitudes/RegistrarOficio";
 import IRegistrarSeguimientoHermes from "@/interfaces/solicitudes/RegistrarSeguimientoHermes";
+import ISolicitud from "@/interfaces/solicitudes/Solicitud";
 
 export default class SolicitudService {
   private api: APIClient = new APIClient(

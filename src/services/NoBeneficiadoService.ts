@@ -1,4 +1,4 @@
-import APIClient from "./connection/APIClient.js";
+import APIClient from "./connection/APIClient";
 
 export default class NoBeneficiadoService {
   private api: APIClient = new APIClient(

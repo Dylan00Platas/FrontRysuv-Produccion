@@ -1,8 +1,8 @@
-import { EncryptData } from "@/utils/EncryptData.js";
-import APIClient from "./connection/APIClient.js";
-import ICrearUsuario from "@/interfaces/usuarios/CrearUsuario.js";
-import IActualizarUsuario from "@/interfaces/usuarios/ActualizarUsuario.js";
-import mapRolAFK from "@/utils/CatalogoTiposUsuario.js";
+import { EncryptData } from "@/utils/EncryptData";
+import APIClient from "./connection/APIClient";
+import mapRolAFK from "@/utils/CatalogoTiposUsuario";
+import IActualizarUsuario from "@/interfaces/usuarios/ActualizarUsuario";
+import ICrearUsuario from "@/interfaces/usuarios/CrearUsuario";
 
 export default class UsuarioService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_ACCESO_URL);

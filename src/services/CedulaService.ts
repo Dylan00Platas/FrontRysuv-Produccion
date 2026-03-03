@@ -1,6 +1,8 @@
-import { IRegistrarCedulaInterna } from "@/interfaces/cedulas/RegistrarCedulaInterna";
+import IRegistrarCedulaExterna from "@/interfaces/cedulas/RegistrarCedulaExterna";
 import APIClient from "./connection/APIClient";
-import { IRegistrarCedulaResultados } from "@/interfaces/cedulas/RegistrarCedulaResultados";
+import IRegistrarCedulaInterna from "@/interfaces/cedulas/RegistrarCedulaInterna";
+import IRegistrarCedulaResultados from "@/interfaces/cedulas/RegistrarCedulaResultados";
+import IResultadoPsicometria from "@/interfaces/cedulas/ResultadoPsicometria";
 
 export default class CedulaService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
@@ -44,232 +46,91 @@ export default class CedulaService {
     });
   }
 
-  async archivarCedula(idCedula, token) {
-    const datos = {
+  async archivarCedula(token: string, idCedula: number) {
+    const data = {
       estado: true,
     };
-
-    const datosLimpios = this.limpiarDatos(datos);
-
-    return await this.api.request(`/${idCedula}`, "PUT", token, datosLimpios);
-  }
-
-  limpiarDatos(obj) {
-    return Object.fromEntries(
-      Object.entries(obj).filter(([v]) => v !== "" && v !== undefined),
-    );
-  }
-
-  async registrarResultado(idCedula, formData, competencias, token) {
-    const psicometrias = {};
-    competencias.forEach((comp) => {
-      const key = Constantes.nombreCompetenciaMap[comp.nombreCompetencia];
-      if (key) {
-        psicometrias[key] = parseFloat(formData[key]) || 0;
-      }
+    return await this.api.request({
+      endpoint: `/${idCedula}`,
+      method: "PUT",
+      token,
+      body: data,
     });
-
-    let sumaPerfil = 0;
-    let sumaPsicometria = 0;
-
-    competencias.slice(0, 11).forEach((item) => {
-      const perfil = Number(item.perfil) || 0;
-      const keyPsicometria =
-        Constantes.nombreCompetenciaMap[item.nombreCompetencia];
-      const valorPsicometria = Number(formData[keyPsicometria]) || 0;
-
-      sumaPerfil += perfil;
-      sumaPsicometria += valorPsicometria;
-    });
-
-    const resultadoCuantitativo = sumaPsicometria / sumaPerfil;
-    const resultadoPorcentaje = Math.round(resultadoCuantitativo * 100);
-
-    const datos = {
-      FKIdCedula: idCedula,
-      ...psicometrias,
-      resultadoPorcentaje,
-    };
-    const datosLimpios = this.limpiarDatos(datos);
-    return await this.api.request("/resultado", "POST", token, datosLimpios);
   }
 
-  async obtenerDatoInicialesCedula(idProcesoContratacion, token) {
-    const datos = {
+  async registrarResultado(token: string, requestData: IResultadoPsicometria) {
+    return await this.api.request({
+      endpoint: "/resultado",
+      method: "POST",
+      token,
+      body: requestData,
+    });
+  }
+
+  async obtenerDatoInicialesCedula(
+    token: string,
+    idProcesoContratacion: number,
+  ) {
+    const data = {
       idProceso: Number(idProcesoContratacion),
     };
-    try {
-      const response = await this.api.request(
-        "/busqueda",
-        "POST",
-        token,
-        datos,
-      );
-      if (response.error) {
-        throw new Error(
-          "No se pudieron obtener los datos iniciales de la cédula",
-        );
-      }
-      return response.procesoContratacion?.[0];
-    } catch (error) {
-      console.error("Error en obtener datos iniciales de cédula", error);
-      throw error;
-    }
+    const response = await this.api.request({
+      endpoint: "/busqueda",
+      method: "POST",
+      token,
+      body: data,
+    });
   }
 
-  async obtenerTodasCedulasDisponibles(token) {
-    try {
-      const response = await this.api.request(
-        "/obtencionCedulas",
-        "GET",
-        token,
-        null,
-      );
-      if (!response || response.error) {
-        throw new Error(response?.mensaje || "Error al obtener cédulas");
-      }
-      return response.cedulas;
-    } catch (err) {
-      console.error("Error en obtenerCedulas:", err);
-      throw err;
-    }
+  async obtenerTodasCedulasDisponibles(token: string) {
+    return await this.api.request({
+      endpoint: "/obtencionCedulas",
+      method: "GET",
+      token,
+    });
   }
 
-  async obtenerCedulaResultadosPorProceso(IdProceso, token) {
-    try {
-      const response = await this.api.request(
-        `/competencia-resultados/${IdProceso}`,
-        "GET",
-        token,
-        null,
-      );
-
-      // ✅ Verifica si el backend devuelve el objeto directamente o dentro de response.data
-      console.log("🔍 Respuesta completa del servidor:", response);
-
-      if (!response || response.error) {
-        throw new Error("Error en la respuesta del servidor.");
-      }
-
-      // ✅ Asegura que devuelva el objeto con "resultados"
-      return response.data ? response.data : response;
-    } catch (error) {
-      console.error("❌ Error en obtenerCedulaResultadosPorProceso:", error);
-      throw error;
-    }
+  async obtenerCedulaResultadosPorProceso(token: string, IdProceso: number) {
+    return await this.api.request({
+      endpoint: `/competencia-resultados/${IdProceso}`,
+      method: "GET",
+      token,
+    });
   }
 
-  async obtenerCedulaPorId(FKIdProceso, token) {
-    try {
-      const response = await this.api.request(
-        `/busqueda/${FKIdProceso}`,
-        "GET",
-        token,
-        null,
-      );
-
-      console.log(
-        "🔍 Respuesta completa del servidor (obtenerCedulaPorId):",
-        response,
-      );
-
-      if (!response || response.error) {
-        throw new Error(
-          response?.mensaje ||
-            "No se pudo obtener la cédula por el ID del proceso.",
-        );
-      }
-
-      // ✅ Devuelve el primer objeto dentro del arreglo 'cedula'
-      return response.cedula?.[0] || null;
-    } catch (error) {
-      console.error("❌ Error en obtenerCedulaPorId:", error);
-      throw error;
-    }
+  async obtenerCedulaPorId(token: string, FKIdProceso: number) {
+    const response = await this.api.request({
+      endpoint: `/busqueda/${FKIdProceso}`,
+      method: "GET",
+      token,
+    });
   }
 
-  async obtenerCedulasActivas(token) {
-    try {
-      const response = await this.api.request("/activas", "GET", token, null);
-      console.log(
-        "🔍 Respuesta completa del servidor (obtenerCedulasActivas):",
-        response,
-      );
-      if (!response || response.error) {
-        throw new Error(
-          response?.mensaje || "Error al obtener las cédulas activas",
-        );
-      }
-      return response.cedulas || response;
-    } catch (error) {
-      console.error("❌ Error en obtenerCedulasActivas:", error);
-      throw error;
-    }
+  async obtenerCedulasActivas(token: string) {
+    const response = await this.api.request({
+      endpoint: "/activas",
+      method: "GET",
+      token,
+    });
   }
 
-  async registrarCedulaExterna(formData, token) {
-    const datos = {
-      FKIdCedula: formData.FKIdCedula,
-      nombre: formData.nombre,
-      archivo: formData.archivo,
-    };
-
-    const datosLimpios = this.limpiarDatos(datos);
-
-    console.log(
-      "JSON que se enviará a /cedula/externa:",
-      JSON.stringify(datosLimpios, null, 2),
-    );
-
-    try {
-      const response = await this.api.request(
-        "/externa",
-        "POST",
-        token,
-        datosLimpios,
-      );
-
-      if (!response || response.error) {
-        throw new Error(
-          response?.mensaje || "Error al registrar la cédula externa.",
-        );
-      }
-
-      return response;
-    } catch (error) {
-      console.error("❌ Error en registrarCedulaExterna:", error);
-      throw error;
-    }
+  async registrarCedulaExterna(
+    token: string,
+    requestData: IRegistrarCedulaExterna,
+  ) {
+    return await this.api.request({
+      endpoint: "/externa",
+      method: "POST",
+      token,
+      body: requestData,
+    });
   }
 
-  async obtenerCedulaExternaPorIdCedula(FKIdCedula, token) {
-    try {
-      if (!FKIdCedula) {
-        throw new Error("Se requiere el FKIdCedula para la búsqueda.");
-      }
-
-      const response = await this.api.request(
-        `/externa/${FKIdCedula}`,
-        "GET",
-        token,
-        null,
-      );
-
-      console.log(
-        "🔍 Respuesta del servidor (obtenerCedulaExternaPorIdCedula):",
-        response,
-      );
-
-      if (!response || response.error) {
-        throw new Error(
-          response?.mensaje || "No se pudo obtener la cédula externa.",
-        );
-      }
-
-      return response.cedulaExterna || response;
-    } catch (error) {
-      console.error("❌ Error en obtenerCedulaExternaPorIdCedula:", error);
-      throw error;
-    }
+  async obtenerCedulaExternaPorIdCedula(token: string, FKIdCedula: number) {
+    return await this.api.request({
+      endpoint: `/externa/${FKIdCedula}`,
+      method: "GET",
+      token,
+    });
   }
 }

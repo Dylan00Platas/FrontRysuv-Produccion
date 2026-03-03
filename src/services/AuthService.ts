@@ -1,66 +1,63 @@
 import { EncryptData } from "@/utils/EncryptData.js";
 import APIClient from "./connection/APIClient.js";
+import ILogin from "@/interfaces/auth/Login.js";
+import IResponseLogin from "@/interfaces/auth/ResponseLogin.js";
 
 export default class AuthService {
+  private api: APIClient = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
+
   constructor() {
     this.api = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
   }
 
-  async login(usuario, contrasenia) {
-    try {
-      let hashedPassword = await EncryptData.sha256(contrasenia);
+  async login(requestData: ILogin) {
+    let hashedPassword = await EncryptData.sha256(requestData.contrasenia);
 
-      const data = await this.api.request("/login", "POST", null, {
-        usuario,
-        contrasenia: hashedPassword,
-      });
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-      }
+    const response: IResponseLogin = await this.api.request({
+      endpoint: "/login",
+      method: "POST",
+      body: requestData,
+    });
 
-      let mensaje = "Operación completada";
-      if (data?.mensaje) {
-        if (typeof data.mensaje === "string") {
-          mensaje = data.mensaje;
-        } else if (typeof data.mensaje === "object") {
-          // Si el objeto tiene una propiedad "mensaje" interna, úsala
-          if (typeof data.mensaje.mensaje === "string") {
-            mensaje = data.mensaje.mensaje;
+    if (response.token) {
+      this.saveToken(response.token);
+    }
+
+    let mensaje = "Operación completada";
+    if (response?.mensaje) {
+      if (typeof response.mensaje === "string") {
+        mensaje = response.mensaje;
+      } else if (typeof response.mensaje === "object") {
+        // TODO-Desarrollo: Si el objeto tiene una propiedad "mensaje" interna
+        /*
+          if (typeof response.mensaje.mensaje === "string") {
+            mensaje = response.mensaje.mensaje;
           } else {
             // Si no, convierte el objeto en texto legible
             mensaje = JSON.stringify(data.mensaje);
           }
-        }
+          */
       }
-
-      return {
-        usuario: data.usuario || null,
-        token: data.token || null,
-        mensaje,
-        error: !!data.error,
-      };
-    } catch (err) {
-      console.error("Error en la petición:", err);
-
-      if (
-        err.message.includes("Failed to fetch") ||
-        err.message.includes("NetworkError")
-      ) {
-        throw new Error(
-          "No se pudo conectar con el servidor. Verifica tu conexión o inténtalo más tarde.",
-        );
-      }
-
-      throw new Error(err.message || "Error desconocido al iniciar sesión");
     }
+
+    return {
+      token: response.token || null,
+      usuario: response.usuario || null,
+      error: !!response.error,
+      mensaje,
+    };
   }
 
-  logout() {
-    localStorage.removeItem("token");
+  saveToken(token: string) {
+    localStorage.setItem("token", token);
   }
 
   getToken() {
     return localStorage.getItem("token");
+  }
+
+  logout() {
+    localStorage.removeItem("token");
   }
 
   isAuthenticated() {

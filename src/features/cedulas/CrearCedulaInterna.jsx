@@ -11,7 +11,7 @@ import CedulaService from "@/services/CedulaService.js";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
 import CatalogoCedula from "@/utils/CatalogoCedulas.js";
 import SolicitudService from "@/services/SolicitudService.js";
-import Constantes from "@/utils/Constants.js";
+import { nombreCompetenciaMap } from "@/utils/Constants";
 import UserContext from "@/utils/UserContext.jsx";
 
 function CrearCedulaInterna() {
@@ -131,8 +131,7 @@ function CrearCedulaInterna() {
     if (!cedulaFromNav || competencias.length === 0) return;
 
     const valoresPsicometria = competencias.reduce((acc, comp) => {
-      const clavePsicometria =
-        Constantes.nombreCompetenciaMap[comp.nombreCompetencia];
+      const clavePsicometria = nombreCompetenciaMap[comp.nombreCompetencia];
       acc[clavePsicometria] = cedulaFromNav[clavePsicometria] || "";
       return acc;
     }, {});
@@ -389,8 +388,7 @@ function CrearCedulaInterna() {
         const i = index + 1;
         const nombreCompetencia = item.nombreCompetencia || "";
         const perfil = Number(item.perfil) || 0;
-        const keyPsicometria =
-          Constantes.nombreCompetenciaMap[item.nombreCompetencia];
+        const keyPsicometria = nombreCompetenciaMap[item.nombreCompetencia];
         const valorPsicometria = Number(formData[keyPsicometria]) || 0;
         sumaPerfil = sumaPerfil + perfil;
         sumaPsicometria = sumaPsicometria + valorPsicometria;
@@ -704,16 +702,12 @@ function CrearCedulaInterna() {
                             className="form-input"
                             value={
                               formData[
-                                Constantes.nombreCompetenciaMap[
-                                  item.nombreCompetencia
-                                ]
+                                nombreCompetenciaMap[item.nombreCompetencia]
                               ] || ""
                             }
                             onChange={(e) => {
                               const key =
-                                Constantes.nombreCompetenciaMap[
-                                  item.nombreCompetencia
-                                ];
+                                nombreCompetenciaMap[item.nombreCompetencia];
                               handleInputChange(key, e.target.value);
                             }}
                             placeholder="Ingresa valor"

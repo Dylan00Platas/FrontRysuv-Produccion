@@ -9,7 +9,7 @@ import {
   oficioCita,
   oficio43Medica,
   copiaCarbon,
-} from "@/utils/Oficio51y52.js";
+} from "@/utils/Constants";
 
 function GenerarOficio() {
   const { currentUser } = useContext(UserContext);
