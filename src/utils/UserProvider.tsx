@@ -1,27 +1,29 @@
 import { useState, useEffect, ReactNode } from "react";
-import UserContext from "./UserContext.jsx";
+import UserContext, { IUserContext } from "./UserContext";
+import ICurrentUser from "@/interfaces/auth/CurrentUser";
 
 const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [currentUser, setUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<ICurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userSaved = localStorage.getItem("usuario");
-    if (userSaved) {
-      setUser(JSON.parse(userSaved));
+    try {
+      const userSaved = localStorage.getItem("usuario");
+      if (userSaved) {
+        setCurrentUser(JSON.parse(userSaved));
+      }
+    } catch {
+      localStorage.removeItem("usuario");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false); // Se terminó de cargar datos de usuario
   }, []);
 
-  if (loading) {
-    return <p>Cargando...</p>;
-  }
+  if (loading) return null;
 
-  return (
-    <UserContext.Provider value={{ currentUser, setUser }}>
-      {children}
-    </UserContext.Provider>
-  );
+  const value: IUserContext = { currentUser, setCurrentUser };
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
 
 export default UserProvider;

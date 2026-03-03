@@ -1,5 +1,11 @@
-import { createContext } from "react";
+import { createContext, Dispatch, SetStateAction } from "react";
+import ICurrentUser from "@/interfaces/auth/CurrentUser";
 
-const UserContext = createContext({});
+export interface IUserContext {
+  currentUser: ICurrentUser | null;
+  setCurrentUser: Dispatch<SetStateAction<ICurrentUser | null>>;
+}
+
+const UserContext = createContext<IUserContext | undefined>(undefined);
 
 export default UserContext;

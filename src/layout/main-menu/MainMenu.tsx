@@ -2,11 +2,12 @@ import { useEffect, useRef, useState, useContext } from "react";
 import "./MainMenu.css";
 import uvBlanco from "@/assets/uvBlanco.png";
 import Sidebar from "@/layout/sidebar/Sidebar.jsx";
+import { useUser } from "@/hooks/useUser";
 import UserContext from "@/utils/UserContext.jsx";
 
 export function MainMenu() {
   const logoRef = useRef(null);
-  const { currentUser } = useContext(UserContext); // TODO
+  const { currentUser } = useUser(); // TODO
   const [isBouncing, setIsBouncing] = useState(false);
 
   const [pos, setPos] = useState({ x: 200, y: 200 });
