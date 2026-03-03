@@ -7,12 +7,14 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
+# Distribución
+dist/
+dist/*
 dist-ssr
 *.local
 
 # Editor directories and files
+.@/.vscode
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -23,7 +25,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment variables and SSL certificates
 .env
 ./ssl/
 .@/ssl/
-.@/.vscode
+
+# Paquetes
+node_modules
+node_modules/*
+jspm_packages

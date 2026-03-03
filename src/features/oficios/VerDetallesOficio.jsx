@@ -4,7 +4,7 @@ import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
 import { PDFDocument, StandardFonts } from "pdf-lib";
 import * as fontkit from "fontkit";
 
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import UserContext from "@/utils/UserContext.jsx";
 
 function VerDetallesOficio() {

@@ -3,7 +3,7 @@ import { useContext } from "react";
 import Select from "react-select";
 
 import "./AsignarSolicitud.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CatalogoCedula from "@/utils/CatalogoCedulas.js";
 import UsuarioServicio from "@/services/UsuarioService.js";
 import UserContext from "@/utils/UserContext.jsx";

@@ -3,7 +3,7 @@ import { FaSearch, FaClock, FaCaretDown, FaCaretUp } from "react-icons/fa";
 import { useRef } from "react";
 
 import "./Evaluacion.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
 import EvaluacionServicio from "@/services/EvaluacionService.js";
 import UserContext from "@/utils/UserContext.jsx";

@@ -9,7 +9,7 @@ import * as echarts from "echarts";
 import * as fontkit from "fontkit";
 
 import "./CrearConstancia.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CedulaService from "@/services/CedulaService.js";
 import SolicitudService from "@/services/SolicitudService.js";
 import ManageFiles from "@/utils/ManageFiles";

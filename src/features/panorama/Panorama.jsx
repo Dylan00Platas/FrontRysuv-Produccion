@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 import "./Panorama.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService";
 import CedulaService from "@/services/CedulaService";
 import UserContext from "@/utils/UserContext.jsx";

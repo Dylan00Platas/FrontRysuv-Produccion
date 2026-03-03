@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService.js";
 import UserContext from "@/utils/UserContext.jsx";
 

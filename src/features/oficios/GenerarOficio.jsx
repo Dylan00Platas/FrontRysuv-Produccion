@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import UserContext from "@/utils/UserContext.jsx";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService.js";
 import {
   oficio51y52,

@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 
 import "./CandidatoNoBeneficiado.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import UserContext from "@/utils/UserContext.jsx";
 
 function CandidatoNoBeneficiado() {

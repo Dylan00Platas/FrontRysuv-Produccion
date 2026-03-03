@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaUserLock, FaSearch } from "react-icons/fa";
 
 import "./IniciarSolicitud.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
 import UserContext from "@/utils/UserContext.jsx";
 

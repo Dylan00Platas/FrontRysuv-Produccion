@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "./Usuarios.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import UsuarioService from "@/services/UsuarioService.js";
 import UserContext from "@/utils/UserContext.jsx";
 

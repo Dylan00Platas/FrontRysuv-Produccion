@@ -4,7 +4,7 @@ import { FaSearch, FaBell, FaExclamationTriangle } from "react-icons/fa";
 import Select from "react-select";
 
 import "./Procesos.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import UsuarioService from "@/services/UsuarioService.js";
 import SolicitudService from "@/services/SolicitudService.js";
 import UserContext from "@/utils/UserContext.jsx";

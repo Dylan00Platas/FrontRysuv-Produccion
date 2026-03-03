@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    // — Módulos (corregido para Vite) —
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+
+    // — React —
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
+
+    // — Imports —
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] },
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": false,
+    "esModuleInterop": true,
+
+    // — Migración JS → TS —
+    "allowJs": true,
+    "checkJs": false,  // no validar archivos .js viejos
+
+    // — Calidad de código —
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": false,      // TODO-Desarrollo: true al terminar migración
+    "noUnusedParameters": false,  // TODO-Desarrollo: true al terminar migración
+
+    // — Build —
+    "noEmit": true,
+    "isolatedModules": true,
+    "skipLibCheck": true
+  },
+  "include": ["src", "vite-env.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

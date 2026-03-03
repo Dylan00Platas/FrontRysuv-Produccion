@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   font-family:
     Kulim Park,
@@ -13,6 +15,62 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  /*dvh, svh, lvh, vh*/
+  height: 100dvh;
+  width: 100dvw;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
 a {
   font-weight: 500;
   color: #646cff;
@@ -40,3 +98,4 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+*/

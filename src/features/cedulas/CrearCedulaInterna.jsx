@@ -6,12 +6,12 @@ import { FiHelpCircle } from "react-icons/fi";
 import Select from "react-select";
 
 import "./CrearCedulaInterna.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CedulaService from "@/services/CedulaService.js";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
 import CatalogoCedula from "@/utils/CatalogoCedulas.js";
 import SolicitudService from "@/services/SolicitudService.js";
-import Constantes from "@/utils/Constantes.js";
+import Constantes from "@/utils/Constants.js";
 import UserContext from "@/utils/UserContext.jsx";
 
 function CrearCedulaInterna() {

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 import "./cedulas.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CedulaService from "@/services/CedulaService.js";
 import UserContext from "@/utils/UserContext.jsx";
 

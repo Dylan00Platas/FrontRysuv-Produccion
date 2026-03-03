@@ -19,7 +19,7 @@ import {
 } from "recharts";
 
 import "./Estadisticas.css";
-import Sidebar from "@/components/layout/sidebar/Sidebar.jsx";
+import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
 import SolicitudService from "@/services/SolicitudService.js";
 import UsuarioService from "@/services/UsuarioService.js";
