@@ -1,12 +1,11 @@
-import { useEffect, useRef, useState, useContext } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./MainMenu.css";
 import uvBlanco from "@/assets/uvBlanco.png";
 import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import { useUser } from "@/hooks/useUser";
-import UserContext from "@/utils/UserContext.jsx";
 
 export function MainMenu() {
-  const logoRef = useRef(null);
+  const logoRef = useRef<HTMLImageElement>(null);
   const { currentUser } = useUser(); // TODO
   const [isBouncing, setIsBouncing] = useState(false);
 
@@ -61,7 +60,7 @@ export function MainMenu() {
   return (
     <div className="flex size-full bg-white fixed top-0 left-0">
       <main className="contenido">
-        <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
+        <Sidebar tipoAcceso={currentUser.FKIdTipoAcceso} />
         <div className="logo-container">
           <img
             ref={logoRef}

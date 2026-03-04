@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 
 import { InputField } from "@/components/InputField/InputField";
 import { AlertBanner } from "@/components/Alert/OnBody/AlertBanner";
-import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
-import AuthService from "@/services/AuthService.js";
+import CatalogoDependencia from "@/utils/CatalogoDependencia";
+import AuthService from "@/services/AuthService";
+import ILogin from "@/interfaces/auth/Login";
 
 const authService = new AuthService();
 
@@ -27,7 +28,12 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      const resultado = await authService.login(usuario, contrasenia);
+      const data: ILogin = {
+        usuario,
+        contrasenia,
+      };
+
+      const resultado = await authService.login(data);
 
       localStorage.removeItem("token");
       localStorage.removeItem("usuario");
@@ -72,16 +78,14 @@ export function Login() {
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-[linear-gradient(135deg,#191947,#0e27b8,#0466d6,#051d38)] [bg-size:300%_300%] animate-[gradientMove_13s_ease_infinite] relative overflow-hidden">
-
       {/* Orbes decorativos de fondo */}
       <div className="absolute top-[-10%] left-[-5%] w-72 h-72 rounded-full bg-[#0e27b8]/30 blur-[80px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 rounded-full bg-[#0466d6]/20 blur-[100px] pointer-events-none" />
 
       {/* Card */}
       <div className="relative z-10 flex flex-col items-center w-85 px-9 py-10 rounded-2xl border border-white/10 bg-white/[0.07] backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] animate-[fadeInUp_0.8s_ease]">
-
         {/* Logo / Título */}
-        <div className="flex flex-col items-center mb-8"> 
+        <div className="flex flex-col items-center mb-8">
           <h2 className='font-["Kulim_Park"] text-3xl font-thin text-white tracking-widest'>
             RySUV
           </h2>
@@ -129,15 +133,6 @@ export function Login() {
                 onChange={(e) => setContrasenia(e.target.value)}
                 required
               />
-              {/* TODO-Desarrollo: Habilitar toggle de visibilidad de contraseña personalizado
-              <button
-                type="button"
-                onClick={togglePassword}
-                tabIndex={-1}
-                className="absolute w-auto top-5 right-3 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors duration-200 p-1"
-              >
-                {showPassword ? <FaEyeSlash size={15} /> : <FaEye size={15} />}
-              </button>*/}
             </div>
           </div>
 
@@ -158,9 +153,24 @@ export function Login() {
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="3"/>
-                  <path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z"/>
+                <svg
+                  className="animate-spin w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="white"
+                    strokeWidth="3"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="white"
+                    d="M4 12a8 8 0 018-8v8z"
+                  />
                 </svg>
                 Verificando...
               </span>
@@ -172,7 +182,7 @@ export function Login() {
 
         {/* Alertas */}
         {mensaje && <AlertBanner type="success" message={mensaje} />}
-        {error   && <AlertBanner type="error"   message={error}   />}
+        {error && <AlertBanner type="error" message={error} />}
 
         {/* Footer */}
         <p className="mt-7 text-[0.72rem] text-white/25 tracking-wider text-center">
