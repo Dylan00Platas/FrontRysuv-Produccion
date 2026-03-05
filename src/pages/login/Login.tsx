@@ -6,9 +6,6 @@ import { AlertBanner } from "@/components/Alert/OnBody/AlertBanner";
 import CatalogoDependencia from "@/utils/CatalogoDependencia";
 import AuthService from "@/services/AuthService";
 import ILogin from "@/interfaces/auth/Login";
-import { EncryptData } from "@/utils/EncryptData";
-import { useAuthToken } from "@/hooks/useAuthToken";
-import { useUser } from "@/hooks/useUser";
 
 const authService = new AuthService();
 
@@ -16,17 +13,13 @@ export function Login() {
   const [usuario, setUsuario] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const [error, setError] = useState("");
-  const [mensaje, setMensaje] = useState("");
+  const [mensaje, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { JWTToken, saveJWTToken, clearJWTToken, isAuthenticated } =
-    useAuthToken();
-  const { currentUsername, saveCurrentUsername, clearCurrentUsername } =
-    useUser();
 
   const handleLogin = async () => {
     setError("");
-    setMensaje("");
+    setMessage("");
     setIsLoading(true);
 
     try {
@@ -36,42 +29,20 @@ export function Login() {
       };
       const resultado = await authService.login(data);
 
-      clearJWTToken();
-      clearCurrentUsername();
-
-      if (resultado.usuario) {
-        saveCurrentUsername(JSON.stringify(resultado.usuario));
-      }
-
-      if (resultado.token) {
-        saveJWTToken(resultado.token);
-        setMensaje(resultado.mensaje);
+      if (resultado.isError == false) {
+        setMessage(resultado.message);
 
         const catalogoDependencia = new CatalogoDependencia();
-        await catalogoDependencia.cargarDependencias(resultado.token);
+        await catalogoDependencia.cargarDependencias();
 
         navigate("/menu");
         window.location.reload();
       } else {
-        setError("Las credenciales son inválidas");
+        setError(resultado.message);
       }
     } catch (err) {
-      if (
-        err instanceof TypeError &&
-        (err.message.includes("NetworkError") ||
-          err.message.includes("Failed to fetch"))
-      ) {
-        setError("Error de conexión: El servidor no está disponible.");
-      } else if (err && typeof err === "object" && "mensaje" in err) {
-        setError((err as { mensaje: string }).mensaje);
-      } else if (
-        err instanceof Error &&
-        !err.message.includes("[object Object]")
-      ) {
-        setError(err.message);
-      } else {
-        setError("Las credenciales son inválidas");
-      }
+      setError("Error interno del sistema");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }

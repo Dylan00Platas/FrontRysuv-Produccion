@@ -1,7 +1,7 @@
 import { EncryptData } from "@/utils/EncryptData.js";
-import APIClient from "./connection/APIClient.js";
-import ILogin from "@/interfaces/auth/Login.js";
-import IResponseLogin from "@/interfaces/auth/ResponseLogin.js";
+import APIClient from "./connection/APIClient";
+import ILogin from "@/interfaces/auth/Login";
+import IResponseHTTP from "@/interfaces/http/Response";
 
 export default class AuthService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
@@ -13,39 +13,16 @@ export default class AuthService {
   async login(requestData: ILogin) {
     requestData.contrasenia = await EncryptData.sha256(requestData.contrasenia);
 
-    const response: IResponseLogin = await this.api.request({
+    const response: IResponseHTTP<string> = await this.api.request({
       endpoint: "/login",
       method: "POST",
       body: requestData,
       withCredentials: false,
     });
 
-    if (response.token) {
-      this.saveToken(response.token);
-    }
-
-    let mensaje = "Operación completada";
-    if (response?.mensaje) {
-      if (typeof response.mensaje === "string") {
-        mensaje = response.mensaje;
-      } else if (typeof response.mensaje === "object") {
-        // TODO-Desarrollo: Si el objeto tiene una propiedad "mensaje" interna
-        /*
-          if (typeof response.mensaje.mensaje === "string") {
-            mensaje = response.mensaje.mensaje;
-          } else {
-            // Si no, convierte el objeto en texto legible
-            mensaje = JSON.stringify(data.mensaje);
-          }
-          */
-      }
-    }
-
     return {
-      token: response.token || null,
-      usuario: response.usuario || null,
-      error: !!response.error,
-      mensaje,
+      isError: response.error!!,
+      message: response.mensaje,
     };
   }
 
