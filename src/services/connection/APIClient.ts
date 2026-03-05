@@ -2,7 +2,10 @@ import IRequestHTTP from "@/interfaces/http/Request";
 import { APIError } from "./APIError";
 
 export default class APIClient {
-  constructor(public baseUrl: string) {}
+  constructor(
+    public baseUrl: string,
+    private defaultWithCredentials = true,
+  ) {}
 
   async request<T = unknown>(request: IRequestHTTP): Promise<T> {
     try {
@@ -22,6 +25,11 @@ export default class APIClient {
 
       if (request.body) {
         options.body = JSON.stringify(request.body);
+      }
+
+      // credentials: true por default
+      if (request.withCredentials ?? this.defaultWithCredentials) {
+        options.credentials = "include";
       }
 
       const response = await fetch(

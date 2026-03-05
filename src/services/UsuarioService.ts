@@ -11,19 +11,18 @@ export default class UsuarioService {
     this.api = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
   }
 
-  async crearUsuario(token: string, userData: ICrearUsuario) {
+  async crearUsuario(userData: ICrearUsuario) {
     userData.contrasenia = await EncryptData.sha256(userData.contrasenia);
     userData.FKIdTipoAcceso = mapRolAFK({ idRol: userData.FKIdTipoAcceso });
 
     return await this.api.request({
       endpoint: "/",
       method: "POST",
-      token,
       body: userData,
     });
   }
 
-  async actualizarUsuario(token: string, userData: IActualizarUsuario) {
+  async actualizarUsuario(userData: IActualizarUsuario) {
     userData.FKIdTipoAcceso = mapRolAFK({ idRol: userData.FKIdTipoAcceso });
     userData.estado = 1;
 
@@ -34,32 +33,28 @@ export default class UsuarioService {
     return await this.api.request({
       endpoint: `/${userData.idAcceso}`,
       method: "PUT",
-      token,
       body: userData,
     });
   }
 
-  async obtenerUsuarios(token: string) {
+  async obtenerUsuarios() {
     return await this.api.request({
       endpoint: "/usuarios",
       method: "GET",
-      token,
     });
   }
 
-  async desactivarUsuario(token: string, idAcceso: number) {
+  async desactivarUsuario(idAcceso: number) {
     return await this.api.request({
       endpoint: `/usuario/${idAcceso}`,
       method: "PUT",
-      token,
     });
   }
 
-  async obtenerAnalistas(token: string) {
+  async obtenerAnalistas() {
     return await this.api.request({
       endpoint: "/analistas",
       method: "GET",
-      token,
     });
   }
 }

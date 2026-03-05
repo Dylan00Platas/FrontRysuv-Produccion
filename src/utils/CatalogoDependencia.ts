@@ -9,13 +9,12 @@ export default class CatalogoDependencia {
     this.api = new APIClient(import.meta.env.VITE_API_CATALOGO_URL);
   }
 
-  async cargarDependencias(token: string) {
+  async cargarDependencias() {
     const response = await this.api.request<{
       dependencias: IDependencia[];
     }>({
       endpoint: "/dependencias",
       method: "GET",
-      token,
     });
 
     CatalogoDependencia.dependencias = response.dependencias;

@@ -19,51 +19,40 @@ export default class SolicitudService {
    * crearSolicitudAsignacionRequisicion()
    * crearSolicitudBolsaTrabajo()
    *  */
-  async crearSolicitudAsignacionRequisicion(
-    requestData: ISolicitud,
-    token: string,
-  ) {
+  async crearSolicitudAsignacionRequisicion(requestData: ISolicitud) {
     requestData.FKIdTipoProceso = 2;
     return await this.api.request({
       endpoint: "/",
       method: "POST",
-      token,
       body: requestData,
     });
   }
 
-  async crearSolicitudBolsaTrabajo(requestData: ISolicitud, token: string) {
+  async crearSolicitudBolsaTrabajo(requestData: ISolicitud) {
     requestData.FKIdTipoProceso = 3;
     return await this.api.request({
       endpoint: "/",
       method: "POST",
-      token,
       body: requestData,
     });
   }
 
-  async obtenerSolicitudes(token: string) {
+  async obtenerSolicitudes() {
     return await this.api.request({
       endpoint: "/busqueda/procesos/",
       method: "GET",
-      token,
     });
   }
 
-  async editarSolicitud(
-    idSolicitud: number,
-    dataUpdate: IActualizarSolicitud,
-    token: string,
-  ) {
+  async editarSolicitud(idSolicitud: number, dataUpdate: IActualizarSolicitud) {
     return await this.api.request({
       endpoint: `/${idSolicitud}`,
       method: "PUT",
-      token,
       body: dataUpdate,
     });
   }
 
-  async capacitarCandidato(idProceso: number, token: string) {
+  async capacitarCandidato(idProceso: number) {
     // TODO-Desarrllo: Checar el uso de la estructura
     const data = {
       capacitado: true,
@@ -73,89 +62,72 @@ export default class SolicitudService {
     return await this.api.request({
       endpoint: `/${idProceso}`,
       method: "PUT",
-      token,
       body: data,
     });
   }
 
   async actualizarProcesoContratacionCedula(
-    token: string,
     idProceso: number,
     requestData: IActualizarProcesoContratacionCedula,
   ) {
     return await this.api.request({
       endpoint: `/${idProceso}`,
       method: "PUT",
-      token,
       body: requestData,
     });
   }
 
   async registrarControlVersion(
-    token: string,
     requestData: IActualizarProcesoContratacionCedula,
   ) {
     return await this.api.request({
       endpoint: "/control-version",
       method: "POST",
-      token,
       body: requestData,
     });
   }
 
-  async ObtenerVersionesPorID(token: string, FKIdProceso: number) {
+  async ObtenerVersionesPorID(FKIdProceso: number) {
     return await this.api.request({
       endpoint: `/busqueda/control-version/${FKIdProceso}`,
       method: "GET",
-      token,
     });
   }
 
-  async eliminarProcesoPorID(token: string, idProceso: number) {
+  async eliminarProcesoPorID(idProceso: number) {
     return await this.api.request({
       endpoint: `/eliminacion/${idProceso}`,
       method: "DELETE",
-      token,
     });
   }
 
-  async registrarOficio(token: string, requestData: IRegistrarOficio) {
+  async registrarOficio(requestData: IRegistrarOficio) {
     return await this.api.request({
       endpoint: "/oficio",
       method: "POST",
-      token,
       body: requestData,
     });
   }
 
-  async obtenerOficiosPorProceso(
-    token: string,
-    FKIdProcesoContratacion: number,
-  ) {
+  async obtenerOficiosPorProceso(FKIdProcesoContratacion: number) {
     return await this.api.request({
       endpoint: `/oficios/${FKIdProcesoContratacion}`,
       method: "GET",
-      token,
     });
   }
 
-  async registrarSeguimientoHermes(
-    token: string,
-    requestData: IRegistrarSeguimientoHermes,
-  ) {
+  async registrarSeguimientoHermes(requestData: IRegistrarSeguimientoHermes) {
     return await this.api.request({
       endpoint: "/seguimiento-hermes",
       method: "POST",
-      token,
       body: requestData,
     });
   }
 
-  async obtenerTodosSeguimientoHermes(token: string) {
+  async obtenerTodosSeguimientoHermes() {
     return await this.api.request({
       endpoint: "/obtencion-seguimiento-hermes",
       method: "GET",
-      token,
     });
   }
 }

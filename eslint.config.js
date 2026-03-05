@@ -7,11 +7,14 @@ import { defineConfig, globalIgnores } from "eslint/config";
 export default defineConfig([
   globalIgnores(["dist"]),
   {
-    files: ["**/*.{js,jsx}"],
+    files: ["**/*.{js,jsx,ts,tsx}"],
     extends: [
       js.configs.recommended,
+      ts.configs.recommended,
       reactHooks.configs["recommended-latest"],
       reactRefresh.configs.vite,
+      "react-app",
+      "react-hooks",
     ],
     languageOptions: {
       ecmaVersion: 2020,
@@ -24,6 +27,15 @@ export default defineConfig([
     },
     rules: {
       "no-unused-vars": ["error", { varsIgnorePattern: "^[A-Z_]" }],
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      "react/tsx-key": "error",
+      "react/jsx-key": "error",
+      "react/no-array-index-key": "warn",
+      "react/no-danger": "error",
+      "react/jsx-no-bind": "warn",
+      "react/tsx-no-bind": "warn",
+      "react/display-name": "error",
     },
   },
 ]);

@@ -11,14 +11,12 @@ export default class EvaluacionServicio {
   }
 
   async registrarEvaluacion(
-    token: string,
     idProceso: number,
     requestData: IRegistrarEvaluacion,
   ) {
     return await this.api.request({
       endpoint: `/${idProceso}`,
       method: "PUT",
-      token,
       body: requestData,
     });
   }

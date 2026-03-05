@@ -11,126 +11,99 @@ export default class CedulaService {
     this.api = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
   }
 
-  async obtenerCompetenciasPorClasificacionCedula(
-    token: string,
-    idCedula: number,
-  ) {
+  async obtenerCompetenciasPorClasificacionCedula(idCedula: number) {
     return await this.api.request({
       endpoint: `/competencia/${idCedula}`,
       method: "GET",
-      token,
     });
   }
 
-  async registrarCedulaInterna(
-    token: string,
-    requestData: IRegistrarCedulaInterna,
-  ) {
+  async registrarCedulaInterna(requestData: IRegistrarCedulaInterna) {
     return await this.api.request({
       endpoint: "/",
       method: "POST",
-      token,
       body: requestData,
     });
   }
 
-  async registrarCedulaResultados(
-    token: string,
-    requestData: IRegistrarCedulaResultados,
-  ) {
+  async registrarCedulaResultados(requestData: IRegistrarCedulaResultados) {
     return await this.api.request({
       endpoint: "/",
       method: "POST",
-      token,
       body: requestData,
     });
   }
 
-  async archivarCedula(token: string, idCedula: number) {
+  async archivarCedula(idCedula: number) {
     const data = {
       estado: true,
     };
     return await this.api.request({
       endpoint: `/${idCedula}`,
       method: "PUT",
-      token,
       body: data,
     });
   }
 
-  async registrarResultado(token: string, requestData: IResultadoPsicometria) {
+  async registrarResultado(requestData: IResultadoPsicometria) {
     return await this.api.request({
       endpoint: "/resultado",
       method: "POST",
-      token,
       body: requestData,
     });
   }
 
-  async obtenerDatoInicialesCedula(
-    token: string,
-    idProcesoContratacion: number,
-  ) {
+  async obtenerDatoInicialesCedula(idProcesoContratacion: number) {
     const data = {
       idProceso: Number(idProcesoContratacion),
     };
     const response = await this.api.request({
       endpoint: "/busqueda",
       method: "POST",
-      token,
       body: data,
     });
   }
 
-  async obtenerTodasCedulasDisponibles(token: string) {
+  async obtenerTodasCedulasDisponibles() {
     return await this.api.request({
       endpoint: "/obtencionCedulas",
       method: "GET",
-      token,
     });
   }
 
-  async obtenerCedulaResultadosPorProceso(token: string, IdProceso: number) {
+  async obtenerCedulaResultadosPorProceso(IdProceso: number) {
     return await this.api.request({
       endpoint: `/competencia-resultados/${IdProceso}`,
       method: "GET",
-      token,
     });
   }
 
-  async obtenerCedulaPorId(token: string, FKIdProceso: number) {
+  async obtenerCedulaPorId(FKIdProceso: number) {
     const response = await this.api.request({
       endpoint: `/busqueda/${FKIdProceso}`,
       method: "GET",
-      token,
     });
   }
 
-  async obtenerCedulasActivas(token: string) {
+  async obtenerCedulasActivas() {
     const response = await this.api.request({
       endpoint: "/activas",
       method: "GET",
-      token,
     });
   }
 
-  async registrarCedulaExterna(
-    token: string,
-    requestData: IRegistrarCedulaExterna,
-  ) {
+  async registrarCedulaExterna(requestData: IRegistrarCedulaExterna) {
     return await this.api.request({
       endpoint: "/externa",
       method: "POST",
-      token,
       body: requestData,
     });
   }
 
-  async obtenerCedulaExternaPorIdCedula(token: string, FKIdCedula: number) {
+  async obtenerCedulaExternaPorIdCedula(FKIdCedula: number) {
     return await this.api.request({
       endpoint: `/externa/${FKIdCedula}`,
       method: "GET",
-      token,
     });
   }
 }

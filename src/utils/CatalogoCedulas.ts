@@ -9,13 +9,12 @@ export default class CatalogoCedula {
     this.api = new APIClient(import.meta.env.VITE_API_CATALOGO_URL);
   }
 
-  async cargarCedulas(token: string) {
+  async cargarCedulas() {
     const response = await this.api.request<{
       clasificacionesCedula: ICedula[];
     }>({
       endpoint: "/clasificacionesCedula",
       method: "GET",
-      token,
     });
 
     CatalogoCedula.clasificacionesCedula = response.clasificacionesCedula;

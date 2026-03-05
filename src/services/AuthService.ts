@@ -11,12 +11,13 @@ export default class AuthService {
   }
 
   async login(requestData: ILogin) {
-    let hashedPassword = await EncryptData.sha256(requestData.contrasenia);
+    requestData.contrasenia = await EncryptData.sha256(requestData.contrasenia);
 
     const response: IResponseLogin = await this.api.request({
       endpoint: "/login",
       method: "POST",
       body: requestData,
+      withCredentials: false,
     });
 
     if (response.token) {
@@ -49,18 +50,18 @@ export default class AuthService {
   }
 
   saveToken(token: string) {
-    localStorage.setItem("token", token);
+    // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
   }
 
   getToken() {
-    return localStorage.getItem("token");
+    // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
   }
 
   logout() {
-    localStorage.removeItem("token");
+    // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
   }
 
   isAuthenticated() {
-    return !!this.getToken();
+    // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
   }
 }

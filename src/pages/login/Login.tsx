@@ -1,4 +1,3 @@
-//import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -7,20 +6,23 @@ import { AlertBanner } from "@/components/Alert/OnBody/AlertBanner";
 import CatalogoDependencia from "@/utils/CatalogoDependencia";
 import AuthService from "@/services/AuthService";
 import ILogin from "@/interfaces/auth/Login";
+import { EncryptData } from "@/utils/EncryptData";
+import { useAuthToken } from "@/hooks/useAuthToken";
+import { useUser } from "@/hooks/useUser";
 
 const authService = new AuthService();
 
 export function Login() {
-  const navigate = useNavigate();
-
   const [usuario, setUsuario] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const togglePassword = () => setShowPassword((prev) => !prev);
+  const navigate = useNavigate();
+  const { JWTToken, saveJWTToken, clearJWTToken, isAuthenticated } =
+    useAuthToken();
+  const { currentUsername, saveCurrentUsername, clearCurrentUsername } =
+    useUser();
 
   const handleLogin = async () => {
     setError("");
@@ -32,18 +34,17 @@ export function Login() {
         usuario,
         contrasenia,
       };
-
       const resultado = await authService.login(data);
 
-      localStorage.removeItem("token");
-      localStorage.removeItem("usuario");
+      clearJWTToken();
+      clearCurrentUsername();
 
       if (resultado.usuario) {
-        localStorage.setItem("usuario", JSON.stringify(resultado.usuario));
+        saveCurrentUsername(JSON.stringify(resultado.usuario));
       }
 
       if (resultado.token) {
-        localStorage.setItem("token", resultado.token);
+        saveJWTToken(resultado.token);
         setMensaje(resultado.mensaje);
 
         const catalogoDependencia = new CatalogoDependencia();
@@ -125,7 +126,7 @@ export function Login() {
             </label>
             <div className="relative">
               <InputField
-                type={showPassword ? "text" : "password"}
+                type="password"
                 name="password"
                 autoComplete="current-password"
                 placeholder="Ingresa tu contraseña"

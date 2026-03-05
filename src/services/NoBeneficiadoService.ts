@@ -9,11 +9,10 @@ export default class NoBeneficiadoService {
     this.api = new APIClient(import.meta.env.VITE_API_PROCESO_CONTRATACION_URL);
   }
 
-  async ObtenerTodosLosNoBeneficiados(token: string) {
+  async ObtenerTodosLosNoBeneficiados() {
     return await this.api.request({
       endpoint: "/noBeneficiados",
       method: "GET",
-      token,
     });
   }
 }
