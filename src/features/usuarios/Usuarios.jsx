@@ -11,14 +11,13 @@ function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
-  const { currentUser } = useContext(UserContext);
-  const usuarioServicio = new UsuarioService();
+  const currentUser = useContext(UserContext);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
         const token = localStorage.getItem("token");
-        const data = await usuarioServicio.obtenerUsuarios(token);
+        const data = await new UsuarioService().obtenerUsuarios();
         const usuariosActivos = data.filter((u) => u.estado === true);
         setUsuarios(usuariosActivos);
       } catch (err) {
@@ -42,7 +41,6 @@ function Usuarios() {
 
   return (
     <div className="usuarios-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
       <main className="main-content">
         <div className="page-header2">
           <h1 className="page-title2">Usuarios</h1>

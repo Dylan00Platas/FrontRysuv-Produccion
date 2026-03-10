@@ -15,7 +15,8 @@ import { useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import uvBlanco from "@/assets/uvBlanco.png";
 
-export function Sidebar(tipoAcceso: number) {
+export function Sidebar() {
+  const tipoAcceso: number = 1;
   const navigate = useNavigate();
 
   const irPanorama = () => navigate("/panorama");

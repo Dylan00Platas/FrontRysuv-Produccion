@@ -11,28 +11,29 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 
-import Agenda from "./features/agenda/Agenda.jsx";
+import Agenda from "./features/agendas/Agenda";
 import Cedulas from "./features/cedulas/Cedulas.jsx";
 import CrearCedulaInterna from "./features/cedulas/CrearCedulaInterna.jsx";
-import CrearConstancia from "./features/cedulas/CrearConstancia.jsx";
+import CrearConstancia from "./features/cedulas/CrearConstancia";
 import Estadisticas from "./features/estadisticas/Estadisticas.jsx";
 import GenerarOficio from "./features/oficios/GenerarOficio.jsx";
-import VerDetallesOficio from "./features/oficios/VerDetallesOficio.jsx";
+import VerDetallesOficio from "./features/oficios/VerDetallesOficio";
 import VerOficios from "./features/oficios/VerOficios.jsx";
-import CandidatoNoBeneficiado from "./features/no-beneficiados/CandidatoNoBeneficiado.jsx";
-import NoBeneficiados from "./features/no-beneficiados/NoBeneficiados.jsx";
-import Panorama from "./features/panorama/Panorama.jsx";
-import Evaluacion from "./features/procesos/Evaluacion.jsx";
-import Procesos from "./features/procesos/Procesos.jsx";
+import CandidatoNoBeneficiado from "./features/no-beneficiados/CandidatoNoBeneficiado";
+import NoBeneficiados from "./features/no-beneficiados/NoBeneficiados";
+import Panorama from "./features/panorama/Panorama";
+import Evaluacion from "./features/procesos/Evaluacion";
+import Procesos from "./features/procesos/Procesos";
 import SeguimientoHermes from "./features/seguimiento-hermes/SeguimientoHermes.jsx";
-import AsignarSolicitud from "./features/solicitudes/AsignarSolicitud.jsx";
-import IniciarSolicitud from "./features/solicitudes/IniciarSolicitud.jsx";
-import Solicitudes from "./features/solicitudes/Solicitudes.jsx";
-import CrearUsuario from "./features/usuarios/CrearUsuario.jsx";
-import EditarUsuario from "./features/usuarios/EditarUsuario.jsx";
-import Usuarios from "./features/usuarios/Usuarios.jsx";
+import AsignarSolicitud from "./features/solicitudes/AsignarSolicitud";
+import IniciarSolicituD from "./features/solicitudes/IniciarSolicitud";
+import Solicitudes from "./features/solicitudes/Solicitudes";
+import CrearUsuario from "./features/usuarios/CrearUsuario";
+import EditarUsuario from "./features/usuarios/EditarUsuario";
+import Usuarios from "./features/usuarios/Usuarios";
 import { Login } from "@/pages/login/Login";
 import { MainMenu } from "@/layout/main-menu/MainMenu";
+import MainLayout from "./layout/main-layout/main-layout";
 
 function AppRoutes() {
   const location = useLocation();
@@ -64,7 +65,14 @@ function AppRoutes() {
         <Route path="/cedulas" element={<Cedulas />} />
         <Route path="/editar-usuario" element={<EditarUsuario />} />
         <Route path="/panorama" element={<Panorama />} />
-        <Route path="/agenda" element={<Agenda />} />
+        <Route
+          path="/agenda"
+          element={
+            <MainLayout>
+              <Agenda />
+            </MainLayout>
+          }
+        />
         <Route path="/generar-oficio" element={<GenerarOficio />} />
         <Route path="/ver-oficios" element={<VerOficios />} />
         <Route path="/ver-detalles-oficio" element={<VerDetallesOficio />} />

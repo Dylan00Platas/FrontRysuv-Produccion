@@ -5,6 +5,8 @@ import IActualizarSolicitud from "@/interfaces/solicitudes/ActualizarSolicitud";
 import IRegistrarOficio from "@/interfaces/solicitudes/RegistrarOficio";
 import IRegistrarSeguimientoHermes from "@/interfaces/solicitudes/RegistrarSeguimientoHermes";
 import ISolicitud from "@/interfaces/solicitudes/Solicitud";
+import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
+import { IActualizarEstadoCita } from "@/utils/features/ActualizarEstadoCita";
 
 export default class SolicitudService {
   private api: APIClient = new APIClient(
@@ -37,16 +39,16 @@ export default class SolicitudService {
     });
   }
 
-  async obtenerSolicitudes() {
+  async obtenerSolicitudes(): Promise<Record<string, ISolicitudProceso>> {
     return await this.api.request({
       endpoint: "/busqueda/procesos/",
       method: "GET",
     });
   }
 
-  async editarSolicitud(idSolicitud: number, dataUpdate: IActualizarSolicitud) {
+  async editarSolicitud(dataUpdate: IActualizarEstadoCita) {
     return await this.api.request({
-      endpoint: `/${idSolicitud}`,
+      endpoint: `/${dataUpdate.idEventoSeleccionado}`,
       method: "PUT",
       body: dataUpdate,
     });

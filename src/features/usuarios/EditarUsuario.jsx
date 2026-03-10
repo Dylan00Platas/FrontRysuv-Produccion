@@ -11,7 +11,7 @@ function EditarUsuario() {
   const navigate = useNavigate();
   const location = useLocation();
   const usuarioAEditar = location.state?.usuario || null;
-  const { currentUser } = useContext(UserContext);
+  const currentUser = useContext(UserContext);
 
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
 
