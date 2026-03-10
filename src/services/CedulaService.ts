@@ -3,6 +3,9 @@ import APIClient from "./connection/APIClient";
 import IRegistrarCedulaInterna from "@/interfaces/cedulas/RegistrarCedulaInterna";
 import IRegistrarCedulaResultados from "@/interfaces/cedulas/RegistrarCedulaResultados";
 import IResultadoPsicometria from "@/interfaces/cedulas/ResultadoPsicometria";
+import IResponseHTTP from "@/interfaces/http/Response";
+import { ICedulaRaw } from "@/interfaces/cedulas/CedulaRaw";
+import { ICedulaExterna } from "@/interfaces/cedulas/CedulaExterna";
 
 export default class CedulaService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
@@ -64,7 +67,7 @@ export default class CedulaService {
     });
   }
 
-  async obtenerTodasCedulasDisponibles() {
+  async obtenerTodasCedulasDisponibles(): Promise<IResponseHTTP<ICedulaRaw[]>> {
     return await this.api.request({
       endpoint: "/obtencionCedulas",
       method: "GET",
@@ -100,7 +103,9 @@ export default class CedulaService {
     });
   }
 
-  async obtenerCedulaExternaPorIdCedula(FKIdCedula: number) {
+  async obtenerCedulaExternaPorIdCedula(
+    FKIdCedula: number,
+  ): Promise<IResponseHTTP<ICedulaExterna>> {
     return await this.api.request({
       endpoint: `/externa/${FKIdCedula}`,
       method: "GET",

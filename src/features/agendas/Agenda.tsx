@@ -9,7 +9,6 @@ import listPlugin from "@fullcalendar/list";
 
 import "./Agenda.css";
 import SolicitudService from "@/services/SolicitudService.js";
-import UserContext from "@/utils/UserContext.jsx";
 import { resolverColor } from "@/utils/CatalogosNoseDonde";
 import { solicitudAEvento } from "@/utils/features/Agendas";
 import { IEventoAgenda } from "@/interfaces/agendas/EventoAgenda";
@@ -24,7 +23,6 @@ interface OpcionEstado {
 }
 
 function Agenda() {
-  const currentUser = useContext(UserContext);
   const [eventos, setEventos] = useState<IEventoAgenda[]>([]);
   // Estado para modal
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -174,10 +172,15 @@ function Agenda() {
   return (
     <>
       <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto">
-        <div className="page-header2">
-          <h1 className="text-[clamp(24px,2.5vw,36px)] font-bold mb-5 text-[#18529d]">
+        {/* Header */}
+        <div className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1">
+            Gestión de fechas de eventos y procesos
+          </p>
+          <h1 className="text-3xl font-extrabold text-[#18529d] tracking-tight">
             Agenda
           </h1>
+          <div className="mt-2 h-1 w-16 rounded-full bg-linear-to-r from-[#18529d] to-[#199532]" />
         </div>
 
         <div className="bg-white p-3.75 rounded-[10px] shadow-[0_3px_8px_rgba(0,0,0,0.1)] -mt-[3%]">
