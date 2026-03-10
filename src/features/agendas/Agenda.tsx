@@ -8,17 +8,15 @@ import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 
 import "./Agenda.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService.js";
 import UserContext from "@/utils/UserContext.jsx";
-import { mapColorEstado, resolverColor } from "@/utils/CatalogosNoseDonde";
-import { getEventosAgenda, solicitudAEvento } from "@/utils/features/Agendas";
+import { resolverColor } from "@/utils/CatalogosNoseDonde";
+import { solicitudAEvento } from "@/utils/features/Agendas";
 import { IEventoAgenda } from "@/utils/features/EventoAgenda";
 import { IEventoSeleccionado } from "@/utils/features/EventoSeleccionado";
-import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
-import IActualizarSolicitud from "@/interfaces/solicitudes/ActualizarSolicitud";
 import { IActualizarEstadoCita } from "@/utils/features/ActualizarEstadoCita";
+import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
 
 interface OpcionEstado {
   value: string;
@@ -175,12 +173,14 @@ function Agenda() {
 
   return (
     <>
-      <main className="agenda-main">
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto">
         <div className="page-header2">
-          <h1 className="page-title2">Agenda</h1>
+          <h1 className="text-[clamp(24px,2.5vw,36px)] font-bold mb-5 text-[#18529d]">
+            Agenda
+          </h1>
         </div>
 
-        <div className="agenda-container">
+        <div className="bg-white p-3.75 rounded-[10px] shadow-[0_3px_8px_rgba(0,0,0,0.1)] -mt-[3%]">
           <FullCalendar
             plugins={[
               dayGridPlugin,
@@ -190,7 +190,6 @@ function Agenda() {
             ]}
             initialView="dayGridMonth"
             eventDrop={handleEventDrop}
-            //TODO-Desarrollo: Validate cookie
             editable={true}
             eventDurationEditable={false}
             locale={esLocale}
@@ -206,16 +205,29 @@ function Agenda() {
         </div>
       </main>
 
-      {/* ── Modal ─────────────────────────────────────────────────────────── */}
+      {/* ── Modal ───────────────────────────────────────────────────────── */}
       {modalAbierto && eventoSeleccionado && (
-        <div className="modal-overlay" onClick={() => setModalAbierto(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Cita</h2>
+        <div
+          className="fixed inset-0 bg-black/50 flex justify-center items-center z-2000"
+          onClick={() => setModalAbierto(false)}
+        >
+          <div
+            className="bg-white p-6.25 rounded-xl w-87.5 shadow-[0_4px_12px_rgba(0,0,0,0.2)] animate-[fadeIn_0.3s_ease] font-[Kulim_Park,sans-serif]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-[2.5rem] font-bold text-[#18529d] mb-37.5 -mt-3.75 pb-3.75">
+              Cita
+            </h2>
 
-            <label className="modal-label">Candidato:</label>
-            <p className="modal-text">{eventoSeleccionado.candidato}</p>
+            <label className="mt-2.5 font-semibold text-[#18529d]">
+              Candidato:
+            </label>
+            <p className="mt-1">{eventoSeleccionado.candidato}</p>
 
-            <label htmlFor={`${fieldID}-date`} className="modal-label">
+            <label
+              htmlFor={`${fieldID}-date`}
+              className="mt-2.5 font-semibold text-[#18529d] block"
+            >
               Fecha:
             </label>
             <input
@@ -228,12 +240,14 @@ function Agenda() {
                   fecha: e.target.value,
                 })
               }
-              className="h-6.25 w-100 modal-input custom-date"
+              className="w-full px-2 py-2 mt-1.5 rounded-md border border-[#ccc] h-6.25"
             />
 
-            <label className="modal-label">Estado:</label>
+            <label className="mt-2.5 font-semibold text-[#18529d] block">
+              Estado:
+            </label>
             <Select<OpcionEstado>
-              className="modal-select"
+              className="modal-select" /* react-select necesita esta clase para overrides */
               classNamePrefix="react-select"
               isDisabled={
                 !ESTADOS_EDITABLES.includes(Number(eventoSeleccionado.estado))
@@ -251,7 +265,6 @@ function Agenda() {
                     : 1,
                 }),
               }}
-              // CORRECCIÓN: se usa === con String() para comparación segura de tipos
               value={
                 OPCIONES_ESTADO.find(
                   (opt) => opt.value === String(eventoSeleccionado.estado),
@@ -268,7 +281,7 @@ function Agenda() {
               options={OPCIONES_ESTADO}
             />
 
-            <div className="modal-checkbox">
+            <div className="flex items-center mt-3 gap-2">
               <input
                 id={`${fieldID}-atendioCita`}
                 type="checkbox"
@@ -283,16 +296,16 @@ function Agenda() {
               <label htmlFor={`${fieldID}-atendioCita`}>No asistió</label>
             </div>
 
-            <div className="modal-buttons">
+            <div className="flex flex-col gap-0">
               <button
-                className="modal-btnGuardar"
                 onClick={handleGuardarCambios}
+                className="mt-6.25 w-full py-2.5 bg-[#199532] text-white border-none rounded-md cursor-pointer hover:bg-[#157929] transition-colors duration-200"
               >
                 Guardar
               </button>
               <button
-                className="modal-btnCerrar"
                 onClick={() => setModalAbierto(false)}
+                className="mt-6.25 w-full py-2.5 bg-[#18529d] text-white border-none rounded-md cursor-pointer hover:bg-[#0f3d75] transition-colors duration-200"
               >
                 Cerrar
               </button>

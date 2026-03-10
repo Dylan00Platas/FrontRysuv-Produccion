@@ -26,7 +26,7 @@ import Evaluacion from "./features/procesos/Evaluacion";
 import Procesos from "./features/procesos/Procesos";
 import SeguimientoHermes from "./features/seguimiento-hermes/SeguimientoHermes.jsx";
 import AsignarSolicitud from "./features/solicitudes/AsignarSolicitud";
-import IniciarSolicituD from "./features/solicitudes/IniciarSolicitud";
+import IniciarSolicitud from "./features/solicitudes/IniciarSolicitud";
 import Solicitudes from "./features/solicitudes/Solicitudes";
 import CrearUsuario from "./features/usuarios/CrearUsuario";
 import EditarUsuario from "./features/usuarios/EditarUsuario";

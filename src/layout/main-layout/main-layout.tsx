@@ -7,8 +7,8 @@ type Props = {
 
 export default function MainLayout({ children }: Props) {
   return (
-    <div className="flex w-svw h-svh bg-white ">
-      <Sidebar />
+    <div className="flex lg:flex-col sm:flex-row w-svw h-svh bg-white ">
+      <Sidebar tipoAcceso={1} />
       {children}
     </div>
   );
