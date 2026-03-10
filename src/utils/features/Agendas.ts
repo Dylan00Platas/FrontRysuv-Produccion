@@ -1,7 +1,7 @@
 import SolicitudService from "@/services/SolicitudService";
 import { mapColorEstado, resolverColor } from "../CatalogosNoseDonde";
 import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
-import { IEventoAgenda } from "./EventoAgenda";
+import { IEventoAgenda } from "../../interfaces/agendas/EventoAgenda";
 
 // TODO-Desarrollo: Asignar mejor nombre a función
 export async function getEventosAgenda(): Promise<IEventoAgenda[]> {
@@ -20,7 +20,7 @@ export async function getEventosAgenda(): Promise<IEventoAgenda[]> {
           : mapColorEstado(s.FKIdEstadoProcesoContratacion);
 
         const data: IEventoAgenda = {
-          id: s.idProceso,
+          id: String(s.idProceso),
           extendedProps: {
             citaVirtual: s.citaVirtual,
             atendioCita: s.atendioCita,
@@ -59,7 +59,7 @@ export function solicitudAEvento(s: ISolicitudProceso): IEventoAgenda {
   );
 
   return {
-    id: s.idProceso,
+    id: String(s.idProceso),
     title: s.citaVirtual
       ? `🛜 ${s.nombreCandidato || "Sin nombre"} `
       : s.nombreCandidato || "Sin nombre",

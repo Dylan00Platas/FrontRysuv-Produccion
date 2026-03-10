@@ -4,12 +4,11 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 import "./cedulas.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CedulaService from "@/services/CedulaService.js";
 import UserContext from "@/utils/UserContext.jsx";
 
 function Cedulas() {
-  const { currentUser } = useContext(UserContext);
+  const currentUser = useContext(UserContext);
   const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
 
   const navigate = useNavigate();
@@ -40,13 +39,11 @@ function Cedulas() {
   // Cargar datos desde la API
   useEffect(() => {
     const cargarCedulas = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+      setLoading(true);
+      setError(null);
 
-        const token = localStorage.getItem("token");
-        const servicio = new CedulaService();
-        const data = await servicio.obtenerTodasCedulasDisponibles(token);
+      try {
+        const data = await new CedulaService().obtenerTodasCedulasDisponibles();
 
         const cedulasNormalizadas = data.map((c) => ({
           idCedula: c.idCedula,
@@ -195,9 +192,7 @@ function Cedulas() {
 
       // Ejecutar las peticiones en paralelo
       const resultados = await Promise.allSettled(
-        selectedCedulas.map((idCedula) =>
-          service.archivarCedula(idCedula, token),
-        ),
+        selectedCedulas.map((idCedula) => service.archivarCedula(idCedula)),
       );
 
       // Comprobar si hubo errores
@@ -247,198 +242,191 @@ function Cedulas() {
   };
 
   return (
-    <div className="cedulas-page">
-      <main className="main-content">
-        <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
+    <>
+      {mensaje.texto && (
+        <div className={`mensaje-flotante ${mensaje.tipo}`}>
+          {mensaje.texto}
+        </div>
+      )}
 
-        {mensaje.texto && (
-          <div className={`mensaje-flotante ${mensaje.tipo}`}>
-            {mensaje.texto}
+      <div className="page-header2">
+        <h1 className="page-title2">Cédulas</h1>
+      </div>
+
+      <div className="main-content-inner-cedula">
+        {/* Filtros */}
+        <div className="filtros-bar-cedula">
+          <div className="filtro-combos-cedula">
+            <Select
+              className="select-filtro"
+              classNamePrefix="select"
+              options={cedulaOptions}
+              value={cedulaFiltro}
+              onChange={setCedulaFiltro}
+              isClearable={true}
+              placeholder="Tipo de cédula"
+            />
+            <Select
+              className="select-filtro-cedula"
+              classNamePrefix="select"
+              options={dependenciaOptions}
+              value={dependenciaFiltro}
+              onChange={setDependenciaFiltro}
+              isClearable={true}
+              placeholder="Dependencia"
+            />
           </div>
+
+          <div className="filtro-busqueda">
+            <FaSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Buscar..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Tabla */}
+        {loading ? (
+          <p className="loading-text">Cargando cédulas...</p>
+        ) : error ? (
+          <p className="error-text">{error}</p>
+        ) : (
+          <>
+            <table className="tabla-cedulas">
+              <thead>
+                <tr>
+                  {showCheckboxes && <th></th>}
+                  <th>Folio/Hermés</th>
+                  <th>Candidato</th>
+                  <th>Dependencia</th>
+                  <th>Puesto</th>
+                  <th>Cédula</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cedulasFiltradas.length > 0 ? (
+                  cedulasFiltradas.map((c) => (
+                    <tr
+                      style={{ cursor: "pointer" }}
+                      key={c.idCedula}
+                      onClick={async () => {
+                        try {
+                          // Si es una cédula externa del proceso 2
+                          if (
+                            c.FKIdTipoCedula === 2 &&
+                            c.FKIdTipoProceso === 2
+                          ) {
+                            // Obtener token del contexto o localStorage
+                            const token = localStorage.getItem("token");
+                            // Llamar al backend para traer el PDF y metadatos
+                            const cedulaExterna =
+                              await new CedulaService().obtenerCedulaExternaPorIdCedula(
+                                c.id,
+                              );
+                            console.info(
+                              "Datos obtenidos de obtenerCedulaExternaPorIdCedula:",
+                              cedulaExterna,
+                            );
+
+                            // Navegar enviando la información completa
+                            navigate("/crear-cedula", {
+                              state: {
+                                cedula: c,
+                                mostrarPDF: true,
+                                archivoUrl: cedulaExterna.archivoUrl || null,
+                                archivoNombre: cedulaExterna.nombre || null,
+                                archivoBase64: cedulaExterna.archivo || null, // opcional para previsualizar
+                              },
+                            });
+                            return;
+                          }
+                        } catch (error) {
+                          console.error(
+                            "Error al obtener la cédula externa:",
+                            error,
+                          );
+                          // Manejo de error (mostrar mensaje, etc.)
+                        }
+                        if (c.cedula === "Resultados") {
+                          navigate("/crear-cedula", { state: { cedula: c } });
+                        } else if (c.cedula === "Interna") {
+                          navigate("/crear-cedula-interna", {
+                            state: { cedula: c },
+                          });
+                        }
+                      }}
+                    >
+                      {showCheckboxes && (
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedCedulas.includes(c.idCedula)}
+                            onChange={() => toggleSelect(c.idCedula)}
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                              width: "20px",
+                              height: "20px",
+                              cursor: "pointer",
+                            }}
+                          />
+                        </td>
+                      )}
+                      <td>{c.folio + " / " + c.hermesNotificacion}</td>
+                      <td>{c.candidato}</td>
+                      <td>{c.dependencia}</td>
+                      <td>{c.puesto}</td>
+                      <td>{c.cedula}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={showCheckboxes ? "7" : "6"}
+                      style={{ textAlign: "center" }}
+                    >
+                      No hay resultados
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </>
         )}
 
-        <div className="page-header2">
-          <h1 className="page-title2">Cédulas</h1>
-        </div>
-
-        <div className="main-content-inner-cedula">
-          {/* Filtros */}
-          <div className="filtros-bar-cedula">
-            <div className="filtro-combos-cedula">
-              <Select
-                className="select-filtro"
-                classNamePrefix="select"
-                options={cedulaOptions}
-                value={cedulaFiltro}
-                onChange={setCedulaFiltro}
-                isClearable={true}
-                placeholder="Tipo de cédula"
-              />
-              <Select
-                className="select-filtro-cedula"
-                classNamePrefix="select"
-                options={dependenciaOptions}
-                value={dependenciaFiltro}
-                onChange={setDependenciaFiltro}
-                isClearable={true}
-                placeholder="Dependencia"
-              />
-            </div>
-
-            <div className="filtro-busqueda">
-              <FaSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Buscar..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Tabla */}
-          {loading ? (
-            <p className="loading-text">Cargando cédulas...</p>
-          ) : error ? (
-            <p className="error-text">{error}</p>
+        {/* Controles de archivo */}
+        <div className="archivar-container">
+          {!showCheckboxes ? (
+            <button
+              className="btn-archivar-toggle"
+              onClick={() => setShowCheckboxes(true)}
+            >
+              Archivar Cédulas
+            </button>
           ) : (
-            <>
-              <table className="tabla-cedulas">
-                <thead>
-                  <tr>
-                    {showCheckboxes && <th></th>}
-                    <th>Folio/Hermés</th>
-                    <th>Candidato</th>
-                    <th>Dependencia</th>
-                    <th>Puesto</th>
-                    <th>Cédula</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cedulasFiltradas.length > 0 ? (
-                    cedulasFiltradas.map((c) => (
-                      <tr
-                        style={{ cursor: "pointer" }}
-                        key={c.idCedula}
-                        onClick={async () => {
-                          try {
-                            // Si es una cédula externa del proceso 2
-                            if (
-                              c.FKIdTipoCedula === 2 &&
-                              c.FKIdTipoProceso === 2
-                            ) {
-                              // Obtener token del contexto o localStorage
-                              const token = localStorage.getItem("token");
-                              // Instancia del servicio
-                              const service = new CedulaService();
-                              // Llamar al backend para traer el PDF y metadatos
-                              const cedulaExterna =
-                                await service.obtenerCedulaExternaPorIdCedula(
-                                  c.id,
-                                  token,
-                                );
-                              console.info(
-                                "Datos obtenidos de obtenerCedulaExternaPorIdCedula:",
-                                cedulaExterna,
-                              );
-
-                              // Navegar enviando la información completa
-                              navigate("/crear-cedula", {
-                                state: {
-                                  cedula: c,
-                                  mostrarPDF: true,
-                                  archivoUrl: cedulaExterna.archivoUrl || null,
-                                  archivoNombre: cedulaExterna.nombre || null,
-                                  archivoBase64: cedulaExterna.archivo || null, // opcional para previsualizar
-                                },
-                              });
-                              return;
-                            }
-                          } catch (error) {
-                            console.error(
-                              "Error al obtener la cédula externa:",
-                              error,
-                            );
-                            // Manejo de error (mostrar mensaje, etc.)
-                          }
-                          if (c.cedula === "Resultados") {
-                            navigate("/crear-cedula", { state: { cedula: c } });
-                          } else if (c.cedula === "Interna") {
-                            navigate("/crear-cedula-interna", {
-                              state: { cedula: c },
-                            });
-                          }
-                        }}
-                      >
-                        {showCheckboxes && (
-                          <td>
-                            <input
-                              type="checkbox"
-                              checked={selectedCedulas.includes(c.idCedula)}
-                              onChange={() => toggleSelect(c.idCedula)}
-                              onClick={(e) => e.stopPropagation()}
-                              style={{
-                                width: "20px",
-                                height: "20px",
-                                cursor: "pointer",
-                              }}
-                            />
-                          </td>
-                        )}
-                        <td>{c.folio + " / " + c.hermesNotificacion}</td>
-                        <td>{c.candidato}</td>
-                        <td>{c.dependencia}</td>
-                        <td>{c.puesto}</td>
-                        <td>{c.cedula}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={showCheckboxes ? "7" : "6"}
-                        style={{ textAlign: "center" }}
-                      >
-                        No hay resultados
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </>
-          )}
-
-          {/* Controles de archivo */}
-          <div className="archivar-container">
-            {!showCheckboxes ? (
-              <button
-                className="btn-archivar-toggle"
-                onClick={() => setShowCheckboxes(true)}
-              >
-                Archivar Cédulas
+            selectedCedulas.length > 0 && (
+              <button className="btn-archivar" onClick={archivarCedulas}>
+                Archivar ({selectedCedulas.length})
               </button>
-            ) : (
-              selectedCedulas.length > 0 && (
-                <button className="btn-archivar" onClick={archivarCedulas}>
-                  Archivar ({selectedCedulas.length})
-                </button>
-              )
-            )}
-            <button
-              className="btn-cedula"
-              onClick={() => navigate("/crear-cedula-interna")}
-            >
-              Crear Cédula Interna
-            </button>
-            <button
-              className="btn-cedulaResultados"
-              onClick={() => navigate("/crear-cedula")}
-            >
-              Crear Cédula de Resultados
-            </button>
-          </div>
+            )
+          )}
+          <button
+            className="btn-cedula"
+            onClick={() => navigate("/crear-cedula-interna")}
+          >
+            Crear Cédula Interna
+          </button>
+          <button
+            className="btn-cedulaResultados"
+            onClick={() => navigate("/crear-cedula")}
+          >
+            Crear Cédula de Resultados
+          </button>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
 

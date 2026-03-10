@@ -47,6 +47,22 @@ function AppRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Login />} />
         <Route path="/menu" element={<MainMenu />} />
+        <Route
+          path="/agenda"
+          element={
+            <MainLayout>
+              <Agenda />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/cedulas"
+          element={
+            <MainLayout>
+              <Cedulas />
+            </MainLayout>
+          }
+        />
         <Route path="/crear-usuario" element={<CrearUsuario />} />
         <Route path="/usuarios" element={<Usuarios />} />
         <Route path="/iniciar-solicitud" element={<IniciarSolicitud />} />
@@ -62,17 +78,8 @@ function AppRoutes() {
         <Route path="/asignar-solicitud" element={<AsignarSolicitud />} />
         <Route path="/procesos" element={<Procesos />} />
         <Route path="/solicitudes" element={<Solicitudes />} />
-        <Route path="/cedulas" element={<Cedulas />} />
         <Route path="/editar-usuario" element={<EditarUsuario />} />
         <Route path="/panorama" element={<Panorama />} />
-        <Route
-          path="/agenda"
-          element={
-            <MainLayout>
-              <Agenda />
-            </MainLayout>
-          }
-        />
         <Route path="/generar-oficio" element={<GenerarOficio />} />
         <Route path="/ver-oficios" element={<VerOficios />} />
         <Route path="/ver-detalles-oficio" element={<VerDetallesOficio />} />

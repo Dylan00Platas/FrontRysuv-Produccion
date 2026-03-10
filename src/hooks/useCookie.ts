@@ -1,4 +1,7 @@
 import ICurrentUser from "@/interfaces/auth/CurrentUser";
+import ILogin from "@/interfaces/auth/Login";
+import IResponseHTTP from "@/interfaces/http/Response";
+import AuthService from "@/services/AuthService";
 import { useCallback, useEffect, useState } from "react";
 
 export interface UseCookieReturn {
@@ -11,7 +14,7 @@ export interface UseCookieReturn {
    * El backend establece la cookie httpOnly.
    * No necesitas manejar el token manualmente.
    */
-  login: (correo: string, contrasenia: string) => Promise<void>;
+  login: (data: ILogin) => Promise<void>;
   /**
    * Llama al endpoint de logout.
    * El backend elimina la cookie httpOnly.
@@ -50,16 +53,14 @@ export function useCookie(): UseCookieReturn {
 
     const API_URL = import.meta.env.VITE_API_ACCESO_URL;
     try {
-      const res = await fetch(`${API_URL}/auth/me`, {
-        method: "GET",
-        credentials: "include", // ← envía la cookie httpOnly automáticamente
-      });
+      const response: IResponseHTTP<ICurrentUser> =
+        await new AuthService().me();
 
-      if (res.ok) {
-        const data: ICurrentUser = await res.json();
+      if (response.error == false) {
+        const data: ICurrentUser = await response.mensaje;
         setUser(data);
       } else {
-        // 401 / 403 → sin sesión válida, no es un error de red
+        // 401 / 403
         setUser(null);
       }
     } catch {
@@ -74,30 +75,30 @@ export function useCookie(): UseCookieReturn {
     void checkSession();
   }, [checkSession]);
 
-  // ── Login ──────────────────────────────────────────────────────────────────
-
-  const login = useCallback(async (correo: string, contrasenia: string) => {
+  const login = useCallback(async (loginData: ILogin) => {
     setIsLoading(true);
     setError(null);
 
     const API_URL = import.meta.env.VITE_API_ACCESO_URL;
 
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        credentials: "include", // ← necesario para que el navegador
-        headers: { "Content-Type": "application/json" }, //  guarde la cookie
-        body: JSON.stringify({ correo, contrasenia }),
-      });
+      const response: IResponseHTTP<string> = await new AuthService().login(
+        loginData,
+      );
 
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body?.message ?? "Credenciales incorrectas.");
+      if (response.estado >= 500) {
+        throw new Error("Error interno del servidor.");
+      } else if (response.estado === 401) {
+        throw new Error("Sesión expirada.");
+      } else if (response.estado >= 400) {
+        throw new Error("Datos incorrectos del cliente.");
       }
 
-      // El backend ya estableció la cookie; pedimos los datos del usuario
-      const data: ICurrentUser = await res.json();
-      setUser(data);
+      const responseData: IResponseHTTP<ICurrentUser> =
+        await new AuthService().me();
+      if (responseData.mensaje) {
+        setUser(responseData.mensaje);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al iniciar sesión.");
       setUser(null);
@@ -114,12 +115,9 @@ export function useCookie(): UseCookieReturn {
 
     const API_URL = import.meta.env.VITE_API_ACCESO_URL;
     try {
-      await fetch(`${API_URL}/auth/logout`, {
-        method: "POST",
-        credentials: "include", // ← el backend borrará la cookie
-      });
+      await new AuthService().logout();
     } catch {
-      // Aunque falle la red, limpiamos el estado local
+      // Aunque falle la red, se limpia estado local
     } finally {
       setUser(null);
       setIsLoading(false);

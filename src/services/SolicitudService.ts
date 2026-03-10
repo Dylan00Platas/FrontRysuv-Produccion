@@ -6,7 +6,7 @@ import IRegistrarOficio from "@/interfaces/solicitudes/RegistrarOficio";
 import IRegistrarSeguimientoHermes from "@/interfaces/solicitudes/RegistrarSeguimientoHermes";
 import ISolicitud from "@/interfaces/solicitudes/Solicitud";
 import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
-import { IActualizarEstadoCita } from "@/utils/features/ActualizarEstadoCita";
+import { IActualizarEstadoCita } from "@/interfaces/agendas/ActualizarEstadoCita";
 
 export default class SolicitudService {
   private api: APIClient = new APIClient(

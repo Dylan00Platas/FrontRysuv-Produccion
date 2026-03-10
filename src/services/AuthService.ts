@@ -2,6 +2,7 @@ import { EncryptData } from "@/utils/EncryptData.js";
 import APIClient from "./connection/APIClient";
 import ILogin from "@/interfaces/auth/Login";
 import IResponseHTTP from "@/interfaces/http/Response";
+import ICurrentUser from "@/interfaces/auth/CurrentUser";
 
 export default class AuthService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
@@ -10,7 +11,7 @@ export default class AuthService {
     this.api = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
   }
 
-  async login(requestData: ILogin) {
+  async login(requestData: ILogin): Promise<IResponseHTTP<string>> {
     requestData.contrasenia = await EncryptData.sha256(requestData.contrasenia);
 
     const response: IResponseHTTP<string> = await this.api.request({
@@ -20,10 +21,14 @@ export default class AuthService {
       withCredentials: false,
     });
 
-    return {
-      isError: response.error!!,
-      message: response.mensaje,
-    };
+    return response;
+  }
+
+  async me(): Promise<IResponseHTTP<ICurrentUser>> {
+    return await this.api.request({
+      endpoint: "/me",
+      method: "GET",
+    });
   }
 
   saveToken(token: string) {
@@ -34,8 +39,11 @@ export default class AuthService {
     // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
   }
 
-  logout() {
-    // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
+  async logout() {
+    return await this.api.request({
+      endpoint: "/logout",
+      method: "POST",
+    });
   }
 
   isAuthenticated() {

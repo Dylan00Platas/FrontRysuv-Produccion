@@ -12,10 +12,10 @@ import SolicitudService from "@/services/SolicitudService.js";
 import UserContext from "@/utils/UserContext.jsx";
 import { resolverColor } from "@/utils/CatalogosNoseDonde";
 import { solicitudAEvento } from "@/utils/features/Agendas";
-import { IEventoAgenda } from "@/utils/features/EventoAgenda";
-import { IEventoSeleccionado } from "@/utils/features/EventoSeleccionado";
+import { IEventoAgenda } from "@/interfaces/agendas/EventoAgenda";
+import { IEventoSeleccionado } from "@/interfaces/agendas/EventoSeleccionado";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
-import { IActualizarEstadoCita } from "@/utils/features/ActualizarEstadoCita";
+import { IActualizarEstadoCita } from "@/interfaces/agendas/ActualizarEstadoCita";
 import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
 
 interface OpcionEstado {
