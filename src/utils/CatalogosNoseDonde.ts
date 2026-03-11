@@ -46,6 +46,9 @@ export const mapColorEstado = (estado: EstadoProceso): string => {
 /**
  * Determina el color final del evento considerando si el candidato no asistió.
  */
-export function resolverColor(estado: number, atendioCita: boolean): string {
+export default function resolverColor(
+  estado: number,
+  atendioCita: boolean,
+): string {
   return atendioCita ? "#d11a2a" : mapColorEstado(estado);
 }

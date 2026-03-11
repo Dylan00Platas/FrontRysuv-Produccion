@@ -9,8 +9,8 @@ import listPlugin from "@fullcalendar/list";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
 
 import "./Agenda.css";
-import { resolverColor } from "@/utils/CatalogosNoseDonde";
 import { solicitudAEvento } from "@/utils/features/Agendas";
+import resolverColor from "@/utils/CatalogosNoseDonde";
 import SolicitudService from "@/services/SolicitudService.js";
 import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
 import IEventoAgenda from "@/interfaces/agendas/EventoAgenda";

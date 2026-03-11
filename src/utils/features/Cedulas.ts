@@ -1,5 +1,5 @@
-import { ICedulaNormalizada } from "@/interfaces/cedulas/CedulaNormalizada";
-import { ICedulaRaw } from "@/interfaces/cedulas/CedulaRaw";
+import ICedulaNormalizada from "@/interfaces/cedulas/CedulaNormalizada";
+import ICedulaRaw from "@/interfaces/cedulas/CedulaRaw";
 
 export function normalizarCedulas(data: ICedulaRaw[]): ICedulaNormalizada[] {
   return data.map((c) => ({

@@ -1,9 +1,9 @@
 import { useEffect, useState, useContext } from "react";
-import { saveAs } from "file-saver";
-import { PDFDocument, StandardFonts } from "pdf-lib";
 import { FaSearch } from "react-icons/fa";
 import { FiHelpCircle } from "react-icons/fi";
 import Select from "react-select";
+import { saveAs } from "file-saver";
+import { PDFDocument, StandardFonts } from "pdf-lib";
 
 import "./CrearCedulaInterna.css";
 import { nombreCompetenciaMap } from "@/utils/Constants";

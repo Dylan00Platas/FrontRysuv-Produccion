@@ -59,7 +59,7 @@ export default class CedulaService {
     });
   }
 
-  async obtenerDatoInicialesCedula(idProcesoContratacion: number) {
+  async obtenerDatoInicialesCedula(idProcesoContratacion: number): Promise<IResponseHTTP<>> {
     const response = await this.api.request({
       endpoint: `/busqueda/${idProcesoContratacion}`,
       method: "GET",
