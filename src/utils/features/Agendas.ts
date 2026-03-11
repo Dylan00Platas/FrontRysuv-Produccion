@@ -1,6 +1,6 @@
-import { resolverColor } from "../CatalogosNoseDonde";
+import resolverColor from "../CatalogosNoseDonde";
 import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
-import { IEventoAgenda } from "../../interfaces/agendas/EventoAgenda";
+import IEventoAgenda from "../../interfaces/agendas/EventoAgenda";
 
 export function solicitudAEvento(s: ISolicitudProceso): IEventoAgenda {
   const colorBase = resolverColor(

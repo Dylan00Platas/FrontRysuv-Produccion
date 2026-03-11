@@ -6,6 +6,7 @@ import IResultadoPsicometria from "@/interfaces/cedulas/ResultadoPsicometria";
 import IResponseHTTP from "@/interfaces/http/Response";
 import { ICedulaRaw } from "@/interfaces/cedulas/CedulaRaw";
 import { ICedulaExterna } from "@/interfaces/cedulas/CedulaExterna";
+import { ICedulaPorClasificacion } from "@/interfaces/cedulas/CedulaPorClasificacion";
 
 export default class CedulaService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
@@ -14,9 +15,11 @@ export default class CedulaService {
     this.api = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
   }
 
-  async obtenerCompetenciasPorClasificacionCedula(idCedula: number) {
+  async obtenerCompetenciasPorClasificacionCedula(
+    FKIdClasificacionCedula: number,
+  ): Promise<IResponseHTTP<ICedulaPorClasificacion[]>> {
     return await this.api.request({
-      endpoint: `/competencia/${idCedula}`,
+      endpoint: `/competencia/${FKIdClasificacionCedula}`,
       method: "GET",
     });
   }
@@ -57,13 +60,9 @@ export default class CedulaService {
   }
 
   async obtenerDatoInicialesCedula(idProcesoContratacion: number) {
-    const data = {
-      idProceso: Number(idProcesoContratacion),
-    };
     const response = await this.api.request({
-      endpoint: "/busqueda",
-      method: "POST",
-      body: data,
+      endpoint: `/busqueda/${idProcesoContratacion}`,
+      method: "GET",
     });
   }
 

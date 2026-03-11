@@ -1,4 +1,4 @@
-export interface ICedulaNormalizada {
+export default interface ICedulaNormalizada {
   idCedula: number;
   folio: string;
   hermesNotificacion: string;

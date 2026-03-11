@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useId } from "react";
+import { useState, useEffect, useId } from "react";
 import Select, { SingleValue } from "react-select";
 import esLocale from "@fullcalendar/core/locales/es";
 import FullCalendar from "@fullcalendar/react";
@@ -6,21 +6,17 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
+import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
 
 import "./Agenda.css";
-import SolicitudService from "@/services/SolicitudService.js";
 import { resolverColor } from "@/utils/CatalogosNoseDonde";
 import { solicitudAEvento } from "@/utils/features/Agendas";
-import { IEventoAgenda } from "@/interfaces/agendas/EventoAgenda";
-import { IEventoSeleccionado } from "@/interfaces/agendas/EventoSeleccionado";
-import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
-import { IActualizarEstadoCita } from "@/interfaces/agendas/ActualizarEstadoCita";
+import SolicitudService from "@/services/SolicitudService.js";
 import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
-
-interface OpcionEstado {
-  value: string;
-  label: string;
-}
+import IEventoAgenda from "@/interfaces/agendas/EventoAgenda";
+import IEventoSeleccionado from "@/interfaces/agendas/EventoSeleccionado";
+import IActualizarEstadoCita from "@/interfaces/agendas/ActualizarEstadoCita";
+import ILabelValue from "@/interfaces/LabelValue";
 
 function Agenda() {
   const [eventos, setEventos] = useState<IEventoAgenda[]>([]);
@@ -29,7 +25,7 @@ function Agenda() {
   const [eventoSeleccionado, setEventoSeleccionado] =
     useState<IEventoSeleccionado | null>(null);
   const ESTADOS_EDITABLES: number[] = [9, 10, 11];
-  const OPCIONES_ESTADO: OpcionEstado[] = [
+  const OPCIONES_ESTADO: ILabelValue[] = [
     { value: "9", label: "Pendiente (cita)" },
     { value: "10", label: "Entregado (cita)" },
     { value: "11", label: "Citado" },
@@ -249,7 +245,7 @@ function Agenda() {
             <label className="mt-2.5 font-semibold text-[#18529d] block">
               Estado:
             </label>
-            <Select<OpcionEstado>
+            <Select<ILabelValue>
               className="modal-select" /* react-select necesita esta clase para overrides */
               classNamePrefix="react-select"
               isDisabled={
@@ -273,7 +269,7 @@ function Agenda() {
                   (opt) => opt.value === String(eventoSeleccionado.estado),
                 ) ?? null
               }
-              onChange={(opcion: SingleValue<OpcionEstado>) => {
+              onChange={(opcion: SingleValue<ILabelValue>) => {
                 if (opcion) {
                   setEventoSeleccionado({
                     ...eventoSeleccionado,

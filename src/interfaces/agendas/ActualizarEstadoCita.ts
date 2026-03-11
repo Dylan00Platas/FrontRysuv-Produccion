@@ -1,4 +1,4 @@
-export interface IActualizarEstadoCita {
+export default interface IActualizarEstadoCita {
   idEventoSeleccionado: string | number;
   fechaEntrevista: string;
   estado: number;

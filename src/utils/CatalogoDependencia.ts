@@ -1,4 +1,5 @@
 import IDependencia from "@/interfaces/dependencias/Dependencia";
+import IResponseHTTP from "@/interfaces/http/Response";
 import APIClient from "@/services/connection/APIClient";
 
 export default class CatalogoDependencia {
@@ -9,16 +10,11 @@ export default class CatalogoDependencia {
     this.api = new APIClient(import.meta.env.VITE_API_CATALOGO_URL);
   }
 
-  async cargarDependencias() {
-    const response = await this.api.request<{
-      dependencias: IDependencia[];
-    }>({
+  async cargarDependencias(): Promise<IResponseHTTP<IDependencia[]>> {
+    return await this.api.request({
       endpoint: "/dependencias",
       method: "GET",
     });
-
-    CatalogoDependencia.dependencias = response.dependencias;
-    return CatalogoDependencia.dependencias;
   }
 
   static obtenerDependencias() {

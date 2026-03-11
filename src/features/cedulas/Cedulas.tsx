@@ -4,20 +4,16 @@ import { useNavigate } from "react-router-dom";
 import Select, { SingleValue } from "react-select";
 
 import "./cedulas.css";
-import CedulaService from "@/services/CedulaService.js";
-import { ICedulaRaw } from "@/interfaces/cedulas/CedulaRaw";
-import IResponseHTTP from "@/interfaces/http/Response";
-import { ICedulaNormalizada } from "@/interfaces/cedulas/CedulaNormalizada";
-import { normalizarCedulas } from "@/utils/features/Cedulas";
-import { ICedulaExterna } from "@/interfaces/cedulas/CedulaExterna";
 import { selectStyles, CedulaBadge } from "@/utils/features/Cedulas.tsx";
+import { normalizarCedulas } from "@/utils/features/Cedulas";
+import CedulaService from "@/services/CedulaService.js";
+import IResponseHTTP from "@/interfaces/http/Response";
+import ICedulaRaw from "@/interfaces/cedulas/CedulaRaw";
+import ICedulaNormalizada from "@/interfaces/cedulas/CedulaNormalizada";
+import ICedulaExterna from "@/interfaces/cedulas/CedulaExterna";
+import ILabelValue from "@/interfaces/LabelValue";
 
-interface OpcionEstado {
-  value: string;
-  label: string;
-}
-
-const CEDULA_OPTIONS: OpcionEstado[] = [
+const CEDULA_OPTIONS: ILabelValue[] = [
   { value: "Interna", label: "Interna" },
   { value: "Resultados", label: "Resultados" },
   { value: "Archivadas", label: "Archivadas" },
@@ -35,18 +31,18 @@ function Cedulas() {
   const [showCheckboxes, setShowCheckboxes] = useState(false);
 
   // Opciones de filtros dinámicas
-  const [dependenciaOptions, setDependenciaOptions] = useState<OpcionEstado[]>(
+  const [dependenciaOptions, setDependenciaOptions] = useState<ILabelValue[]>(
     [],
   );
-  const [resultadoOptions, setResultadoOptions] = useState<OpcionEstado[]>([]);
+  const [resultadoOptions, setResultadoOptions] = useState<ILabelValue[]>([]);
 
   // Estados de filtros — todos tipados correctamente para react-select
   const [cedulaFiltro, setCedulaFiltro] =
-    useState<SingleValue<OpcionEstado>>(null);
+    useState<SingleValue<ILabelValue>>(null);
   const [dependenciaFiltro, setDependenciaFiltro] =
-    useState<SingleValue<OpcionEstado>>(null);
+    useState<SingleValue<ILabelValue>>(null);
   const [resultadoFiltro, setResultadoFiltro] =
-    useState<SingleValue<OpcionEstado>>(null);
+    useState<SingleValue<ILabelValue>>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const cargarCedulas = async () => {
@@ -229,7 +225,7 @@ function Cedulas() {
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div className="flex gap-3 flex-1 flex-wrap">
                 <div className="min-w-44 flex-1">
-                  <Select<OpcionEstado>
+                  <Select<ILabelValue>
                     classNamePrefix="rs"
                     options={CEDULA_OPTIONS}
                     value={cedulaFiltro}
@@ -240,7 +236,7 @@ function Cedulas() {
                   />
                 </div>
                 <div className="min-w-52 flex-1">
-                  <Select<OpcionEstado>
+                  <Select<ILabelValue>
                     classNamePrefix="rs"
                     options={dependenciaOptions}
                     value={dependenciaFiltro}

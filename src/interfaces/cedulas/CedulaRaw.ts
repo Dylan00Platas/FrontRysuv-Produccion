@@ -1,4 +1,4 @@
-export interface ICedulaRaw {
+export default interface ICedulaRaw {
   idCedula: number;
   folio?: string;
   hermesNotificacion?: string;

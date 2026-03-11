@@ -1,4 +1,6 @@
 import ICedula from "@/interfaces/cedulas/Cedula";
+import { IClasificacionCedula } from "@/interfaces/cedulas/ClasificacionCedula";
+import IResponseHTTP from "@/interfaces/http/Response";
 import APIClient from "@/services/connection/APIClient";
 
 export default class CatalogoCedula {
@@ -9,16 +11,13 @@ export default class CatalogoCedula {
     this.api = new APIClient(import.meta.env.VITE_API_CATALOGO_URL);
   }
 
-  async cargarCedulas() {
-    const response = await this.api.request<{
-      clasificacionesCedula: ICedula[];
-    }>({
+  async getClasificacionesCedulas(): Promise<
+    IResponseHTTP<IClasificacionCedula[]>
+  > {
+    return await this.api.request({
       endpoint: "/clasificacionesCedula",
       method: "GET",
     });
-
-    CatalogoCedula.clasificacionesCedula = response.clasificacionesCedula;
-    return CatalogoCedula.clasificacionesCedula;
   }
 
   static obtenerClasificacionesCedulas() {

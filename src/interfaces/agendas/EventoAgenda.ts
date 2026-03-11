@@ -1,4 +1,4 @@
-export interface IEventoAgenda {
+export default interface IEventoAgenda {
   id: string;
   title: string;
   start: string;

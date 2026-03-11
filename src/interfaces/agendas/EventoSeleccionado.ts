@@ -1,4 +1,4 @@
-export interface IEventoSeleccionado {
+export default interface IEventoSeleccionado {
   id: number;
   title: string;
   fecha: string;

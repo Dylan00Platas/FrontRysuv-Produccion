@@ -167,7 +167,7 @@ function Panorama() {
         setLoadingCedulas(false);
       }
     };
-    cargarCedulas();
+    getClasificacionesCedulas;
   }, []);
 
   //  Filtros de Cédulas
