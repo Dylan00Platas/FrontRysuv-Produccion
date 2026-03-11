@@ -13,7 +13,7 @@ import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CedulaService from "@/services/CedulaService.js";
 import SolicitudService from "@/services/SolicitudService.js";
 import ManageFiles from "@/utils/ManageFiles";
-import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
+import CatalogoDependencia from "@/services/CatalogoDependencia.js";
 import UserContext from "@/utils/UserContext.jsx";
 
 function CrearConstancia() {

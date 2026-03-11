@@ -20,7 +20,7 @@ import {
 
 import "./Estadisticas.css";
 import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
+import CatalogoDependencia from "@/services/CatalogoDependencia.js";
 import SolicitudService from "@/services/SolicitudService.js";
 import UsuarioService from "@/services/UsuarioService.js";
 import UserContext from "@/utils/UserContext.jsx";

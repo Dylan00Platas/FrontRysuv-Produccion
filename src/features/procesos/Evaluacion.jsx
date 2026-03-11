@@ -4,7 +4,7 @@ import { useRef } from "react";
 
 import "./Evaluacion.css";
 import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
+import CatalogoDependencia from "@/services/CatalogoDependencia.js";
 import EvaluacionServicio from "@/services/EvaluacionService.js";
 import UserContext from "@/utils/UserContext.jsx";
 

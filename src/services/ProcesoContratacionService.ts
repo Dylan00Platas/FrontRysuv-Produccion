@@ -7,11 +7,11 @@ import {
   IGetProcesosContratacion,
   IGetProcesosContratacionCandidatosNoBeneficiados,
 } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
-import IPostControlVersion from "@/schemas/control-versiones/PostControlVersion";
 import { IGetControlVerionesProceso } from "@/schemas/control-versiones/GetControlVersion";
 import IPostOficioProcesoContratacion from "@/schemas/procesos-contratacion/PostOficioProcesoContratacion";
 import { IGetOficiosProcesoContratacion } from "@/schemas/procesos-contratacion/GetOficioProcesoContratacion";
 import { IPostSeguimientoHermes } from "@/schemas/procesos-contratacion/PostSeguimientoHermes";
+import IPostControlVersion from "@/schemas/control-versiones/PostControlVersion";
 
 export default class ProcesoContratacion {
   private api: APIClient = new APIClient(

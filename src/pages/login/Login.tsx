@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { InputField } from "@/components/InputField/InputField";
 import { AlertBanner } from "@/components/Alert/OnBody/AlertBanner";
-import CatalogoDependencia from "@/utils/CatalogoDependencia";
+import CatalogoDependencia from "@/services/CatalogoDependencia";
 import AuthService from "@/services/AuthService";
 import ILogin from "@/interfaces/auth/Login";
 

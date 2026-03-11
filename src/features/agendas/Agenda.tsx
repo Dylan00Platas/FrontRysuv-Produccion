@@ -10,7 +10,7 @@ import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
 
 import "./Agenda.css";
 import { solicitudAEvento } from "@/utils/features/Agendas";
-import resolverColor from "@/utils/CatalogosNoseDonde";
+import resolverColor from "@/services/CatalogosNoseDonde";
 import SolicitudService from "@/services/SolicitudService.js";
 import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
 import IEventoAgenda from "@/interfaces/agendas/EventoAgenda";

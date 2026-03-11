@@ -1,4 +1,4 @@
-import resolverColor from "../CatalogosNoseDonde";
+import resolverColor from "../../services/CatalogosNoseDonde";
 import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
 import IEventoAgenda from "../../interfaces/agendas/EventoAgenda";
 

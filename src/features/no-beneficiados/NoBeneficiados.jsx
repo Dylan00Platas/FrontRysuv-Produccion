@@ -5,7 +5,7 @@ import Select from "react-select";
 import "./NoBeneficiados.css";
 import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import NoBeneficiadoService from "@/services/NoBeneficiadoService.js";
-import CatalogoDependencia from "@/utils/CatalogoDependencia.js";
+import CatalogoDependencia from "@/services/CatalogoDependencia.js";
 import UserContext from "@/utils/UserContext.jsx";
 
 function NoBeneficiados() {

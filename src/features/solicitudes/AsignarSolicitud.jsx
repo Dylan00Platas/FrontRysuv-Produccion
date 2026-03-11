@@ -4,7 +4,7 @@ import Select from "react-select";
 
 import "./AsignarSolicitud.css";
 import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import CatalogoCedula from "@/utils/CatalogoCedulas.js";
+import CatalogoCedula from "@/services/CatalogoCedulas.js";
 import UsuarioServicio from "@/services/UsuarioService.js";
 import UserContext from "@/utils/UserContext.jsx";
 
