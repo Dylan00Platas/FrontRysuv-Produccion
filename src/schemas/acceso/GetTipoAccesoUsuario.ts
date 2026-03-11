@@ -3,6 +3,6 @@ export interface ITipoAccesoUsuarioBase {
   tipoAcceso: string;
 }
 
-export interface ITiposAccesoUsuario {
+export interface IGetTiposAccesoUsuario {
   tiposAcceso: ITipoAccesoUsuarioBase[];
 }

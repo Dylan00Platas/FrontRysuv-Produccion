@@ -1,12 +1,15 @@
-import IRegistrarCedulaExterna from "@/interfaces/cedulas/RegistrarCedulaExterna";
+import IPostCedulaExterna from "@/schemas/cedulas-externas/PostCedulaExterna";
 import APIClient from "./connection/APIClient";
-import IRegistrarCedulaInterna from "@/interfaces/cedulas/RegistrarCedulaInterna";
-import IRegistrarCedulaResultados from "@/interfaces/cedulas/RegistrarCedulaResultados";
-import IResultadoPsicometria from "@/interfaces/cedulas/ResultadoPsicometria";
 import IResponseHTTP from "@/interfaces/http/Response";
-import { ICedulaRaw } from "@/interfaces/cedulas/CedulaRaw";
-import { ICedulaExterna } from "@/interfaces/cedulas/CedulaExterna";
-import { ICedulaPorClasificacion } from "@/interfaces/cedulas/CedulaPorClasificacion";
+import {
+  IGetCedula,
+  IGetCedulas,
+  IGetCedulasActivas,
+} from "@/schemas/cedulas/GetCedula";
+import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompetencia";
+import { IGetCedulaExterna } from "@/schemas/cedulas-externas/GetCedulaExterna";
+import IPostCedula from "@/schemas/cedulas/PostCedula";
+import IPutCedula from "@/schemas/cedulas/PutCedula";
 
 export default class CedulaService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
@@ -15,35 +18,37 @@ export default class CedulaService {
     this.api = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
   }
 
-  async obtenerCompetenciasPorClasificacionCedula(
-    FKIdClasificacionCedula: number,
-  ): Promise<IResponseHTTP<ICedulaPorClasificacion[]>> {
+  // TODO-Desarrollo: Verificar estado 200
+  async postCedulaInterna(
+    requestData: IPostCedula,
+  ): Promise<IResponseHTTP<string | number>> {
     return await this.api.request({
-      endpoint: `/competencia/${FKIdClasificacionCedula}`,
+      endpoint: "/",
+      method: "POST",
+      body: requestData,
+    });
+  }
+
+  async getCedulasInternas(): Promise<IResponseHTTP<IGetCedulas>> {
+    return await this.api.request({
+      endpoint: "/obtencionCedulas",
       method: "GET",
     });
   }
 
-  async registrarCedulaInterna(requestData: IRegistrarCedulaInterna) {
+  async getCedulasInternasActivas(): Promise<
+    IResponseHTTP<IGetCedulasActivas>
+  > {
     return await this.api.request({
-      endpoint: "/",
-      method: "POST",
-      body: requestData,
+      endpoint: "/activas",
+      method: "GET",
     });
   }
 
-  async registrarCedulaResultados(requestData: IRegistrarCedulaResultados) {
-    return await this.api.request({
-      endpoint: "/",
-      method: "POST",
-      body: requestData,
-    });
-  }
-
-  async archivarCedula(idCedula: number) {
-    const data = {
-      estado: true,
-    };
+  async putCedulaInterna(
+    idCedula: number,
+    data: IPutCedula,
+  ): Promise<IResponseHTTP<string>> {
     return await this.api.request({
       endpoint: `/${idCedula}`,
       method: "PUT",
@@ -51,63 +56,49 @@ export default class CedulaService {
     });
   }
 
-  async registrarResultado(requestData: IResultadoPsicometria) {
+  async getCedulaInternaIdProceso(
+    idProceso: number,
+  ): Promise<IResponseHTTP<IGetCedula>> {
     return await this.api.request({
-      endpoint: "/resultado",
+      endpoint: `/busqueda/${idProceso}`,
+      method: "GET",
+    });
+  }
+
+  async getCompetenciasClasificacionCedula(
+    FKIdClasificacionCedula: number,
+  ): Promise<IResponseHTTP<IGetCompetenciasClasificacionCedula>> {
+    return await this.api.request({
+      endpoint: `/competencia/${FKIdClasificacionCedula}`,
+      method: "GET",
+    });
+  }
+
+  async getResultadosIdProceso(
+    idProceso: number,
+  ): Promise<IResponseHTTP<IGetCompetenciasClasificacionCedula>> {
+    return await this.api.request({
+      endpoint: `/competencia-resultados/${idProceso}`,
+      method: "GET",
+    });
+  }
+
+  async postResultadoCedulaExterna(
+    data: IPostCedulaExterna,
+  ): Promise<IResponseHTTP<string>> {
+    return await this.api.request({
+      endpoint: `/externa`,
       method: "POST",
-      body: requestData,
+      body: data,
     });
   }
 
-  async obtenerDatoInicialesCedula(idProcesoContratacion: number): Promise<IResponseHTTP<>> {
-    const response = await this.api.request({
-      endpoint: `/busqueda/${idProcesoContratacion}`,
-      method: "GET",
-    });
-  }
-
-  async obtenerTodasCedulasDisponibles(): Promise<IResponseHTTP<ICedulaRaw[]>> {
-    return await this.api.request({
-      endpoint: "/obtencionCedulas",
-      method: "GET",
-    });
-  }
-
-  async obtenerCedulaResultadosPorProceso(IdProceso: number) {
-    return await this.api.request({
-      endpoint: `/competencia-resultados/${IdProceso}`,
-      method: "GET",
-    });
-  }
-
-  async obtenerCedulaPorId(FKIdProceso: number) {
-    const response = await this.api.request({
-      endpoint: `/busqueda/${FKIdProceso}`,
-      method: "GET",
-    });
-  }
-
-  async obtenerCedulasActivas() {
-    const response = await this.api.request({
-      endpoint: "/activas",
-      method: "GET",
-    });
-  }
-
-  async registrarCedulaExterna(requestData: IRegistrarCedulaExterna) {
-    return await this.api.request({
-      endpoint: "/externa",
-      method: "POST",
-      body: requestData,
-    });
-  }
-
-  async obtenerCedulaExternaPorIdCedula(
+  async getCedulaExterna(
     FKIdCedula: number,
-  ): Promise<IResponseHTTP<ICedulaExterna>> {
+  ): Promise<IResponseHTTP<IGetCedulaExterna>> {
     return await this.api.request({
       endpoint: `/externa/${FKIdCedula}`,
-      method: "GET",
+      method: "POST",
     });
   }
 }

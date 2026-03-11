@@ -1,8 +1,9 @@
 import { EncryptData } from "@/utils/EncryptData.js";
 import APIClient from "./connection/APIClient";
-import ILogin from "@/interfaces/auth/Login";
 import IResponseHTTP from "@/interfaces/http/Response";
+import ILogin from "@/interfaces/auth/Login";
 import ICurrentUser from "@/interfaces/auth/CurrentUser";
+import IPostUsuario from "@/schemas/acceso/PostUser";
 
 export default class AuthService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
@@ -39,14 +40,21 @@ export default class AuthService {
     // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
   }
 
-  async logout() {
+  async logout(): Promise<IResponseHTTP<string>> {
     return await this.api.request({
       endpoint: "/logout",
-      method: "POST",
+      method: "DELETE",
     });
   }
 
   isAuthenticated() {
     // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
+  }
+
+  async register(data: IPostUsuario): Promise<IResponseHTTP<string>> {
+    return await this.api.request({
+      endpoint: "/",
+      method: "POST",
+    });
   }
 }

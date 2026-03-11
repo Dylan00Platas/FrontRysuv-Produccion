@@ -88,6 +88,10 @@ export interface ICedulaBase {
   titularPlaza: string;
 }
 
+export interface IGetCedula {
+  cedula: ICedulaBase[];
+}
+
 export interface IGetCedulas {
   cedulas: ICedulaBase[];
 }
