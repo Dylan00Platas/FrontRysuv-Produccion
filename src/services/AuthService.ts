@@ -1,9 +1,9 @@
 import { EncryptData } from "@/utils/EncryptData.js";
 import APIClient from "./connection/APIClient";
 import IResponseHTTP from "@/interfaces/http/Response";
-import ILogin from "@/interfaces/auth/Login";
-import ICurrentUser from "@/interfaces/auth/CurrentUser";
+import ILogin from "@/schemas/acceso/PostLogin";
 import IPostUsuario from "@/schemas/acceso/PostUser";
+import ICurrentUser from "@/interfaces/auth/CurrentUser";
 
 export default class AuthService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_ACCESO_URL);

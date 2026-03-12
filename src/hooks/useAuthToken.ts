@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 const TOKEN_KEY = "token";
 
 export function useAuthToken() {
