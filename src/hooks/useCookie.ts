@@ -100,6 +100,9 @@ export function useCookie(): UseCookieReturn {
         setUser(responseData.mensaje);
       }
     } catch (err) {
+      console.error(
+        `useCookie.ts - Error al obtener cookie de usuario \n ${error}`,
+      );
       setError(err instanceof Error ? err.message : "Error al iniciar sesión.");
       setUser(null);
     } finally {

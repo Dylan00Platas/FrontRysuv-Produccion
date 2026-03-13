@@ -28,3 +28,5 @@ export default interface IPutCedula {
   referidoPor: string;
   resultado: string;
 }
+
+export type IPutCedulaPartial = Partial<IPutCedula>;

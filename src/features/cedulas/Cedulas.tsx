@@ -1,211 +1,162 @@
-import { useEffect, useState } from "react";
+// ------------------------------------------------------------------------------
+import { useCallback, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Select, { SingleValue } from "react-select";
 
 import "./cedulas.css";
-import { selectStyles, CedulaBadge } from "@/utils/features/Cedulas.tsx";
+import {
+  selectStyles,
+  CedulaBadge,
+  getIdTipoCedula,
+} from "@/utils/features/Cedulas.tsx";
 import { normalizarCedulas } from "@/utils/features/Cedulas";
 import CedulaService from "@/services/CedulaService.js";
-import IResponseHTTP from "@/interfaces/http/Response";
-import ICedulaRaw from "@/interfaces/cedulas/CedulaRaw";
-import ICedulaNormalizada from "@/interfaces/cedulas/CedulaNormalizada";
-import ICedulaExterna from "@/interfaces/cedulas/CedulaExterna";
 import ILabelValue from "@/interfaces/LabelValue";
-
-const CEDULA_OPTIONS: ILabelValue[] = [
-  { value: "Interna", label: "Interna" },
-  { value: "Resultados", label: "Resultados" },
-  { value: "Archivadas", label: "Archivadas" },
-];
+import { ICedulaBase } from "@/schemas/cedulas/GetCedula";
+import { useCedulas } from "@/hooks/useCedulas";
+import { getUniqueOptionsLabelValue } from "@/utils/utils";
+import { useToast } from "@/hooks/useToast";
+import { Toast } from "@/components/Alert/Floating/Toast";
+import { useCedulasFiltradas } from "@/hooks/UseCedulasFiltradas";
 
 function Cedulas() {
-  const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
   const navigate = useNavigate();
-  const [cedulas, setCedulas] = useState<ICedulaNormalizada[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { toast, mostrarToast } = useToast();
+  // Obtencion de cedulas -----------------------------------------------------
+  const {
+    data: cedulasData,
+    loading: cedulasLoading,
+    error: cedulasError,
+    refetch: refetchCedulas,
+  } = useCedulas();
 
-  // Estado de selección
+  const [cedulasNormalizadas, setCedulasNormalizadas] = useState<
+    ICedulaBase[] | null
+  >(null);
+  const [dependenciasUnicas, setDependenciasUnicas] = useState<
+    ILabelValue[] | undefined
+  >();
+  const [resultadosUnicos, setResultadosUnicos] = useState<
+    ILabelValue[] | null
+  >(null);
+
+  useEffect(() => {
+    if (!cedulasData?.length) return;
+
+    const normalizadas = normalizarCedulas(cedulasData);
+    setCedulasNormalizadas(normalizadas);
+    setDependenciasUnicas(
+      getUniqueOptionsLabelValue(normalizadas, "dependencia"),
+    );
+    setResultadosUnicos(getUniqueOptionsLabelValue(normalizadas, "resultado"));
+  }, [cedulasData]);
+
+  // Manejo de filtros -------------------------------------------------------
+  const CEDULA_OPTIONS: ILabelValue[] = [
+    { value: "Interna", label: "Interna" },
+    { value: "Resultados", label: "Resultados" },
+    { value: "Archivadas", label: "Archivadas" },
+  ];
+
+  const {
+    cedulaFiltro,
+    setCedulaFiltro,
+    dependenciaFiltro,
+    setDependenciaFiltro,
+    resultadoFiltro,
+    setResultadoFiltro,
+    searchTerm,
+    setSearchTerm,
+    cedulasFiltradas,
+    resetFilters,
+  } = useCedulasFiltradas(cedulasNormalizadas); // ✅ nombre correcto
+
+  // Selección de cedulas -----------------------------------------------------
   const [selectedCedulas, setSelectedCedulas] = useState<number[]>([]);
   const [showCheckboxes, setShowCheckboxes] = useState(false);
 
-  // Opciones de filtros dinámicas
-  const [dependenciaOptions, setDependenciaOptions] = useState<ILabelValue[]>(
-    [],
-  );
-  const [resultadoOptions, setResultadoOptions] = useState<ILabelValue[]>([]);
-
-  // Estados de filtros — todos tipados correctamente para react-select
-  const [cedulaFiltro, setCedulaFiltro] =
-    useState<SingleValue<ILabelValue>>(null);
-  const [dependenciaFiltro, setDependenciaFiltro] =
-    useState<SingleValue<ILabelValue>>(null);
-  const [resultadoFiltro, setResultadoFiltro] =
-    useState<SingleValue<ILabelValue>>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const cargarCedulas = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const data: IResponseHTTP<ICedulaRaw[]> =
-        await new CedulaService().obtenerTodasCedulasDisponibles();
-
-      // FIX: lógica de guardado corregida
-      if (!data.mensaje) return;
-
-      const cedulasNormalizadas: ICedulaNormalizada[] = normalizarCedulas(
-        data.mensaje,
-      );
-      setCedulas(cedulasNormalizadas);
-
-      const dependenciasUnicas = [
-        ...new Set(cedulasNormalizadas.map((c) => c.dependencia)),
-      ].map((d) => ({ value: d, label: d }));
-
-      const resultadosUnicos = [
-        ...new Set(cedulasNormalizadas.map((c) => c.resultado)),
-      ].map((r) => ({ value: r, label: r }));
-
-      setDependenciaOptions(dependenciasUnicas);
-      setResultadoOptions(resultadosUnicos);
-    } catch (err) {
-      console.error("Error al cargar cédulas:", err);
-      setError("No se pudieron cargar las cédulas.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    cargarCedulas();
-  }, []);
-
-  // Filtros — FIX: comparación contra .value del objeto de react-select
-  const cedulasFiltradas = cedulas.filter((c) => {
-    let coincideCedula = true;
-
-    if (cedulaFiltro?.value) {
-      if (cedulaFiltro.value === "Archivadas") {
-        coincideCedula = c.estado === true;
-      } else {
-        coincideCedula = c.cedula === cedulaFiltro.value && c.estado !== true;
-      }
-    } else {
-      coincideCedula = c.estado !== true;
-    }
-
-    // FIX: comparar string contra string usando .value
-    const coincideDependencia =
-      !dependenciaFiltro || c.dependencia === dependenciaFiltro.value;
-    const coincideResultado =
-      !resultadoFiltro || c.resultado === resultadoFiltro.value;
-
-    const term = searchTerm.toLowerCase();
-    const coincideBusqueda =
-      c.folio.toLowerCase().includes(term) ||
-      c.candidato.toLowerCase().includes(term) ||
-      c.dependencia.toLowerCase().includes(term) ||
-      c.puesto.toLowerCase().includes(term) ||
-      c.resultado.toLowerCase().includes(term) ||
-      c.cedula.toLowerCase().includes(term);
-
-    return (
-      coincideCedula &&
-      coincideDependencia &&
-      coincideResultado &&
-      coincideBusqueda
-    );
-  });
-
-  // FIX: id tipado como number
-  const toggleSelect = (id: number) => {
+  const toggleSelect = useCallback((id: number) => {
     setSelectedCedulas((prev) =>
       prev.includes(id) ? prev.filter((cid) => cid !== id) : [...prev, id],
     );
-  };
+  }, []);
 
-  const mostrarMensaje = (texto: string, tipo: string) => {
-    setMensaje({ texto, tipo });
-    setTimeout(() => setMensaje({ texto: "", tipo: "" }), 4000);
-  };
+  const clearSelection = useCallback(() => {
+    setSelectedCedulas([]);
+    setShowCheckboxes(false);
+  }, []);
 
-  const archivarCedulas = async () => {
+  const archivarCedulas = useCallback(async () => {
     if (selectedCedulas.length === 0) return;
 
-    try {
-      const service = new CedulaService();
+    const service = new CedulaService();
+    const resultados = await Promise.allSettled(
+      selectedCedulas.map((id) => service.archivarCedula(id)),
+    );
 
-      const resultados = await Promise.allSettled(
-        selectedCedulas.map((idCedula) => service.archivarCedula(idCedula)),
+    const errores = resultados.filter((r) => r.status === "rejected");
+
+    if (errores.length > 0) {
+      console.error("Errores al archivar:", errores);
+      mostrarToast(
+        errores.length === selectedCedulas.length
+          ? "No se pudieron archivar las cédulas."
+          : "Algunas cédulas no se pudieron archivar.",
+        "error",
       );
-
-      const errores = resultados.filter((r) => r.status === "rejected");
-
-      if (errores.length > 0) {
-        console.error("Errores al archivar:", errores);
-        mostrarMensaje("Algunas cédulas no se pudieron archivar.", "error");
-      } else {
-        mostrarMensaje("Cédulas archivadas correctamente.", "exito");
-      }
-
-      // FIX: refrescar correctamente la lista tras archivar
-      await cargarCedulas();
-    } catch (err) {
-      console.error("Error al archivar cédulas:", err);
-      mostrarMensaje("Error al archivar las cédulas.", "error");
-    } finally {
-      setSelectedCedulas([]);
-      setShowCheckboxes(false);
+    } else {
+      mostrarToast("Cédulas archivadas correctamente.", "exito");
     }
-  };
 
-  const handleRowClick = async (c: ICedulaNormalizada) => {
-    try {
-      if (c.FKIdTipoCedula === 2 && c.FKIdTipoProceso === 2) {
-        const cedulaExterna: IResponseHTTP<ICedulaExterna> =
-          await new CedulaService().obtenerCedulaExternaPorIdCedula(c.idCedula);
+    await refetchCedulas();
+    clearSelection();
+  }, [selectedCedulas, mostrarToast, refetchCedulas, clearSelection]);
 
-        navigate("/crear-cedula", {
-          state: {
-            cedula: c,
-            mostrarPDF: true,
-            archivoUrl: cedulaExterna.mensaje.FKIdCedula ?? null,
-            archivoNombre: cedulaExterna.mensaje.nombre ?? null,
-            archivoBase64: cedulaExterna.mensaje.archivo ?? null,
-          },
-        });
+  const handleRowClick = useCallback(
+    async (c: ICedulaBase) => {
+      if (c.FKIdTipoCedula === 2 && c.FKIdProceso === 2) {
+        try {
+          const { mensaje } = await new CedulaService().getCedulaExterna(
+            c.idCedula,
+          );
+          navigate("/crear-cedula", {
+            state: {
+              cedula: c,
+              mostrarPDF: true,
+              archivoUrl: mensaje.documento.FKIdCedula ?? null,
+              archivoNombre: mensaje.documento.nombre ?? null,
+              archivoBase64: mensaje.documento.archivo ?? null,
+            },
+          });
+        } catch (error) {
+          console.error("Error al obtener la cédula externa:", error);
+          mostrarToast("No se pudo cargar el archivo de la cédula.", "error");
+        }
         return;
       }
-    } catch (error) {
-      console.error("Error al obtener la cédula externa:", error);
-      return;
-    }
 
-    if (c.cedula === "Resultados") {
-      navigate("/crear-cedula", { state: { cedula: c } });
-    } else if (c.cedula === "Interna") {
-      navigate("/crear-cedula-interna", { state: { cedula: c } });
-    }
-  };
+      const RUTAS: Partial<Record<string, string>> = {
+        Resultados: "/crear-cedula",
+        Interna: "/crear-cedula-interna",
+      };
+
+      const ruta = RUTAS[c.FKIdTipoCedula];
+      if (ruta) {
+        navigate(ruta, { state: { cedula: c } });
+      } else {
+        console.warn("Tipo de cédula sin ruta definida:", c.FKIdTipoCedula);
+      }
+    },
+    [navigate, mostrarToast],
+  );
 
   const colSpan = showCheckboxes ? 7 : 6;
 
   return (
     <>
       {/* Toast de notificación */}
-      {mensaje.texto && (
-        <div
-          className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-semibold text-white transition-all duration-300 ${
-            mensaje.tipo === "exito"
-              ? "bg-linear-to-r from-emerald-500 to-emerald-600"
-              : "bg-linear-to-r from-red-500 to-rose-600"
-          }`}
-        >
-          <span className="text-base">{mensaje.texto}</span>
-        </div>
-      )}
+      <Toast texto={toast.texto} tipo={toast.tipo} />
 
       <main className="ml-65 w-[calc(100%-260px)] px-10 py-8 overflow-y-auto min-h-screen bg-slate-50">
         {/* Header */}
@@ -238,7 +189,7 @@ function Cedulas() {
                 <div className="min-w-52 flex-1">
                   <Select<ILabelValue>
                     classNamePrefix="rs"
-                    options={dependenciaOptions}
+                    options={dependenciasUnicas}
                     value={dependenciaFiltro}
                     onChange={setDependenciaFiltro}
                     isClearable
@@ -263,16 +214,18 @@ function Cedulas() {
 
           {/* Tabla */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            {loading ? (
+            {cedulasLoading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <div className="w-8 h-8 rounded-full border-4 border-[#18529d]/20 border-t-[#18529d] animate-spin" />
                 <p className="text-sm text-slate-400 font-medium">
                   Cargando cédulas...
                 </p>
               </div>
-            ) : error ? (
+            ) : cedulasError ? (
               <div className="flex items-center justify-center py-20">
-                <p className="text-sm text-red-500 font-medium">{error}</p>
+                <p className="text-sm text-red-500 font-medium">
+                  {cedulasError}
+                </p>
               </div>
             ) : (
               <table className="w-full text-sm">
@@ -321,7 +274,7 @@ function Cedulas() {
                           {`${c.folio} / ${c.hermesNotificacion}`}
                         </td>
                         <td className="px-5 py-3.5 font-medium text-slate-800">
-                          {c.candidato}
+                          {c.nombreCandidato}
                         </td>
                         <td className="px-5 py-3.5 text-slate-600">
                           {c.dependencia}
@@ -330,7 +283,9 @@ function Cedulas() {
                           {c.puesto}
                         </td>
                         <td className="px-5 py-3.5">
-                          <CedulaBadge tipo={c.cedula} />
+                          <CedulaBadge
+                            tipo={getIdTipoCedula(c.FKIdTipoCedula)}
+                          />
                         </td>
                       </tr>
                     ))
@@ -354,7 +309,7 @@ function Cedulas() {
             )}
 
             {/* Footer de tabla con conteo */}
-            {!loading && !error && (
+            {!cedulasLoading && !cedulasError && (
               <div className="px-5 py-3 border-t border-slate-100 bg-slate-50/80">
                 <span className="text-xs text-slate-400 font-medium">
                   {cedulasFiltradas.length} resultado

@@ -51,3 +51,11 @@ export default interface IPutProcesoContratacion {
   seguimientoEvaluacionDesempenio: boolean;
   titularPlaza: string;
 }
+
+export type IPutProcesoContratacionAgenda = Pick<
+  IPutProcesoContratacion,
+  | "fechaEntrevista"
+  | "FKIdEstadoProcesoContratacion"
+  | "atendioCita"
+  | "citaVirtual"
+>;

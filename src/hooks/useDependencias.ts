@@ -20,6 +20,9 @@ export function useDependencias(): IGettingData<IGetDependencias> {
           setError("No se obtuvieron dependencias");
         }
       } catch (err) {
+        console.error(
+          `useDependencias.ts - Error al obtener dependencias \n ${error}`,
+        );
         setError("Error al obtener dependencias");
       } finally {
         setLoading(false);

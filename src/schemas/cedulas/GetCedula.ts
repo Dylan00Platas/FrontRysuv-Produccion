@@ -11,12 +11,14 @@ export interface ICedulaBase {
   competenciasSobresaliente: string;
   conclusiones: string;
   consecutivoExpediente: string;
+  dependencia: string;
   descripcionDesarrollar: string;
   descripcionReforzar: string;
   diasProceso: string;
   edad: string;
   educacionFormal: string;
   efectoContratacion: string;
+  estado: boolean;
   evaluacionConocimientos: string;
   expectativaLaboral: string;
   experiencia: string;
@@ -87,6 +89,8 @@ export interface ICedulaBase {
   seguimientoEvaluacionDesempenio: string;
   titularPlaza: string;
 }
+
+export type ICedulaBasePartial = Partial<ICedulaBase>;
 
 export interface IGetCedula {
   cedula: ICedulaBase[];

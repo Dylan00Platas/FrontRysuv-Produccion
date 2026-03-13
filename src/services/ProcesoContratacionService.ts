@@ -1,7 +1,9 @@
 import IPostProcesoContratacion from "@/schemas/procesos-contratacion/PostProcesoContratacion";
 import APIClient from "./connection/APIClient";
 import IResponseHTTP from "@/interfaces/http/Response";
-import IPutProcesoContratacion from "@/schemas/procesos-contratacion/PutProcesoContratacion";
+import IPutProcesoContratacion, {
+  IPutProcesoContratacionAgenda,
+} from "@/schemas/procesos-contratacion/PutProcesoContratacion";
 import {
   IGetProcesoContratacion,
   IGetProcesosContratacion,
@@ -13,7 +15,7 @@ import { IGetOficiosProcesoContratacion } from "@/schemas/procesos-contratacion/
 import { IPostSeguimientoHermes } from "@/schemas/procesos-contratacion/PostSeguimientoHermes";
 import IPostControlVersion from "@/schemas/control-versiones/PostControlVersion";
 
-export default class ProcesoContratacion {
+export default class ProcesoContratacionService {
   private api: APIClient = new APIClient(
     import.meta.env.VITE_API_PROCESO_CONTRATACION_URL,
   );
@@ -34,7 +36,7 @@ export default class ProcesoContratacion {
 
   async putProcesoContratacion(
     idProceso: number,
-    data: IPutProcesoContratacion,
+    data: IPutProcesoContratacion | IPutProcesoContratacionAgenda,
   ): Promise<IResponseHTTP<string>> {
     return await this.api.request({
       endpoint: `/${idProceso}`,
@@ -61,16 +63,12 @@ export default class ProcesoContratacion {
     });
   }
 
-  // TODO-Desarrollo: Verificar en backend
   async getProcesoContratacionById(
     idProceso: number,
   ): Promise<IResponseHTTP<IGetProcesoContratacion>> {
     return await this.api.request({
-      endpoint: `/busqueda`,
-      method: "POST",
-      body: {
-        idProceso,
-      },
+      endpoint: `/busqueda/${idProceso}`,
+      method: "GET",
     });
   }
 

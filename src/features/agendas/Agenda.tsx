@@ -10,13 +10,14 @@ import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
 
 import "./Agenda.css";
 import { solicitudAEvento } from "@/utils/features/Agendas";
+import { IPutProcesoContratacionAgenda } from "@/schemas/procesos-contratacion/PutProcesoContratacion";
+import IResponseHTTP from "@/interfaces/http/Response";
 import resolverColor from "@/services/CatalogosNoseDonde";
-import SolicitudService from "@/services/SolicitudService.js";
-import ISolicitudProceso from "@/interfaces/procesos/Solicitud";
+import SolicitudService from "@/services/ProcesoContratacionService";
 import IEventoAgenda from "@/interfaces/agendas/EventoAgenda";
 import IEventoSeleccionado from "@/interfaces/agendas/EventoSeleccionado";
-import IActualizarEstadoCita from "@/interfaces/agendas/ActualizarEstadoCita";
 import ILabelValue from "@/interfaces/LabelValue";
+import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 
 function Agenda() {
   const [eventos, setEventos] = useState<IEventoAgenda[]>([]);
@@ -35,12 +36,11 @@ function Agenda() {
   useEffect(() => {
     async function cargarEventos(): Promise<void> {
       try {
-        const data: Record<string, ISolicitudProceso> | null =
-          await new SolicitudService().obtenerSolicitudes();
+        const data = await new SolicitudService().getProcesosContratacion();
 
         if (!data) return;
 
-        const solicitudes = Object.values(data) as ISolicitudProceso[];
+        const solicitudes = Object.values(data) as IProcesoContratacionBase[];
         const nuevosEventos = solicitudes
           .filter((s) => Boolean(s.fechaEntrevista))
           .filter((s) => s.FKIdEstadoProcesoContratacion !== 7)
@@ -75,17 +75,18 @@ function Agenda() {
     if (!eventoSeleccionado) return;
 
     try {
-      const payload: IActualizarEstadoCita = {
-        idEventoSeleccionado: eventoSeleccionado.estado,
+      const payload: IPutProcesoContratacionAgenda = {
         fechaEntrevista: eventoSeleccionado.fecha,
         atendioCita: eventoSeleccionado.atendioCita,
         citaVirtual: eventoSeleccionado.citaVirtual,
-        estado: eventoSeleccionado.estado,
+        FKIdEstadoProcesoContratacion: eventoSeleccionado.estado,
       };
 
-      const response: any = await new SolicitudService().editarSolicitud(
-        payload,
-      );
+      const response: IResponseHTTP<string> =
+        await new SolicitudService().putProcesoContratacion(
+          eventoSeleccionado.id,
+          payload,
+        );
 
       const colorFinal = resolverColor(
         eventoSeleccionado.estado,
@@ -116,7 +117,7 @@ function Agenda() {
       setModalAbierto(false);
     } catch (error) {
       console.error("Error al guardar cambios:", error);
-      alert("❌ Error al guardar los cambios");
+      alert("Error al guardar los cambios");
     }
   };
 
@@ -134,17 +135,22 @@ function Agenda() {
         (ev) => ev.id === idEventoSeleccionado,
       );
 
-      const payload: IActualizarEstadoCita = {
-        idEventoSeleccionado: idEventoSeleccionado,
+      const payload: IPutProcesoContratacionAgenda = {
         fechaEntrevista: nuevaFecha,
-        estado: eventoOriginal!!.extendedProps.estado,
+        FKIdEstadoProcesoContratacion: eventoOriginal!!.extendedProps.estado,
         atendioCita: eventoOriginal!!.extendedProps.atendioCita,
         citaVirtual: eventoOriginal!!.extendedProps.citaVirtual,
       };
 
-      await new SolicitudService().editarSolicitud(payload);
+      await new SolicitudService().putProcesoContratacion(
+        Number(idEventoSeleccionado),
+        payload,
+      );
 
-      const colorFinal = resolverColor(payload.estado, payload.atendioCita);
+      const colorFinal = resolverColor(
+        payload.FKIdEstadoProcesoContratacion,
+        payload.atendioCita,
+      );
 
       setEventos((prev) =>
         prev.map((ev) =>

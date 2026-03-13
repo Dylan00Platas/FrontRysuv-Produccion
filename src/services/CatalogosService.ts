@@ -1,7 +1,10 @@
 import APIClient from "./connection/APIClient";
 import IResponseHTTP from "@/interfaces/http/Response";
 import { IGetClasificacionesCedula } from "@/schemas/catalogos/GetClasificacionCedula";
-import { IGetDependencias } from "@/schemas/catalogos/GetDependencia";
+import {
+  IDependenciaBase,
+  IGetDependencias,
+} from "@/schemas/catalogos/GetDependencia";
 import { IGetEstadosProcesoContratacion } from "@/schemas/catalogos/GetStatesContractingProcess";
 import { IGetTemporalDefinitiva } from "@/schemas/catalogos/GetTemporaryPermanent";
 import { IGetTiposCedula } from "@/schemas/catalogos/GetTipoCedula";
@@ -57,6 +60,15 @@ export default class CatalogoService {
   async getDependencias(): Promise<IResponseHTTP<IGetDependencias>> {
     return await this.api.request({
       endpoint: "/dependencias",
+      method: "GET",
+    });
+  }
+
+  async getDependenciaById(
+    idDependencia: number,
+  ): Promise<IResponseHTTP<IDependenciaBase>> {
+    return await this.api.request({
+      endpoint: `/dependencias/${idDependencia}`,
       method: "GET",
     });
   }

@@ -9,7 +9,7 @@ import {
 import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompetencia";
 import { IGetCedulaExterna } from "@/schemas/cedulas-externas/GetCedulaExterna";
 import IPostCedula from "@/schemas/cedulas/PostCedula";
-import IPutCedula from "@/schemas/cedulas/PutCedula";
+import IPutCedula, { IPutCedulaPartial } from "@/schemas/cedulas/PutCedula";
 
 export default class CedulaService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
@@ -99,6 +99,17 @@ export default class CedulaService {
     return await this.api.request({
       endpoint: `/externa/${FKIdCedula}`,
       method: "POST",
+    });
+  }
+
+  async archivarCedula(idCedula: number) {
+    const data: IPutCedulaPartial = {
+      estado: true,
+    };
+    return await this.api.request({
+      endpoint: `/${idCedula}`,
+      method: "PUT",
+      body: data,
     });
   }
 }

@@ -46,8 +46,8 @@ export function CedulaBadge({ tipo }: { tipo: string }) {
       label: "Resultados",
       classes: "bg-slate-100 text-slate-700 ring-1 ring-slate-200",
     },
-    Archivadas: {
-      label: "Archivada",
+    DeBolsa: {
+      label: "De bolsa",
       classes: "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
     },
   };
@@ -65,3 +65,16 @@ export function CedulaBadge({ tipo }: { tipo: string }) {
     </span>
   );
 }
+
+export const getIdTipoCedula = (id: number): string => {
+  switch (id) {
+    case 1:
+      return "Interna";
+    case 2:
+      return "Resultados";
+    case 3:
+      return "De bolsa";
+    default:
+      return "";
+  }
+};
