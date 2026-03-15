@@ -59,3 +59,16 @@ export type IPutProcesoContratacionAgenda = Pick<
   | "atendioCita"
   | "citaVirtual"
 >;
+
+export type IPutProcesoContratacionCedula = Pick<
+  IPutProcesoContratacion,
+  | "FKIdDependencia"
+  //| "numeroPlaza"
+  | "nombreCandidato"
+  | "resultadoHabilidadesWord"
+  | "resultadoHabilidadesExcel"
+  | "resultadoOrtografia"
+  //| "evaluacionConocimientos"
+  | "avaladoPor"
+  | "educacionFormal"
+>;

@@ -60,7 +60,7 @@ export interface IGetProcesosContratacion {
 }
 
 export interface IGetProcesoContratacion {
-  procesos: IProcesoContratacionBase;
+  procesoContratación: IProcesoContratacionBase;
 }
 
 export interface IProcesoContratacionCandidatoNoBeneficiadoBase {

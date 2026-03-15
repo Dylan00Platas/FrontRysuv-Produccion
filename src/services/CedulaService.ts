@@ -8,8 +8,11 @@ import {
 } from "@/schemas/cedulas/GetCedula";
 import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompetencia";
 import { IGetCedulaExterna } from "@/schemas/cedulas-externas/GetCedulaExterna";
-import IPostCedula from "@/schemas/cedulas/PostCedula";
+import IPostCedula, {
+  IPostCedulaInternaForm,
+} from "@/schemas/cedulas/PostCedula";
 import IPutCedula, { IPutCedulaPartial } from "@/schemas/cedulas/PutCedula";
+import IPostResultadoCedula from "@/schemas/cedulas/PostResultadoCedula";
 
 export default class CedulaService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
@@ -18,9 +21,9 @@ export default class CedulaService {
     this.api = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
   }
 
-  // TODO-Desarrollo: Verificar estado 200
+  // TODO-Desarrollo: Verificar body en backend
   async postCedulaInterna(
-    requestData: IPostCedula,
+    requestData: IPostCedulaInternaForm,
   ): Promise<IResponseHTTP<string | number>> {
     return await this.api.request({
       endpoint: "/",
@@ -80,6 +83,16 @@ export default class CedulaService {
     return await this.api.request({
       endpoint: `/competencia-resultados/${idProceso}`,
       method: "GET",
+    });
+  }
+
+  async postResultadoCedulaInterna(
+    data: IPostResultadoCedula,
+  ): Promise<IResponseHTTP<string>> {
+    return await this.api.request({
+      endpoint: `/resultado`,
+      method: "POST",
+      body: data,
     });
   }
 

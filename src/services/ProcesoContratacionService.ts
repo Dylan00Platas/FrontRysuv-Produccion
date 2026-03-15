@@ -67,7 +67,7 @@ export default class ProcesoContratacionService {
     idProceso: number,
   ): Promise<IResponseHTTP<IGetProcesoContratacion>> {
     return await this.api.request({
-      endpoint: `/busqueda/${idProceso}`,
+      endpoint: `/busqueda/proceso/${idProceso}`,
       method: "GET",
     });
   }
