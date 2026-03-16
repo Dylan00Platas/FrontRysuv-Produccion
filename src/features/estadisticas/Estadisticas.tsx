@@ -17,19 +17,31 @@ import {
   Bar,
   CartesianGrid,
 } from "recharts";
+import { Temporal } from "@js-temporal/polyfill";
 
 import "./Estadisticas.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import CatalogoDependencia from "@/services/CatalogoDependencia.js";
-import SolicitudService from "@/services/SolicitudService.js";
-import UsuarioService from "@/services/UsuarioService.js";
-import UserContext from "@/utils/UserContext.jsx";
+import AccesoService from "@/services/AccesoService";
+import IResponseHTTP from "@/interfaces/http/Response";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import { IGetProcesosContratacion } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
+import { IGetUsuarios } from "@/schemas/acceso/GetUsuario";
+import { Toast } from "@/components/Alert/Floating/Toast";
+import { useToast } from "@/hooks/useToast";
+
+interface ICedulaAdaptada {
+  id: number;
+  folio: string;
+  puesto: string;
+  estado: string;
+}
 
 function Estadisticas() {
   const navigate = useNavigate();
+  const { toast, mostrarToast } = useToast();
+
   const [procesos, setProcesos] = useState([]);
-  const [procesosRaw, setProcesosRaw] = useState([]);
-  const [analistas, setAnalistas] = useState([]);
+  const [procesosRaw, setProcesosRaw] = useState<IGetProcesosContratacion>([]);
+  const [analistas, setAnalistas] = useState<IGetUsuarios>([]);
   const [loadingProcesos, setLoadingProcesos] = useState(true);
   const [analistaOptions, setAnalistaOptions] = useState([
     { value: "Todos", label: "Todos" },
@@ -43,16 +55,15 @@ function Estadisticas() {
     { value: "Todos", label: "Todos" },
   ]);
 
-  const { currentUser } = useContext(UserContext);
-
   const [analistaFiltroEval, setAnalistaFiltroEval] = useState({
     value: "Todos",
     label: "Todos los analistas",
   });
   const [mesFiltroEval, setMesFiltroEval] = useState(null);
 
-  const [solicitudes, setSolicitudes] = useState([]);
-  const [solicitudesRaw, setSolicitudesRaw] = useState([]);
+  const [solicitudes, setSolicitudes] = useState<ICedulaAdaptada[]>([]);
+  const [procesosContratacion, setProcesosContratacion] =
+    useState<IGetProcesosContratacion | null>(null);
   const [loadingSolicitudes, setLoadingSolicitudes] = useState(true);
   const [estadoFiltro, setEstadoFiltro] = useState({
     value: "Todos",
@@ -60,15 +71,12 @@ function Estadisticas() {
   });
   const [searchTermSolicitudes, setSearchTermSolicitudes] = useState("");
 
-  const solicitudService = new SolicitudService();
-  const token = localStorage.getItem("token");
-
   //  Estados para los contadores
   const [pendientes, setPendientes] = useState(0);
   const [entregadas, setEntregadas] = useState(0);
   const [notificadas, setNotificadas] = useState(0);
 
-  function mapEstado(fk) {
+  function mapEstado(fk: number) {
     switch (fk) {
       case 9:
         return "Pendiente";
@@ -98,14 +106,15 @@ function Estadisticas() {
   useEffect(() => {
     const fetchSolicitudes = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const servicio = new SolicitudService();
-        const data = await servicio.obtenerSolicitudes(token);
+        const data: IResponseHTTP<IGetProcesosContratacion> =
+          await new ProcesoContratacionService().getProcesosContratacion();
 
-        setSolicitudesRaw(data);
+        setProcesosContratacion(data.mensaje);
 
         // Solo solicitudes sin analista y sin tipo bolsa
-        const dataSinBolsa = data.filter((s) => s.FKIdTipoProceso !== 3);
+        const dataSinBolsa = data.mensaje.procesos.filter(
+          (s) => s.FKIdTipoProceso !== 3,
+        );
         const dataSinAnalista = dataSinBolsa.filter(
           (s) => s.FKIdAcceso === null,
         );
@@ -141,7 +150,7 @@ function Estadisticas() {
 
   // Al hacer doble clic: abrir asignar solicitud
   const handleEditarSolicitud = (solicitudAdaptada) => {
-    const solicitudCompleta = solicitudesRaw.find(
+    const solicitudCompleta = procesosContratacion?.procesos.find(
       (s) => s.idProceso === solicitudAdaptada.id,
     );
     navigate("/asignar-solicitud", { state: { solicitud: solicitudCompleta } });
@@ -162,15 +171,16 @@ function Estadisticas() {
     const fetchSolicitudes = async () => {
       try {
         setLoading(true);
-        const solicitudes = await SolicitudService.obtenerSolicitudes(token);
+        const solicitudes: IResponseHTTP<IGetProcesosContratacion> =
+          await new ProcesoContratacionService().getProcesosContratacion();
 
-        const pendientesCount = solicitudes.filter(
+        const pendientesCount = solicitudes.mensaje.procesos.filter(
           (s) => s.FKIdEstadoProcesoContratacion === 9,
         ).length;
-        const entregadasCount = solicitudes.filter(
+        const entregadasCount = solicitudes.mensaje.procesos.filter(
           (s) => s.FKIdEstadoProcesoContratacion === 10,
         ).length;
-        const citadasCount = solicitudes.filter(
+        const citadasCount = solicitudes.mensaje.procesos.filter(
           (s) => s.FKIdEstadoProcesoContratacion === 11,
         ).length;
 
@@ -179,45 +189,54 @@ function Estadisticas() {
         setNotificadas(citadasCount);
 
         setCitado(
-          solicitudes.filter((s) => s.FKIdEstadoProcesoContratacion === 1)
-            .length,
+          solicitudes.mensaje.procesos.filter(
+            (s) => s.FKIdEstadoProcesoContratacion === 1,
+          ).length,
         );
         setEvaluado(
-          solicitudes.filter((s) => s.FKIdEstadoProcesoContratacion === 2)
-            .length,
+          solicitudes.mensaje.procesos.filter(
+            (s) => s.FKIdEstadoProcesoContratacion === 2,
+          ).length,
         );
         setProcesamiento(
-          solicitudes.filter((s) =>
+          solicitudes.mensaje.procesos.filter((s) =>
             [13, 14, 15].includes(s.FKIdEstadoProcesoContratacion),
           ).length,
         );
 
         setRevision(
-          solicitudes.filter((s) => s.FKIdEstadoProcesoContratacion === 4)
-            .length,
+          solicitudes.mensaje.procesos.filter(
+            (s) => s.FKIdEstadoProcesoContratacion === 4,
+          ).length,
         );
         setFirma(
-          solicitudes.filter((s) => s.FKIdEstadoProcesoContratacion === 5)
-            .length,
+          solicitudes.mensaje.procesos.filter(
+            (s) => s.FKIdEstadoProcesoContratacion === 5,
+          ).length,
         );
         setNotificadoProceso(
-          solicitudes.filter((s) => s.FKIdEstadoProcesoContratacion === 6)
-            .length,
+          solicitudes.mensaje.procesos.filter(
+            (s) => s.FKIdEstadoProcesoContratacion === 6,
+          ).length,
         );
         setCancelado(
-          solicitudes.filter((s) => s.FKIdEstadoProcesoContratacion === 7)
-            .length,
+          solicitudes.mensaje.procesos.filter(
+            (s) => s.FKIdEstadoProcesoContratacion === 7,
+          ).length,
         );
         setTerminado(
-          solicitudes.filter((s) => s.FKIdEstadoProcesoContratacion === 8)
-            .length,
+          solicitudes.mensaje.procesos.filter(
+            (s) => s.FKIdEstadoProcesoContratacion === 8,
+          ).length,
         );
 
         // --- Construcción de dataMensual
-        const validas = solicitudes.filter((s) => s.fechaNotificacion);
+        const validas = solicitudes.mensaje.procesos.filter(
+          (s) => s.fechaNotificacion,
+        );
 
         if (validas.length > 0) {
-          const parseFecha = (f) => new Date(f);
+          const parseFecha = (f: string) => new Date(f);
 
           // Fecha más reciente
           const maxFecha = new Date(
@@ -225,7 +244,7 @@ function Estadisticas() {
           );
 
           // Generar últimos 4 meses
-          const meses = [];
+          const meses: { mes: string; solicitudes: number }[] = [];
           for (let i = 3; i >= 0; i--) {
             const d = new Date(maxFecha);
             d.setMonth(d.getMonth() - i);
@@ -260,30 +279,30 @@ function Estadisticas() {
     };
 
     fetchSolicitudes();
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     const fetchProcesos = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const SolicitudService = new SolicitudService();
-        const usuarioServicio = new UsuarioService();
-
         //  Traer solicitudes
-        const data = await SolicitudService.obtenerSolicitudes(token);
-        setProcesosRaw(data);
+        const data: IResponseHTTP<IGetProcesosContratacion> =
+          await new ProcesoContratacionService().getProcesosContratacion();
+        setProcesosRaw(data.mensaje);
 
         //  Traer analistas
-        const analistasData = await usuarioServicio.obtenerAnalistas(token);
-        setAnalistas(analistasData);
+        const analistasData: IResponseHTTP<IGetUsuarios> =
+          await new AccesoService().getAnalistas();
+        setAnalistas(analistasData.mensaje);
 
         const analistasMap = {};
-        analistasData.forEach((a) => {
+        analistas.usuarios.forEach((a) => {
           analistasMap[a.idAcceso] =
             `${a.nombre} ${a.primerApellido} ${a.segundoApellido || ""}`.trim();
         });
 
-        const dataConAnalista = data.filter((s) => s.FKIdAcceso !== null);
+        const dataConAnalista = data.mensaje.procesos.filter(
+          (s) => s.FKIdAcceso !== null,
+        );
 
         const procesosAdaptados = dataConAnalista.map((s, idx) => ({
           id: s.idProceso || idx,
@@ -396,7 +415,13 @@ function Estadisticas() {
     { name: "Citado", value: notificadas },
   ];
 
-  const [dataMensual, setDataMensual] = useState([]);
+  const [dataMensual, setDataMensual] = useState<
+    | {
+        mes: string;
+        solicitudes: number;
+      }[]
+    | null
+  >(null);
 
   const dataProcesos = [
     { name: "Citado", value: citado },
@@ -430,24 +455,16 @@ function Estadisticas() {
   ];
 
   return (
-    <div className="estadisticas-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
+    <>
+      {/* Toast de notificación */}
+      <Toast texto={toast.texto} tipo={toast.tipo} />
       {/* Main Content */}
       <main className="main-content-estadisticas">
         <div className="page-header">
           <h1 className="page-title-estadisticas">Estadísticas</h1>
         </div>
 
-        <div
-          style={{
-            width: "500px",
-            marginBottom: "20px",
-            border: "1.5px solid #18529",
-            // Propiedades para centrar horizontalmente:
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
+        <div className="w-125 mb-5 mx-auto border-[1.5px] border-[#18529]">
           {" "}
           <Select
             options={graficasOptions}
@@ -1045,7 +1062,7 @@ function Estadisticas() {
           </section>
         </div>
       </main>
-    </div>
+    </>
   );
 }
 

@@ -2,12 +2,13 @@ import type { FC } from "react";
 
 interface ToastProps {
   texto: string;
-  tipo: "exito" | "error" | "";
+  tipo: "exito" | "error" | "advertencia" | "";
 }
 
 const ESTILOS: Record<string, string> = {
   exito: "bg-linear-to-r from-emerald-500 to-emerald-600",
   error: "bg-linear-to-r from-red-500 to-rose-600",
+  advertencia: "bg-linear-to-r from-ambar-500 to-ambar-600",
 };
 
 export const Toast: FC<ToastProps> = ({ texto, tipo }) => {

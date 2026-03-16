@@ -20,6 +20,7 @@ import ILabelValue from "@/interfaces/LabelValue";
 import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 
 function Agenda() {
+  const fieldID = useId();
   const [eventos, setEventos] = useState<IEventoAgenda[]>([]);
   // Estado para modal
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -31,7 +32,6 @@ function Agenda() {
     { value: "10", label: "Entregado (cita)" },
     { value: "11", label: "Citado" },
   ];
-  const fieldID = useId();
 
   useEffect(() => {
     async function cargarEventos(): Promise<void> {

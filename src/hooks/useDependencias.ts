@@ -17,13 +17,13 @@ export function useDependencias(): IGettingData<IGetDependencias> {
         if (response.error == false && response.mensaje) {
           setData(response.mensaje);
         } else {
-          setError("No se obtuvieron dependencias");
+          setError("No hay dependencias registradas.");
         }
       } catch (err) {
         console.error(
-          `useDependencias.ts - Error al obtener dependencias \n ${error}`,
+          `useDependencias.ts - Error al obtener dependencias:\n ${error}`,
         );
-        setError("Error al obtener dependencias");
+        setError("Error al obtener dependencias.");
       } finally {
         setLoading(false);
       }

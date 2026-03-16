@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { saveAs } from "file-saver";
 import { PDFDocument } from "pdf-lib";
 import { FaSearch } from "react-icons/fa";
@@ -9,57 +9,93 @@ import * as echarts from "echarts";
 import * as fontkit from "fontkit";
 
 import "./CrearConstancia.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import CedulaService from "@/services/CedulaService.js";
-import SolicitudService from "@/services/SolicitudService.js";
 import ManageFiles from "@/utils/ManageFiles";
-import CatalogoDependencia from "@/services/CatalogoDependencia.js";
-import UserContext from "@/utils/UserContext.jsx";
+import { useToast } from "@/hooks/useToast";
+import { Toast } from "@/components/Alert/Floating/Toast";
+import {
+  IDependenciaBase,
+  IGetDependencias,
+} from "@/schemas/catalogos/GetDependencia";
+import { useDependenciaById } from "@/hooks/useDependenciaById";
+import { useDependencias } from "@/hooks/useDependencias";
+import { useProcesoTipos } from "@/hooks/useProcesoTipos";
+import {
+  IGetTiposProceso,
+  ITipoProcesoBase,
+} from "@/schemas/catalogos/GetTipoProceso";
+import IResponseHTTP from "@/interfaces/http/Response";
+import { IGetCedulaExterna } from "@/schemas/cedulas-externas/GetCedulaExterna";
+import { IGetCedula } from "@/schemas/cedulas/GetCedula";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompetencia";
 
 function CrearConstancia() {
-  const [showHelp, setShowHelp] = useState(false);
+  // Utils ---------------------------------------------------------------------
   const navigate = useNavigate();
-  const { currentUser } = useContext(UserContext);
-
   const fechaActual = new Date();
   const dia = fechaActual.getDate().toString().padStart(2, "0");
   const mes = (fechaActual.getMonth() + 1).toString().padStart(2, "0");
   const año = fechaActual.getFullYear();
   const fechaFormateada = `${dia}/${mes}/${año}`;
+  const { toast, mostrarToast } = useToast();
+  const [showHelp, setShowHelp] = useState(false);
 
-  const servicioCedula = new CedulaService();
+  // Obtención de datos ---------------------------------------------------------
+  // Obtención de cedula.folio desde query
+  const location = useLocation();
+  const cedulaFromNav = location.state?.cedula || null;
   const [porcentajeHabilidades, setPorcentajeHabilidades] = useState(0);
 
-  const cedulaFromNav = location.state?.cedula || null;
-  console.log("📌 cedulaFromNav recibida desde Cedulas:", cedulaFromNav);
+  // Obtener dependencias --------------------------------------------------------
+  const {
+    data: dataDependencias,
+    loading: loadingDependencias,
+    error: errorDependencias,
+  } = useDependencias();
+  const [dependencias, setDependencias] = useState<IGetDependencias | null>();
+  useEffect(() => {
+    setDependencias(dataDependencias);
+  }, [dataDependencias]);
 
-  const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
+  const {
+    data: dataDependenciaById,
+    loading: loadingDependenciaById,
+    error: errorDependenciaById,
+  } = useDependenciaById();
+  const [dependenciaById, setDependenciaById] =
+    useState<IDependenciaBase | null>();
 
-  const [dependencias, setDependencias] = useState([]);
-  const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
+  // Tipos de proceso de contratación --------------------------------------------
+  const {
+    data: dataProcesoTipos,
+    loading: loadingProcesoTipos,
+    error: errorProcesoTipos,
+  } = useProcesoTipos();
+  const [procesoTipos, setProcesoTipos] = useState<IGetTiposProceso | null>();
+  useEffect(() => {
+    setProcesoTipos(dataProcesoTipos);
+  }, [dataDependencias]);
 
-  const [aprobadoJefeOficina, setAprobadoJefeOficina] = useState(false);
-  const [aprobadoDireccion, setAprobadoDireccion] = useState(false);
+  const {
+    data: dataProcesoTipoById,
+    loading: loadingProcesoTipoById,
+    error: errorProcesoTipoById,
+  } = useProcesoTipos();
+  const [procesoTipoById, setProcesoTipoById] =
+    useState<ITipoProcesoBase | null>();
+  const [procesoTipoId, setProcesoTipoId] = useState(0);
 
-  const [tipoProceso, setTipoProceso] = useState(1);
-
-  const chartGaugeRef = useRef(null);
-  const chartRadarRef = useRef(null);
-
-  const { mostrarPDF, archivoNombre } = location.state || {};
-
-  const [archivoBase64, setArchivoBase64] = useState("");
-
+  // Manejo de archivo PDf -------------------------------------------------------
   const archivoUrl = location.state?.archivoUrl || null;
-
   const [filePDF, setFilePDF] = useState(null);
   const [nombreArchivo, setNombreArchivo] = useState("");
+  const [archivoBase64, setArchivoBase64] = useState("");
   const fileInputRef = useRef(null);
+  const { mostrarPDF, archivoNombre } = location.state || {};
 
-  /* Cositas para el drag and drop deez in ya mouth */
-
+  // Manejo de dragging archivo --------------------------------------------------
   const [isDragging, setIsDragging] = useState(false);
-
   useEffect(() => {
     const handleDragEnter = (e) => {
       e.preventDefault();
@@ -88,7 +124,7 @@ function CrearConstancia() {
       if (!file) return;
 
       if (file.type !== "application/pdf") {
-        alert("Por favor suelta un archivo PDF válido.");
+        mostrarToast("Por favor suelta un archivo PDF válido", "advertencia");
         return;
       }
 
@@ -99,8 +135,9 @@ function CrearConstancia() {
       // Leerlo como Base64
       const reader = new FileReader();
       reader.onload = () => {
-        const base64 = reader.result.split(",")[1];
-        setArchivoBase64(base64);
+        if (reader.result) {
+          setArchivoBase64(reader.result?.split(",")[1]);
+        }
       };
       reader.readAsDataURL(file);
 
@@ -125,12 +162,20 @@ function CrearConstancia() {
     };
   }, []);
 
+  // -----------------------------------------------------------------------------
+
+  const [aprobadoJefeOficina, setAprobadoJefeOficina] = useState(false);
+  const [aprobadoDireccion, setAprobadoDireccion] = useState(false);
+
+  const chartGaugeRef = useRef(null);
+  const chartRadarRef = useRef(null);
+
   useEffect(() => {
     if (
       cedulaFromNav?.FKIdTipoCedula === 2 &&
       cedulaFromNav?.FKIdTipoProceso === 2
     ) {
-      setTipoProceso(2);
+      setProcesoTipoId(2);
     }
   }, [cedulaFromNav]);
 
@@ -178,30 +223,38 @@ function CrearConstancia() {
             cedulaFromNav.idCedula,
           );
 
-          const response = await servicioCedula.obtenerCedulaExternaPorIdCedula(
-            cedulaFromNav.idCedula,
-            token,
-          );
+          const response: IResponseHTTP<IGetCedulaExterna> =
+            await new CedulaService().getCedulaExterna(cedulaFromNav.idCedula);
 
-          if (!response || !response.documento?.archivo) {
-            console.warn(
-              "⚠️ No se encontró archivo base64 para esta cédula externa.",
+          if (
+            response.error == false ||
+            response.mensaje.documento.archivo?.length <= 0
+          ) {
+            mostrarToast(
+              "⚠️ No se encontró archivo designado a esta cédula externa.",
+              "error",
             );
             return;
           }
-
-          console.log("📄 Cédula externa encontrada. Mostrando PDF inline...");
           // Guardamos el PDF en base64 para mostrarlo en pantalla
-          setArchivoBase64(response.documento.archivo);
-          setNombreArchivo(response.documento.nombre || "document.pdf");
+          setArchivoBase64(response.mensaje.documento.archivo);
+          setNombreArchivo(
+            response.mensaje.documento.nombre ||
+              `${response.mensaje.documento.nombre}.pdf`,
+          );
           setPdfVisible(true);
         } else {
-          console.log(
+          mostrarToast(
             "ℹ️ No se encontró idCedula, no se buscará archivo externo.",
+            "advertencia",
           );
         }
       } catch (error) {
-        console.error("❌ Error al obtener la cédula externa:", error);
+        console.error(
+          "CrearConstancia.tsx - Error al buscar archivo de cédula externa:\n",
+          error,
+        );
+        mostrarToast("❌ Error al obtener la cédula externa:", "exito");
       }
     };
 
@@ -290,9 +343,7 @@ function CrearConstancia() {
 
   useEffect(() => {
     if (cedulaFromNav) {
-      const dep = dependencias.find(
-        (d) => d.idDependencia === cedulaFromNav.idDependencia,
-      );
+      useDependenciaById(cedulaFromNav.idDependencia);
       setAprobadoJefeOficina(!!cedulaFromNav.aprobadoJefeOficina);
       setAprobadoDireccion(!!cedulaFromNav.aprobadoDireccion);
 
@@ -342,14 +393,14 @@ function CrearConstancia() {
 
         resultadoFinal: cedulaFromNav.resultadoProcesoEvaluacion || "",
 
-        adscripcion: dep
+        adscripcion: dependenciaById
           ? {
-              value: dep.idDependencia,
-              label: dep.nombre,
-              zona: dep.zona,
+              idDependencia: dependenciaById.idDependencia,
+              nombre: dependenciaById.nombre,
+              zona: dependenciaById.zona,
             }
           : null,
-        region: dep ? dep.zona : "",
+        region: dependenciaById ? dependenciaById.zona : "",
       }));
     }
   }, [cedulaFromNav, dependenciasCargadas, dependencias]);
@@ -413,32 +464,24 @@ function CrearConstancia() {
   const handleBuscarCedula = async () => {
     try {
       if (!formData.idProceso) {
-        setMensaje({
-          texto: `⚠️  Por favor ingresa el identificador y presiona la lupa  `,
-          tipo: "error",
-        });
-        setTimeout(() => setMensaje(""), 5000);
+        mostrarToast(
+          " ⚠️ Por favor ingresa el identificador y presiona la lupa.",
+          "advertencia",
+        );
         return;
       }
-      const token = localStorage.getItem("token");
-      const proceso = await servicioCedula.obtenerDatoInicialesCedula(
-        formData.idProceso,
-        token,
-      );
+      const proceso: IResponseHTTP<IGetCedula> =
+        await new CedulaService().getCedulaInternaIdProceso(formData.idProceso);
 
-      const cedula = await servicioCedula.obtenerCedulaPorId(
-        formData.idProceso,
-        token,
-      );
-
-      if (!cedula || !proceso) {
-        alert("No se encontró la cédula o los datos iniciales.");
+      if (!proceso) {
+        mostrarToast(
+          "No se encontró la cédula o los datos iniciales.",
+          "advertencia",
+        );
         return;
       }
 
-      const dep = dependenciasCargadas
-        ? dependencias.find((d) => d.idDependencia === proceso.FKIdDependencia)
-        : null;
+      useDependenciaById(proceso.mensaje.cedula.FKIdDependencia);
 
       const updatedFormData = {
         edad: cedula.edad || "",
@@ -469,22 +512,24 @@ function CrearConstancia() {
             : proceso.FKIdTemporalDefinitiva === 2
               ? "2"
               : "",
+        adscripcion: {},
+        region: "",
       };
 
-      if (dep) {
+      if (dependenciaById) {
         updatedFormData.adscripcion = {
-          value: dep.idDependencia,
-          label: dep.nombre,
-          zona: dep.zona,
+          idDependencia: dependenciaById.idDependencia,
+          nombre: dependenciaById.nombre,
+          zona: dependenciaById.zona,
         };
-        updatedFormData.region = dep.zona;
+        updatedFormData.region = dependenciaById.zona;
       } else {
-        updatedFormData.adscripcion = null;
+        updatedFormData.adscripcion = {};
         updatedFormData.region = "";
       }
 
       setFormData((prev) => ({ ...prev, ...updatedFormData }));
-      setTipoProceso(proceso.FKIdTipoProceso);
+      setProcesoTipoId(proceso.FKIdTipoProceso);
     } catch (err) {
       console.error("Error al buscar cédula:", err);
       alert("Ocurrió un error al buscar la cédula");
@@ -518,22 +563,6 @@ function CrearConstancia() {
     }
   }, [mostrarPDF, archivoBase64]);
 
-  async function cargarDependencias() {
-    const token = localStorage.getItem("token");
-    const catalogo = new CatalogoDependencia();
-    try {
-      if (CatalogoDependencia.obtenerDependencias().length === 0) {
-        await catalogo.cargarDependencias(token);
-      }
-      const depsObj = CatalogoDependencia.obtenerDependencias();
-      const depsArray = Object.values(depsObj);
-      setDependencias(depsArray);
-      setDependenciasCargadas(true);
-    } catch (err) {
-      console.error("Error cargando dependencias:", err);
-    }
-  }
-
   const handleGenerarPDF = async () => {
     const existingPdfBytes = await fetch("/CedulaResultadosEditable.pdf").then(
       (res) => res.arrayBuffer(),
@@ -557,7 +586,7 @@ function CrearConstancia() {
     form.getTextField("oficio").setText(formData.oficio);
     form
       .getTextField("temporalidad")
-      .setText(formData.temporalidad == 1 ? "Temporal" : "Definitiva");
+      .setText(formData.temporalidad == "Temporal" ? "Temporal" : "Definitiva");
     form.getTextField("nombre").setText(formData.nombre);
     form.getTextField("edad").setText(formData.edad + " años");
     form.getTextField("educacion").setText(formData.educacion);
@@ -645,6 +674,11 @@ function CrearConstancia() {
       }
     }
 
+    /**
+     * TODO-Desarrollo:
+     * Obtener por medio de cookie
+     * Eliminar firma de /public
+     */
     if (usuario?.FKidTipoAcceso === 1 || usuario?.FKidTipoAcceso === 4) {
       try {
         const firmaBytes = await fetch("/Firma_AVC.png").then((res) =>
@@ -659,7 +693,8 @@ function CrearConstancia() {
           height: firmaDims.height,
         });
       } catch (err) {
-        console.error("❌ Error al agregar la firma AVC:", err);
+        console.error("CrearConstancia.tsx - Error agregando firma:\n", err);
+        mostrarToast(" ❌ Error al agregar la firma AVC.", "error");
       }
     }
     const pdfBytes = await pdfDoc.save();
@@ -695,12 +730,10 @@ function CrearConstancia() {
     e.preventDefault();
     try {
       if (!formData.FKIdProceso) {
-        setMensaje({
-          texto: `⚠️  Por favor primero busca el identificador con la lupa para poder guardar la cédula `,
-          tipo: "error",
-        });
-        setTimeout(() => setMensaje(""), 5000);
-
+        mostrarToast(
+          `⚠️ Por favor primero busca el identificador con la lupa para poder guardar la cédula.`,
+          "advertencia",
+        );
         return;
       }
       const token = localStorage.getItem("token");
@@ -711,107 +744,85 @@ function CrearConstancia() {
 
       console.log(cedulaData);
 
-      const response = await servicioCedula.registrarCedulaResultados(
-        cedulaData,
-        token,
-      );
-      if (response) {
+      const response: IResponseHTTP<string> =
+        await new CedulaService().postResultadoCedulaInterna(cedulaData);
+      if (response.error == false) {
         try {
-          const SolicitudService = new SolicitudService();
           const solicitudData = mapFormDataToSolicitud(formData);
-          console.log(
-            "➡️ Datos procesados a enviar:",
-            solicitudData,
-            "id",
-            formData.FKIdProceso,
-          );
-          const respSolicitud = await SolicitudService.editarSolicitud(
-            formData.FKIdProceso,
-            solicitudData,
-            token,
-          );
+          const respSolicitud: IResponseHTTP<string> =
+            await new ProcesoContratacionService().putProcesoContratacion(
+              formData.FKIdProceso,
+              solicitudData,
+            );
           if (respSolicitud && !respSolicitud.error) {
-            setMensaje({
-              texto: "✅ Cédula registrada correctamente",
-              tipo: "exito",
-            });
+            mostrarToast(" ✅ Cédula registrada correctamente", "exito");
 
             if (!response.error && response.estado === 200) {
               if (archivoBase64 && nombreArchivo) {
-                const datosExterna = {
-                  FKIdCedula: response.idCedula,
+                await new CedulaService().postResultadoCedulaExterna({
+                  FKIdCedula: Number(response.mensaje),
                   nombre: nombreArchivo,
                   archivo: archivoBase64,
-                };
-                console.log("📤 Enviando archivo PDF externo:", datosExterna);
-                await servicioCedula.registrarCedulaExterna(
-                  datosExterna,
-                  token,
-                );
+                });
               }
             }
-
-            setTimeout(() => setMensaje(""), 3000);
             setTimeout(() => {
               navigate(-1);
             }, 2000);
           } else {
-            setMensaje({
-              texto:
-                "⚠️ La cédula se guardó, pero hubo un error al actualizar la base de datos.",
-              tipo: "exito",
-            });
-            setTimeout(() => setMensaje(""), 3000);
+            mostrarToast(
+              "⚠️ La cédula se guardó, pero hubo un error al actualizar la base de datos.",
+              "error",
+            );
           }
         } catch (err) {
-          console.error("Error al actualizar solicitud:", err);
-          setMensaje({
-            texto:
-              "⚠️ La cédula se guardó, pero hubo un error al actualizar la base de datos.",
-            tipo: "exito",
-          });
-          setTimeout(() => setMensaje(""), 3000);
+          console.error(
+            "CrearConstancia.tsx - Error al actualizar solicitud:\n",
+            err,
+          );
+          mostrarToast(
+            "⚠️ La cédula se guardó, pero hubo un error al actualizar la base de datos.",
+            "error",
+          );
         }
       } else {
-        setMensaje({
-          texto: `❌ Error: Ocurrió un error al registrar la cédula. ${response.error.message}`,
-          tipo: "error",
-        });
-        setTimeout(() => setMensaje(""), 3000);
+        mostrarToast("Ocurrió un error al registrar la cédula.", "error");
       }
     } catch (err) {
-      console.error("Error al registrar cédula:", err);
-      setMensaje({
-        texto: `❌ Error: Ocurrió un error al registrar la cédula. ${err.message}`,
-        tipo: "error",
-      });
-      setTimeout(() => setMensaje(""), 3000);
+      console.error(
+        "CrearConstanciaInterma.tsx - Error al registrar cédula:\n",
+        err,
+      );
+      mostrarToast(
+        `❌ Error: Ocurrió un error al registrar la cédula.`,
+        "error",
+      );
     }
   };
 
   const handleCrearGraficas = async () => {
     try {
       if (!formData.FKIdProceso) {
-        setMensaje({
-          texto: `⚠️  Por favor busca el identificador con la lupa para poder crear las gráficas `,
-          tipo: "error",
-        });
-        setTimeout(() => setMensaje(""), 5000);
+        mostrarToast(
+          `⚠️  Por favor busca el identificador con la lupa para poder crear las gráficas `,
+          "advertencia",
+        );
         return;
       }
 
-      const token = localStorage.getItem("token");
-      const data = await servicioCedula.obtenerCedulaResultadosPorProceso(
-        formData.FKIdProceso,
-        token,
-      );
+      const response: IResponseHTTP<IGetCompetenciasClasificacionCedula> =
+        await new CedulaService().getResultadosIdProceso(formData.FKIdProceso);
 
-      if (!data || !data.resultados || data.resultados.length === 0) {
-        alert("No se recibieron datos de competencias.");
+      if (
+        !response ||
+        !response.error ||
+        response.mensaje.competencias?.length <= 0
+      ) {
+        mostrarToast("No se recibieron datos de competencias.", "advertencia");
         return;
       }
 
-      const resultado = data.resultados[0];
+      const resultado = response.mensaje.competencias[0];
       if (
         resultado.resultadoPorcentaje !== undefined &&
         resultado.resultadoPorcentaje !== null
@@ -917,15 +928,10 @@ function CrearConstancia() {
   }, [mostrarPDF, archivoBase64, archivoNombre]);
 
   return (
-    <div className="crear-constancia-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
+    <>
+      {/* Toast de notificación */}
+      <Toast texto={toast.texto} tipo={toast.tipo} />
       <main className="main-content">
-        {mensaje.texto && (
-          <div className={`mensaje-flotante ${mensaje.tipo}`}>
-            {mensaje.texto}
-          </div>
-        )}
-
         <div className="help-icon" onClick={() => setShowHelp(true)}>
           <FiHelpCircle />
         </div>
@@ -1316,7 +1322,7 @@ function CrearConstancia() {
           </div>
         )}
       </main>
-    </div>
+    </>
   );
 }
 

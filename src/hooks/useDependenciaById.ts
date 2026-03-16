@@ -22,13 +22,13 @@ export function useDependenciaById(
           setData(response.mensaje);
           setError(null);
         } else {
-          setError("No hay dependencia registrada con ese ID");
+          setError("No hay dependencia registrada con ese ID.");
         }
       } catch (err) {
         console.error(
-          `useDependenciaById.ts - Error al obtener dependencia por ID \n ${err}`,
+          `useDependenciaById.ts - Error al obtener dependencia por ID:\n ${err}`,
         );
-        setError("Error al obtener dependencia");
+        setError("Error al obtener dependencia por ID.");
       } finally {
         setLoading(false);
       }

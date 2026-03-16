@@ -88,12 +88,12 @@ export interface IProcesoContratacionCandidatoNoBeneficiadoBase {
   fechaRecibido: string;
   fechaRevisionOfiEval: string;
   folio: string;
-  FKIdAcceso: number;
+  FKIdAcceso?: number;
   FKIdDependencia: number;
   FKIdEstadoProcesoContratacion: number;
   FKIdTemporalDefinitiva: number;
   FKIdTipoPersonal: number;
-  FKIdTipoProceso: number;
+  FKIdTipoProceso?: number;
   funcionDesempeniar: string;
   hermesNotificacion: string;
   idProceso: number;

@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-type ToastTipo = "exito" | "error" | "";
+type ToastTipo = "exito" | "error" | "advertencia" | "";
 
 interface Toast {
   texto: string;

@@ -20,13 +20,13 @@ export function useCedulas(): IUseCedulas {
       if (response.error === false && response.mensaje) {
         setData(response.mensaje.cedulas);
       } else {
-        setError("No se obtuvieron cedulas internas");
+        setError("No hay cedulas internas registradas.");
       }
     } catch (err) {
       console.error(
-        `useCedulas.ts - Error al obtener cédulas internas \n ${error}`,
+        `useCedulas.ts - Error al obtener cédulas internas:\n ${error}`,
       );
-      setError("Error al obtener cedulas internas");
+      setError("Error al obtener cedulas internas.");
     } finally {
       setLoading(false);
     }

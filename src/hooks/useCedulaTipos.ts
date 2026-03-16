@@ -7,12 +7,12 @@ import {
 } from "@/schemas/catalogos/GetTipoCedula";
 import CatalogoService from "@/services/CatalogosService";
 
-interface IUseCedulaTipos extends IGettingData<ITipoCedulaBase[] | null> {
+interface IUseCedulaTipos extends IGettingData<IGetTiposCedula | null> {
   refetch: () => Promise<void>;
 }
 
 export function useCedulaTipos(): IUseCedulaTipos {
-  const [data, setData] = useState<ITipoCedulaBase[] | null>(null);
+  const [data, setData] = useState<IGetTiposCedula | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,15 +22,15 @@ export function useCedulaTipos(): IUseCedulaTipos {
       const response = await new CatalogoService().getTiposCedula();
 
       if (response.error === false && response.mensaje) {
-        setData(response.mensaje.tiposCedula);
+        setData(response.mensaje);
       } else {
-        setError("No hay tipos de cedulas existentes");
+        setError("No hay tipos de cedulas registradas.");
       }
     } catch (err) {
       console.error(
-        `useCedulaTipos.ts - Error al obtener tipos de cedulas \n ${error}`,
+        `useCedulaTipos.ts - Error al obtener tipos de cedulas:\n ${error}`,
       );
-      setError("Error al obtener tipos de cedulas");
+      setError("Error al obtener tipos de cedulas.");
     } finally {
       setLoading(false);
     }

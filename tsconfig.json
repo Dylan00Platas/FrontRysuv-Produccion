@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    // — Módulos (corregido para Vite) —
+    // — Módulos para Vite —
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "bundler",
