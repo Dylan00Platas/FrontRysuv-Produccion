@@ -4,7 +4,7 @@ export default class ManageFiles {
    * @param {string} rutaArchivo - Ruta del archivo PDF a convertir.
    * @returns {string} - Cadena Base64 del archivo PDF.
    */
-  static async pdfToBase64(archivo: File) {
+  static async pdfToBase64(archivo: File): Promise<string> {
     if (!archivo || archivo.type !== "application/pdf") {
       throw new Error("El archivo debe ser un PDF válido.");
     }

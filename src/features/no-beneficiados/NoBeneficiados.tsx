@@ -195,7 +195,7 @@ function NoBeneficiados() {
           <tbody>
             {candidatosFiltrados.length === 0 ? (
               <tr>
-                <td colSpan={4} style={{ textAlign: "center" }}>
+                <td colSpan={4} className="text-center">
                   No hay candidatos con los filtros seleccionados.
                 </td>
               </tr>

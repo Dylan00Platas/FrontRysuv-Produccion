@@ -554,9 +554,12 @@ function CrearCedulaInterna() {
           <form className="form-grid" onSubmit={handleSubmit}>
             {/* ID de candidato */}
             <div className="form-group">
-              <label className="form-label">ID de candidato</label>
+              <label htmlFor={`${fieldID}-FKIdProceso`} className="form-label">
+                ID de candidato
+              </label>
               <div className="input-with-button">
                 <input
+                  id={`${fieldID}-FKIdProceso`}
                   type="number"
                   className="form-input"
                   value={formData.FKIdProceso}
@@ -583,8 +586,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Hermes</label>
+              <label
+                htmlFor={`${fieldID}-hermesNotificacion`}
+                className="form-label-evaluacion"
+              >
+                Hermes
+              </label>
               <input
+                id={`${fieldID}-hermesNotificacion`}
                 type="text"
                 className="form-input"
                 value={formData.hermesNotificacion}
@@ -595,8 +604,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Número de Plaza</label>
+              <label
+                htmlFor={`${fieldID}-numPlaza`}
+                className="form-label-evaluacion"
+              >
+                Número de Plaza
+              </label>
               <input
+                id={`${fieldID}-numPlaza`}
                 type="text"
                 className="form-input"
                 value={formData.numPlaza}
@@ -605,10 +620,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label
+                htmlFor={`${fieldID}-fechaElaboracionPropuesta`}
+                className="form-label-evaluacion"
+              >
                 Fecha de Elaboración
               </label>
               <input
+                id={`${fieldID}-fechaElaboracionPropuesta`}
                 type="date"
                 className="form-input"
                 value={formData.fechaElaboracionPropuesta}
@@ -619,8 +638,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Nombre</label>
+              <label
+                htmlFor={`${fieldID}-nombreCandidato`}
+                className="form-label-evaluacion"
+              >
+                Nombre
+              </label>
               <input
+                id={`${fieldID}-nombreCandidato`}
                 type="text"
                 className="form-input"
                 value={formData.nombreCandidato}
@@ -631,8 +656,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Edad</label>
+              <label
+                htmlFor={`${fieldID}-edad`}
+                className="form-label-evaluacion"
+              >
+                Edad
+              </label>
               <input
+                id={`${fieldID}-edad`}
                 type="text"
                 className="form-input"
                 value={formData.edad}
@@ -644,8 +675,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Educación Formal</label>
+              <label
+                htmlFor={`${fieldID}-educacionFormal`}
+                className="form-label-evaluacion"
+              >
+                Educación Formal
+              </label>
               <input
+                id={`${fieldID}-educacionFormal`}
                 type="text"
                 className="form-input"
                 value={formData.educacionFormal}
@@ -656,8 +693,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Avalado por</label>
+              <label
+                htmlFor={`${fieldID}-avaladoPor`}
+                className="form-label-evaluacion"
+              >
+                Avalado por
+              </label>
               <input
+                id={`${fieldID}-avaladoPor`}
                 type="text"
                 className="form-input"
                 value={formData.avaladoPor}
@@ -668,8 +711,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Puesto</label>
+              <label
+                htmlFor={`${fieldID}-puesto`}
+                className="form-label-evaluacion"
+              >
+                Puesto
+              </label>
               <input
+                id={`${fieldID}-puesto`}
                 type="text"
                 className="form-input"
                 value={formData.puesto}
@@ -678,8 +727,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Adscripción</label>
+              <label
+                htmlFor={`${fieldID}-adscripcion`}
+                className="form-label-evaluacion"
+              >
+                Adscripción
+              </label>
               <Select<IDependenciaFormCedula>
+                id={`${fieldID}-adscripcion`}
                 options={
                   dependencias?.dependencias.map((dep) => ({
                     idDependencia: dep.idDependencia,
@@ -710,8 +765,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Referido Por</label>
+              <label
+                htmlFor={`${fieldID}-referidoPor`}
+                className="form-label-evaluacion"
+              >
+                Referido Por
+              </label>
               <input
+                id={`${fieldID}-referidoPor`}
                 type="text"
                 className="form-input"
                 value={formData.referidoPor}
@@ -722,10 +783,14 @@ function CrearCedulaInterna() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label
+                htmlFor={`${fieldID}-antecedentesFamiliaresUV`}
+                className="form-label-evaluacion"
+              >
                 Antecedentes Familia UV
               </label>
               <input
+                id={`${fieldID}-antecedentesFamiliaresUV`}
                 type="text"
                 className="form-input"
                 value={formData.antecedentesFamiliaresUV}
@@ -737,18 +802,21 @@ function CrearCedulaInterna() {
 
             {/* Selección de cédula */}
             <h3 className="section-title">Confirmación de Competencias</h3>
-            <div className="form-group" style={{ gridColumn: "span 3" }}>
-              <label className="form-label-evaluacion">
+            <div className="form-group col-span-3">
+              <label
+                htmlFor={`${fieldID}-idCedula`}
+                className="form-label-evaluacion"
+              >
                 Seleccionar Cédula
               </label>
               <Select<ITipoCedulaBase>
+                id={`${fieldID}-idCedula`}
                 className="select-cedula"
-                options={dataCedulaTipos ?? []}
+                options={dataCedulaTipos?.tiposCedula ?? []}
                 getOptionLabel={(o) => o.cedula}
                 getOptionValue={(o) => String(o.idTipoCedula)}
-                // FIX: el value comparaba con FKIdProceso en vez de idCedula
                 value={
-                  dataCedulaTipos?.find(
+                  dataCedulaTipos?.tiposCedula.find(
                     (option) => option.idTipoCedula === formData.idCedula,
                   ) ?? null
                 }
@@ -765,10 +833,7 @@ function CrearCedulaInterna() {
             </div>
 
             {/* Tabla de competencias */}
-            <div
-              className="tabla-competencias"
-              style={{ gridColumn: "span 3" }}
-            >
+            <div className="tabla-competencias grid-cols-3">
               <table>
                 <thead>
                   <tr>
@@ -778,7 +843,6 @@ function CrearCedulaInterna() {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* FIX: competencias es un objeto con .competencias[], no un array directo */}
                   {competencias?.competencias &&
                   competencias.competencias.length > 0 ? (
                     competencias.competencias.map((item, i) => {
@@ -788,7 +852,7 @@ function CrearCedulaInterna() {
                       return (
                         <tr key={i}>
                           <td>{item.nombreCompetencia}</td>
-                          <td>{item.perfil}</td>
+                          <td>{item.idCompetencia}</td>
                           <td>
                             <input
                               type="number"
@@ -809,7 +873,7 @@ function CrearCedulaInterna() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={3} style={{ textAlign: "center" }}>
+                      <td colSpan={3} className="text-center">
                         Selecciona una cédula para ver sus competencias
                       </td>
                     </tr>
@@ -831,8 +895,14 @@ function CrearCedulaInterna() {
               ] as { label: string; key: keyof IPostCedulaInternaForm }[]
             ).map(({ label, key }) => (
               <div key={key} className="form-group">
-                <label className="form-label-evaluacion">{label}</label>
+                <label
+                  htmlFor={`${fieldID}-conocimientosEspecificos`}
+                  className="form-label-evaluacion"
+                >
+                  {label}
+                </label>
                 <input
+                  id={`${fieldID}-conocimientosEspecificos`}
                   type="text"
                   className="form-input"
                   value={(formData[key] as string) ?? ""}
@@ -866,13 +936,15 @@ function CrearCedulaInterna() {
                 { label: "Resultados", key: "resultados" },
               ] as { label: string; key: keyof IPostCedulaInternaForm }[]
             ).map(({ label, key }) => (
-              <div
-                key={key}
-                className="form-group"
-                style={{ gridColumn: "span 3" }}
-              >
-                <label className="form-label-evaluacion">{label}</label>
+              <div key={key} className="form-group col-span-3">
+                <label
+                  htmlFor={`${fieldID}-conclusiones`}
+                  className="form-label-evaluacion"
+                >
+                  {label}
+                </label>
                 <textarea
+                  id={`${fieldID}-conclusiones`}
                   className="large-textarea"
                   value={(formData[key] as string) ?? ""}
                   onChange={(e) =>

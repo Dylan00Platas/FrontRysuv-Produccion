@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext } from "react";
-import Select from "react-select";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import Select, { SingleValue } from "react-select";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import {
@@ -17,252 +17,178 @@ import {
   Bar,
   CartesianGrid,
 } from "recharts";
-import { Temporal } from "@js-temporal/polyfill";
 
 import "./Estadisticas.css";
 import AccesoService from "@/services/AccesoService";
 import IResponseHTTP from "@/interfaces/http/Response";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
-import { IGetProcesosContratacion } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
-import { IGetUsuarios } from "@/schemas/acceso/GetUsuario";
+import {
+  IGetProcesosContratacion,
+  IProcesoContratacionBase,
+} from "@/schemas/procesos-contratacion/GetProcesoContratacion";
+import { IGetUsuarios, IUsuarioBase } from "@/schemas/acceso/GetUsuario";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
+import ILabelValue from "@/interfaces/LabelValue";
+import { generarOpcionesMeses, mapEstado } from "@/utils/features/Estadisticas";
 
+// Interfaces de UI ------------------------------------------------------------
 interface ICedulaAdaptada {
   id: number;
   folio: string;
   puesto: string;
   estado: string;
 }
+interface IProcesoAdaptado {
+  id: number;
+  folio: string;
+  nombre: string;
+  analista: string;
+  estado: string;
+  region: string;
+  dependencia: string;
+}
+interface ISelectOptionNum {
+  value: string | number;
+  label: string;
+}
+interface IFiltrosProcesos {
+  estado: ILabelValue | null;
+  analista: ILabelValue | null;
+  dependencia: ILabelValue | null;
+}
+interface IDataMensual {
+  mes: string;
+  solicitudes: number;
+}
+
+// Constantes ------------------------------------------------------------------
+const COLORS_PIE = ["#18529D", "#199532", "#df5252ff"];
+const COLORS_PIE2 = [
+  "#18529D",
+  "#d86f1aff",
+  "#199532",
+  "#6549a5ff",
+  "#df5252ff",
+  "#4daedbff",
+  "#8C564B",
+  "#9467BD",
+];
+const COLORS_BAR = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7f50",
+  "#8dd1e1",
+  "#d0ed57",
+  "#a4de6c",
+  "#d88884",
+];
+const GRAFICAS_OPTIONS: ILabelValue[] = [
+  { value: "todas", label: "Todas las gráficas" },
+  { value: "solicitudes", label: "Solicitudes" },
+  { value: "procesos", label: "Procesos" },
+  { value: "mensual", label: "Actividades mensuales" },
+  { value: "porAnalista", label: "Procesos por analista" },
+  { value: "evaluacion", label: "Resultados de evaluación" },
+];
+const ESTADO_OPTIONS: ILabelValue[] = [
+  { value: "Citado", label: "Citado" },
+  { value: "En procesamiento", label: "En procesamiento" },
+  { value: "En revisión", label: "En revisión" },
+  { value: "En firma", label: "En firma" },
+  { value: "Notificado", label: "Notificado" },
+  { value: "Pendiente", label: "Pendiente" },
+  { value: "Evaluado", label: "Evaluado" },
+];
+const ESTADO_SOLICITUD_OPTIONS: ILabelValue[] = [
+  { value: "Todos", label: "Todos" },
+  { value: "Pendiente (cita)", label: "Pendiente (cita)" },
+  { value: "Entregado (cita)", label: "Entregado (cita)" },
+  { value: "Citado", label: "Citado" },
+];
+const OPCION_TODOS: ILabelValue = { value: "Todos", label: "Todos" };
+const OPCION_TODOS_ANALISTAS: ILabelValue = {
+  value: "Todos",
+  label: "Todos los analistas",
+};
+
+// -----------------------------------------------------------------------------
+// Componente
+// -----------------------------------------------------------------------------
 
 function Estadisticas() {
   const navigate = useNavigate();
   const { toast, mostrarToast } = useToast();
 
-  const [procesos, setProcesos] = useState([]);
-  const [procesosRaw, setProcesosRaw] = useState<IGetProcesosContratacion>([]);
-  const [analistas, setAnalistas] = useState<IGetUsuarios>([]);
+  // -- Datos remotos ------------------------------------------------------------
+  // FIX: antes había 3 useEffect separados que llamaban a getProcesosContratacion()
+  // tres veces innecesariamente. Ahora se hace UNA sola llamada y los datos se
+  // comparten entre todas las secciones.
+  const [procesosRaw, setProcesosRaw] = useState<IProcesoContratacionBase[]>(
+    [],
+  );
+  const [analistas, setAnalistas] = useState<IUsuarioBase[]>([]);
   const [loadingProcesos, setLoadingProcesos] = useState(true);
-  const [analistaOptions, setAnalistaOptions] = useState([
-    { value: "Todos", label: "Todos" },
-  ]);
-  const [analistaFiltro, setAnalistaFiltro] = useState({
-    value: "Todos",
-    label: "Todos",
-  });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dependenciaOptions, setDependenciaOptions] = useState([
-    { value: "Todos", label: "Todos" },
-  ]);
-
-  const [analistaFiltroEval, setAnalistaFiltroEval] = useState({
-    value: "Todos",
-    label: "Todos los analistas",
-  });
-  const [mesFiltroEval, setMesFiltroEval] = useState(null);
-
-  const [solicitudes, setSolicitudes] = useState<ICedulaAdaptada[]>([]);
-  const [procesosContratacion, setProcesosContratacion] =
-    useState<IGetProcesosContratacion | null>(null);
-  const [loadingSolicitudes, setLoadingSolicitudes] = useState(true);
-  const [estadoFiltro, setEstadoFiltro] = useState({
-    value: "Todos",
-    label: "Todos",
-  });
-  const [searchTermSolicitudes, setSearchTermSolicitudes] = useState("");
-
-  //  Estados para los contadores
-  const [pendientes, setPendientes] = useState(0);
-  const [entregadas, setEntregadas] = useState(0);
-  const [notificadas, setNotificadas] = useState(0);
-
-  function mapEstado(fk: number) {
-    switch (fk) {
-      case 9:
-        return "Pendiente";
-      case 10:
-        return "Entregado";
-      case 11:
-        return "Notificado";
-      default:
-        return "Pendiente";
-    }
-  }
-
-  const graficasOptions = [
-    { value: "todas", label: "Todas las gráficas" },
-    { value: "solicitudes", label: "Solicitudes" },
-    { value: "procesos", label: "Procesos" },
-    { value: "mensual", label: "Actividades mensuales" },
-    { value: "porAnalista", label: "Procesos por analista" },
-    { value: "evaluacion", label: "Resultados de evaluación" },
-  ];
-
-  const [graficaSeleccionada, setGraficaSeleccionada] = useState({
-    value: "todas",
-    label: "Todas las gráficas",
-  });
+  const [dataMensual, setDataMensual] = useState<IDataMensual[] | null>(null);
 
   useEffect(() => {
-    const fetchSolicitudes = async () => {
+    let cancelado = false;
+
+    const fetchTodo = async () => {
       try {
-        const data: IResponseHTTP<IGetProcesosContratacion> =
-          await new ProcesoContratacionService().getProcesosContratacion();
+        setLoadingProcesos(true);
 
-        setProcesosContratacion(data.mensaje);
+        // FIX: ambas llamadas en paralelo — no dependen una de la otra
+        const [responseProcesos, responseAnalistas] = await Promise.all([
+          new ProcesoContratacionService().getProcesosContratacion() as Promise<
+            IResponseHTTP<IGetProcesosContratacion>
+          >,
+          new AccesoService().getAnalistas() as Promise<
+            IResponseHTTP<IGetUsuarios>
+          >,
+        ]);
 
-        // Solo solicitudes sin analista y sin tipo bolsa
-        const dataSinBolsa = data.mensaje.procesos.filter(
-          (s) => s.FKIdTipoProceso !== 3,
-        );
-        const dataSinAnalista = dataSinBolsa.filter(
-          (s) => s.FKIdAcceso === null,
-        );
+        if (cancelado) return;
 
-        const adaptadas = dataSinAnalista.map((s, idx) => ({
-          id: s.idProceso || idx,
-          folio: s.folio || s.hermesNotificacion || "N/A",
-          puesto: s.categoriaPuestoOrigen || "Sin puesto",
-          estado: mapEstado(s.FKIdEstadoProcesoContratacion),
-        }));
+        const procesos = responseProcesos.mensaje?.procesos ?? [];
+        // FIX: antes se usaba analistas.usuarios justo después de setAnalistas,
+        // pero el estado no se actualiza síncronamente — se leía el array vacío.
+        // Ahora se trabaja con la variable local directamente.
+        const usuariosLista = responseAnalistas.mensaje?.usuarios ?? [];
 
-        setSolicitudes(adaptadas);
-      } catch (error) {
-        console.error("Error al cargar solicitudes:", error);
-      } finally {
-        setLoadingSolicitudes(false);
-      }
-    };
+        setProcesosRaw(procesos);
+        setAnalistas(usuariosLista);
 
-    fetchSolicitudes();
-  }, []);
-
-  // Filtro combinado (igual que la página original)
-  const solicitudesFiltradas = solicitudes.filter((s) => {
-    const coincideEstado =
-      estadoFiltro.value === "Todos" || s.estado === estadoFiltro.value;
-    const coincideBusqueda =
-      s.folio.toLowerCase().includes(searchTermSolicitudes.toLowerCase()) ||
-      s.puesto.toLowerCase().includes(searchTermSolicitudes.toLowerCase()) ||
-      s.estado.toLowerCase().includes(searchTermSolicitudes.toLowerCase());
-    return coincideEstado && coincideBusqueda;
-  });
-
-  // Al hacer doble clic: abrir asignar solicitud
-  const handleEditarSolicitud = (solicitudAdaptada) => {
-    const solicitudCompleta = procesosContratacion?.procesos.find(
-      (s) => s.idProceso === solicitudAdaptada.id,
-    );
-    navigate("/asignar-solicitud", { state: { solicitud: solicitudCompleta } });
-  };
-
-  const [citado, setCitado] = useState(0);
-  const [evaluado, setEvaluado] = useState(0);
-  const [procesamiento, setProcesamiento] = useState(0);
-  const [revision, setRevision] = useState(0);
-  const [firma, setFirma] = useState(0);
-  const [notificadoProceso, setNotificadoProceso] = useState(0);
-  const [cancelado, setCancelado] = useState(0);
-  const [terminado, setTerminado] = useState(0);
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSolicitudes = async () => {
-      try {
-        setLoading(true);
-        const solicitudes: IResponseHTTP<IGetProcesosContratacion> =
-          await new ProcesoContratacionService().getProcesosContratacion();
-
-        const pendientesCount = solicitudes.mensaje.procesos.filter(
-          (s) => s.FKIdEstadoProcesoContratacion === 9,
-        ).length;
-        const entregadasCount = solicitudes.mensaje.procesos.filter(
-          (s) => s.FKIdEstadoProcesoContratacion === 10,
-        ).length;
-        const citadasCount = solicitudes.mensaje.procesos.filter(
-          (s) => s.FKIdEstadoProcesoContratacion === 11,
-        ).length;
-
-        setPendientes(pendientesCount);
-        setEntregadas(entregadasCount);
-        setNotificadas(citadasCount);
-
-        setCitado(
-          solicitudes.mensaje.procesos.filter(
-            (s) => s.FKIdEstadoProcesoContratacion === 1,
-          ).length,
-        );
-        setEvaluado(
-          solicitudes.mensaje.procesos.filter(
-            (s) => s.FKIdEstadoProcesoContratacion === 2,
-          ).length,
-        );
-        setProcesamiento(
-          solicitudes.mensaje.procesos.filter((s) =>
-            [13, 14, 15].includes(s.FKIdEstadoProcesoContratacion),
-          ).length,
-        );
-
-        setRevision(
-          solicitudes.mensaje.procesos.filter(
-            (s) => s.FKIdEstadoProcesoContratacion === 4,
-          ).length,
-        );
-        setFirma(
-          solicitudes.mensaje.procesos.filter(
-            (s) => s.FKIdEstadoProcesoContratacion === 5,
-          ).length,
-        );
-        setNotificadoProceso(
-          solicitudes.mensaje.procesos.filter(
-            (s) => s.FKIdEstadoProcesoContratacion === 6,
-          ).length,
-        );
-        setCancelado(
-          solicitudes.mensaje.procesos.filter(
-            (s) => s.FKIdEstadoProcesoContratacion === 7,
-          ).length,
-        );
-        setTerminado(
-          solicitudes.mensaje.procesos.filter(
-            (s) => s.FKIdEstadoProcesoContratacion === 8,
-          ).length,
-        );
-
-        // --- Construcción de dataMensual
-        const validas = solicitudes.mensaje.procesos.filter(
-          (s) => s.fechaNotificacion,
-        );
+        // -- Datos mensuales ----------------------------------------------------
+        const validas = procesos.filter((p) => p.fechaNotificacion);
 
         if (validas.length > 0) {
-          const parseFecha = (f: string) => new Date(f);
-
-          // Fecha más reciente
           const maxFecha = new Date(
-            Math.max(...validas.map((s) => parseFecha(s.fechaNotificacion))),
+            Math.max(
+              ...validas.map((p) => new Date(p.fechaNotificacion).getTime()),
+            ),
           );
 
-          // Generar últimos 4 meses
-          const meses: { mes: string; solicitudes: number }[] = [];
-          for (let i = 3; i >= 0; i--) {
-            const d = new Date(maxFecha);
-            d.setMonth(d.getMonth() - i);
-            const mes = d.toLocaleString("es-ES", { month: "long" });
-            const year = d.getFullYear();
-            meses.push({
-              mes: `${mes.charAt(0).toUpperCase() + mes.slice(1)} ${year}`,
+          const meses: IDataMensual[] = Array.from({ length: 4 }, (_, i) => {
+            const d = new Date(
+              maxFecha.getFullYear(),
+              maxFecha.getMonth() - (3 - i),
+              1,
+            );
+            return {
+              mes: d
+                .toLocaleString("es-ES", { month: "long", year: "numeric" })
+                .replace(/^\w/, (c) => c.toUpperCase()),
               solicitudes: 0,
-            });
-          }
+            };
+          });
 
-          // Contar notificaciones por mes
-          validas.forEach((s) => {
-            const fecha = parseFecha(s.fechaNotificacion);
-            const mes = fecha.toLocaleString("es-ES", { month: "long" });
-            const year = fecha.getFullYear();
-            const label = `${mes.charAt(0).toUpperCase() + mes.slice(1)} ${year}`;
-
+          validas.forEach((p) => {
+            const fecha = new Date(p.fechaNotificacion);
+            const label = fecha
+              .toLocaleString("es-ES", { month: "long", year: "numeric" })
+              .replace(/^\w/, (c) => c.toUpperCase());
             const entry = meses.find((m) => m.mes === label);
             if (entry) entry.solicitudes += 1;
           });
@@ -272,240 +198,344 @@ function Estadisticas() {
           setDataMensual([]);
         }
       } catch (error) {
-        console.error("Error cargando solicitudes:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSolicitudes();
-  }, []);
-
-  useEffect(() => {
-    const fetchProcesos = async () => {
-      try {
-        //  Traer solicitudes
-        const data: IResponseHTTP<IGetProcesosContratacion> =
-          await new ProcesoContratacionService().getProcesosContratacion();
-        setProcesosRaw(data.mensaje);
-
-        //  Traer analistas
-        const analistasData: IResponseHTTP<IGetUsuarios> =
-          await new AccesoService().getAnalistas();
-        setAnalistas(analistasData.mensaje);
-
-        const analistasMap = {};
-        analistas.usuarios.forEach((a) => {
-          analistasMap[a.idAcceso] =
-            `${a.nombre} ${a.primerApellido} ${a.segundoApellido || ""}`.trim();
-        });
-
-        const dataConAnalista = data.mensaje.procesos.filter(
-          (s) => s.FKIdAcceso !== null,
+        console.error("Error cargando datos:", error);
+        mostrarToast(
+          "❌ Error al cargar los datos. Intente más tarde.",
+          "error",
         );
-
-        const procesosAdaptados = dataConAnalista.map((s, idx) => ({
-          id: s.idProceso || idx,
-          folio: s.folio || s.hermesNotificacion || "N/A",
-          nombre: s.nombreCandidato || "Sin candidato",
-          analista: analistasMap[s.FKIdAcceso] || "Sin analista",
-          estado: mapEstado(s.FKIdEstadoProcesoContratacion),
-          region: s.region || "Sin región",
-          dependencia: s.nombre || "Sin dependencia",
-        }));
-
-        setProcesos(procesosAdaptados);
-
-        const dependenciasUnicas = [
-          { value: "Todos", label: "Todos" },
-          ...Array.from(
-            new Set(procesosAdaptados.map((p) => p.dependencia)),
-          ).map((d) => ({
-            value: d,
-            label: d,
-          })),
-        ];
-        setDependenciaOptions(dependenciasUnicas);
-        // Opciones de filtros
-        const analistasUnicos = [
-          { value: "Todos", label: "Todos" },
-          ...Array.from(new Set(procesosAdaptados.map((p) => p.analista))).map(
-            (a) => ({ value: a, label: a }),
-          ),
-        ];
-        setAnalistaOptions(analistasUnicos);
-      } catch (error) {
-        console.error("Error al cargar procesos:", error);
       } finally {
-        setLoadingProcesos(false);
+        if (!cancelado) setLoadingProcesos(false);
       }
     };
 
-    fetchProcesos();
+    fetchTodo();
+    return () => {
+      cancelado = true;
+    };
   }, []);
 
-  function mapEstadotwo(fk) {
-    switch (fk) {
-      case 1:
-        return "Citado";
-      case 2:
-        return "Evaluado";
-      case 4:
-        return "En revisión";
-      case 5:
-        return "En firma";
-      case 6:
-        return "Notificado";
-      case 7:
-        return "Cancelado";
-      case 8:
-        return "Terminado";
-      case 9:
-        return "Pendiente (cita)";
-      case 10:
-        return "Entregado (cita)";
-      case 11:
-        return "Citado";
-      case 12:
-      case 13:
-      case 14:
-      case 15:
-        return "En procesamiento";
-      default:
-        return "En proceso";
-    }
-  }
+  // -- Procesos adaptados (con nombre de analista) ------------------------------
+  // MEJORA: useMemo — se recalcula solo cuando cambian procesosRaw o analistas,
+  // no en cada render.
+  const procesosAdaptados = useMemo<IProcesoAdaptado[]>(() => {
+    // FIX: antes se construía analistasMap usando analistas del estado
+    // inmediatamente después del set (estado aún vacío). Ahora se deriva
+    // directamente desde el array en el estado ya poblado.
+    const analistasMap = Object.fromEntries(
+      analistas.map((a) => [
+        a.idAcceso,
+        `${a.nombre} ${a.primerApellido} ${a.segundoApellido ?? ""}`.trim(),
+      ]),
+    );
 
-  const [filtrosProcesos, setFiltrosProcesos] = useState({
+    return procesosRaw
+      .filter((p) => p.FKIdAcceso !== null)
+      .map((p, idx) => ({
+        id: p.idProceso ?? idx,
+        folio: p.folio ?? p.hermesNotificacion ?? "N/A",
+        nombre: p.nombreCandidato ?? "Sin candidato",
+        analista: analistasMap[p.FKIdAcceso ?? ""] ?? "Sin analista",
+        estado: mapEstado(p.FKIdEstadoProcesoContratacion),
+        region: p.region ?? "Sin región",
+        dependencia: p.nombre ?? "Sin dependencia",
+      }));
+  }, [procesosRaw, analistas]);
+
+  // -- Solicitudes adaptadas (sin analista, sin tipo bolsa) ---------------------
+  const solicitudes = useMemo<ICedulaAdaptada[]>(() => {
+    return procesosRaw
+      .filter((p) => p.FKIdTipoProceso !== 3 && p.FKIdAcceso === null)
+      .map((p, idx) => ({
+        id: p.idProceso ?? idx,
+        folio: p.folio ?? p.hermesNotificacion ?? "N/A",
+        puesto: p.categoriaPuestoOrigen ?? "Sin puesto",
+        estado: mapEstado(p.FKIdEstadoProcesoContratacion),
+      }));
+  }, [procesosRaw]);
+
+  // -- Contadores derivados ------------------------------------------------------
+  // MEJORA: en lugar de 8+ useState individuales para cada contador
+  // (pendientes, entregadas, citado, evaluado…), se calculan todos con
+  // un solo useMemo. Elimina ~8 estados y el código de filtrado duplicado.
+  const contadores = useMemo(() => {
+    const contar = (ids: number[]) =>
+      procesosRaw.filter((p) => ids.includes(p.FKIdEstadoProcesoContratacion))
+        .length;
+
+    return {
+      pendientes: contar([9]),
+      entregadas: contar([10]),
+      notificadas: contar([11]),
+      citado: contar([1]),
+      evaluado: contar([2]),
+      procesamiento: contar([13, 14, 15]),
+      revision: contar([4]),
+      firma: contar([5]),
+      notificadoProceso: contar([6]),
+      cancelado: contar([7]),
+      terminado: contar([8]),
+    };
+  }, [procesosRaw]);
+
+  // -- Opciones de filtros -------------------------------------------------------
+  const analistaOptions = useMemo<ILabelValue[]>(
+    () => [
+      OPCION_TODOS,
+      ...Array.from(new Set(procesosAdaptados.map((p) => p.analista))).map(
+        (a) => ({ value: a, label: a }),
+      ),
+    ],
+    [procesosAdaptados],
+  );
+
+  const dependenciaOptions = useMemo<ILabelValue[]>(
+    () => [
+      OPCION_TODOS,
+      ...Array.from(new Set(procesosAdaptados.map((p) => p.dependencia))).map(
+        (d) => ({ value: d, label: d }),
+      ),
+    ],
+    [procesosAdaptados],
+  );
+
+  // Opciones de mes (estable — no depende de datos remotos)
+  const mesesOptions = useMemo(() => generarOpcionesMeses(4), []);
+
+  // -- Filtros de gráficas -------------------------------------------------------
+  const [graficaSeleccionada, setGraficaSeleccionada] = useState<ILabelValue>(
+    GRAFICAS_OPTIONS[0],
+  );
+
+  // Filtros de la tabla de procesos
+  const [filtrosProcesos, setFiltrosProcesos] = useState<IFiltrosProcesos>({
     estado: null,
     analista: null,
     dependencia: null,
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const procesosFiltrados = procesos.filter((p) => {
-    const coincideEstado =
-      !filtrosProcesos.estado || filtrosProcesos.estado.value === p.estado;
-    const coincideAnalista =
-      !filtrosProcesos.analista ||
-      filtrosProcesos.analista.value === p.analista;
-    const coincideDependencia =
-      !filtrosProcesos.dependencia ||
-      filtrosProcesos.dependencia.value === p.dependencia;
-    const coincideBusqueda =
-      p.folio.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.analista.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.estado.toLowerCase().includes(searchTerm.toLowerCase());
-    return (
-      coincideEstado &&
-      coincideAnalista &&
-      coincideDependencia &&
-      coincideBusqueda
+  // Filtros de la tabla de solicitudes
+  const [estadoFiltroSolicitud, setEstadoFiltroSolicitud] =
+    useState<ILabelValue>(OPCION_TODOS);
+  const [searchTermSolicitudes, setSearchTermSolicitudes] = useState("");
+
+  // Filtros de la gráfica "por analista"
+  const [analistaFiltro, setAnalistaFiltro] =
+    useState<ILabelValue>(OPCION_TODOS);
+
+  // Filtros de la gráfica "evaluación"
+  const [analistaFiltroEval, setAnalistaFiltroEval] = useState<ILabelValue>(
+    OPCION_TODOS_ANALISTAS,
+  );
+  const [mesFiltroEval, setMesFiltroEval] = useState<ILabelValue | null>(null);
+
+  // -- Datos filtrados -----------------------------------------------------------
+  const procesosFiltrados = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return procesosAdaptados.filter((p) => {
+      const coincideEstado =
+        !filtrosProcesos.estado || filtrosProcesos.estado.value === p.estado;
+      const coincideAnalista =
+        !filtrosProcesos.analista ||
+        filtrosProcesos.analista.value === p.analista;
+      const coincideDependencia =
+        !filtrosProcesos.dependencia ||
+        filtrosProcesos.dependencia.value === p.dependencia;
+      const coincideBusqueda =
+        !term ||
+        p.folio.toLowerCase().includes(term) ||
+        p.nombre.toLowerCase().includes(term) ||
+        p.analista.toLowerCase().includes(term) ||
+        p.estado.toLowerCase().includes(term);
+      return (
+        coincideEstado &&
+        coincideAnalista &&
+        coincideDependencia &&
+        coincideBusqueda
+      );
+    });
+  }, [procesosAdaptados, filtrosProcesos, searchTerm]);
+
+  const solicitudesFiltradas = useMemo(() => {
+    const term = searchTermSolicitudes.toLowerCase();
+    return solicitudes.filter((s) => {
+      const coincideEstado =
+        estadoFiltroSolicitud.value === "Todos" ||
+        s.estado === estadoFiltroSolicitud.value;
+      const coincideBusqueda =
+        !term ||
+        s.folio.toLowerCase().includes(term) ||
+        s.puesto.toLowerCase().includes(term) ||
+        s.estado.toLowerCase().includes(term);
+      return coincideEstado && coincideBusqueda;
+    });
+  }, [solicitudes, estadoFiltroSolicitud, searchTermSolicitudes]);
+
+  // -- Datos para gráficas (memoizados) -----------------------------------------
+  const dataSolicitudesChart = useMemo(
+    () => [
+      { name: "Pendiente (cita)", value: contadores.pendientes },
+      { name: "Entregado (cita)", value: contadores.entregadas },
+      { name: "Citado", value: contadores.notificadas },
+    ],
+    [contadores],
+  );
+
+  const dataProcesosChart = useMemo(
+    () => [
+      { name: "Citado", value: contadores.citado },
+      { name: "Evaluado", value: contadores.evaluado },
+      { name: "En procesamiento", value: contadores.procesamiento },
+      { name: "En revisión", value: contadores.revision },
+      { name: "En firma", value: contadores.firma },
+      { name: "Notificado", value: contadores.notificadoProceso },
+    ],
+    [contadores],
+  );
+
+  // Datos para "procesos por analista"
+  const dataAnalistaChart = useMemo(() => {
+    const base =
+      analistaFiltro.value === "Todos"
+        ? procesosAdaptados
+        : procesosAdaptados.filter((p) => p.analista === analistaFiltro.value);
+
+    const contar = (estado: string) =>
+      base.filter((p) => p.estado === estado).length;
+
+    return [
+      { name: "Citado", value: contar("Citado") },
+      { name: "Evaluado", value: contar("Evaluado") },
+      { name: "En procesamiento", value: contar("En procesamiento") },
+      { name: "En revisión", value: contar("En revisión") },
+      { name: "En firma", value: contar("En firma") },
+      { name: "Notificado", value: contar("Notificado") },
+    ];
+  }, [procesosAdaptados, analistaFiltro]);
+
+  const totalAnalistaChart = useMemo(
+    () =>
+      analistaFiltro.value === "Todos"
+        ? procesosAdaptados.length
+        : procesosAdaptados.filter((p) => p.analista === analistaFiltro.value)
+            .length,
+    [procesosAdaptados, analistaFiltro],
+  );
+
+  // Datos para "resultados de evaluación"
+  const dataEvaluacionChart = useMemo(() => {
+    let base = procesosRaw.filter(
+      (p) => p.fechaNotificacion !== null && p.fechaNotificacion !== "",
     );
-  });
 
-  const totalSolicitudes = pendientes + entregadas + notificadas;
+    if (analistaFiltroEval.value !== "Todos") {
+      base = base.filter(
+        (p) => String(p.FKIdAcceso) === analistaFiltroEval.value,
+      );
+    }
 
+    if (mesFiltroEval) {
+      base = base.filter((p) => {
+        const fecha = new Date(p.fechaNotificacion);
+        return (
+          `${fecha.getFullYear()}-${fecha.getMonth() + 1}` ===
+          mesFiltroEval.value
+        );
+      });
+    }
+
+    const conteo: Record<string, number> = {};
+    base.forEach((p) => {
+      const key = p.resultadoProcesoEvaluacion?.trim() || "Sin resultado";
+      conteo[key] = (conteo[key] ?? 0) + 1;
+    });
+
+    return {
+      data: Object.entries(conteo).map(([name, value]) => ({ name, value })),
+      total: base.length,
+    };
+  }, [procesosRaw, analistaFiltroEval, mesFiltroEval]);
+
+  // -- Helpers de navegación -----------------------------------------------------
+  const handleEditarSolicitud = useCallback(
+    (solicitudAdaptada: ICedulaAdaptada) => {
+      const solicitudCompleta = procesosRaw.find(
+        (p) => p.idProceso === solicitudAdaptada.id,
+      );
+      navigate("/asignar-solicitud", {
+        state: { solicitud: solicitudCompleta },
+      });
+    },
+    [procesosRaw, navigate],
+  );
+
+  // -- Totales -------------------------------------------------------------------
+  const totalSolicitudes =
+    contadores.pendientes + contadores.entregadas + contadores.notificadas;
   const totalProcesos =
-    citado + evaluado + procesamiento + revision + firma + notificadoProceso;
+    contadores.citado +
+    contadores.evaluado +
+    contadores.procesamiento +
+    contadores.revision +
+    contadores.firma +
+    contadores.notificadoProceso;
 
-  const dataSolicitudes = [
-    { name: "Pendiente (cita)", value: pendientes },
-    { name: "Entregado (cita)", value: entregadas },
-    { name: "Citado", value: notificadas },
-  ];
+  const mostrarGrafica = (key: string) =>
+    graficaSeleccionada?.value === key ||
+    graficaSeleccionada?.value === "todas";
 
-  const [dataMensual, setDataMensual] = useState<
-    | {
-        mes: string;
-        solicitudes: number;
-      }[]
-    | null
-  >(null);
-
-  const dataProcesos = [
-    { name: "Citado", value: citado },
-    { name: "Evaluado", value: evaluado },
-    { name: "En procesamiento", value: procesamiento },
-    { name: "En revisión", value: revision },
-    { name: "En firma", value: firma },
-    { name: "Notificado", value: notificadoProceso },
-  ];
-
-  const COLORS = ["#18529D", "#199532", "#df5252ff"];
-  const COLORS2 = [
-    "#18529D",
-    "#d86f1aff",
-    "#199532",
-    "#6549a5ff",
-    "#df5252ff",
-    "#4daedbff",
-    "#8C564B",
-    "#9467BD",
-  ];
-
-  const estadoOptions = [
-    { value: "Citado", label: "Citado" },
-    { value: "En procesamiento", label: "En procesamiento" },
-    { value: "En revisión", label: "En revisión" },
-    { value: "En firma", label: "En firma" },
-    { value: "Notificado", label: "Notificado" },
-    { value: "Pendiente", label: "Pendiente" },
-    { value: "Evaluado", label: "Evaluado" },
-  ];
-
+  // -- Render --------------------------------------------------------------------
   return (
     <>
-      {/* Toast de notificación */}
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      {/* Main Content */}
+
       <main className="main-content-estadisticas">
         <div className="page-header">
           <h1 className="page-title-estadisticas">Estadísticas</h1>
         </div>
 
+        {/* Selector de gráfica */}
         <div className="w-125 mb-5 mx-auto border-[1.5px] border-[#18529]">
-          {" "}
-          <Select
-            options={graficasOptions}
+          <Select<ILabelValue>
+            options={GRAFICAS_OPTIONS}
             value={graficaSeleccionada}
-            onChange={setGraficaSeleccionada}
+            onChange={(v) => v && setGraficaSeleccionada(v)}
             placeholder="Selecciona una gráfica..."
-            isClearable
+            // FIX: isClearable estaba activado pero el valor nunca podría ser null
+            // porque siempre se muestra "Todas" como default. Se quita para evitar
+            // un estado undefined en graficaSeleccionada?.value
+            isClearable={false}
           />
         </div>
 
         <div className="contenido-cedula-inner">
-          {/* Gráfica de Solicitudes */}
-          {/* Gráfica de Solicitudes */}
-
-          {(graficaSeleccionada?.value === "solicitudes" ||
-            graficaSeleccionada?.value === "todas") && (
+          {/* -- Solicitudes ---------------------------------------------------- */}
+          {mostrarGrafica("solicitudes") && (
             <section className="stats-section">
               <h1 className="section-title">
                 📌 {totalSolicitudes} Solicitudes Activas
               </h1>
               <label className="stats-label">
-                {pendientes} Pendientes (cita), {entregadas} Entregadas (cita),{" "}
-                {notificadas} Citadas
+                {contadores.pendientes} Pendientes (cita),{" "}
+                {contadores.entregadas} Entregadas (cita),{" "}
+                {contadores.notificadas} Citadas
               </label>
               <div className="chart-container">
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
-                      data={dataSolicitudes}
+                      data={dataSolicitudesChart}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
                       outerRadius={108}
-                      fill="#8884d8"
                       dataKey="value"
                       label
                     >
-                      {dataSolicitudes.map((entry, index) => (
+                      {dataSolicitudesChart.map((_, index) => (
                         <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
+                          key={`cell-sol-${index}`}
+                          fill={COLORS_PIE[index % COLORS_PIE.length]}
                         />
                       ))}
                     </Pie>
@@ -517,35 +547,36 @@ function Estadisticas() {
             </section>
           )}
 
-          {(graficaSeleccionada?.value === "procesos" ||
-            graficaSeleccionada?.value === "todas") && (
+          {/* -- Procesos ------------------------------------------------------- */}
+          {mostrarGrafica("procesos") && (
             <section className="stats-section">
               <h1 className="section-title">
                 ⚙️ {totalProcesos} Procesos Activos
               </h1>
               <label className="stats-label">
-                {citado} Citado, {evaluado} Evaluado, {procesamiento} En
-                procesamiento, {revision} En revisión, {firma} En firma,{" "}
-                {notificadoProceso} Notificado, {cancelado} Cancelado,{" "}
-                {terminado} Terminado
+                {contadores.citado} Citado, {contadores.evaluado} Evaluado,{" "}
+                {contadores.procesamiento} En procesamiento,{" "}
+                {contadores.revision} En revisión, {contadores.firma} En firma,{" "}
+                {contadores.notificadoProceso} Notificado,{" "}
+                {contadores.cancelado} Cancelado, {contadores.terminado}{" "}
+                Terminado
               </label>
               <div className="chart-container">
                 <ResponsiveContainer width="100%" height={320}>
                   <PieChart>
                     <Pie
-                      data={dataProcesos}
+                      data={dataProcesosChart}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
                       outerRadius={120}
-                      fill="#82ca9d"
                       dataKey="value"
                       label
                     >
-                      {dataProcesos.map((entry, index) => (
+                      {dataProcesosChart.map((_, index) => (
                         <Cell
-                          key={`cell2-${index}`}
-                          fill={COLORS2[index % COLORS2.length]}
+                          key={`cell-proc-${index}`}
+                          fill={COLORS_PIE2[index % COLORS_PIE2.length]}
                         />
                       ))}
                     </Pie>
@@ -557,14 +588,14 @@ function Estadisticas() {
             </section>
           )}
 
-          {(graficaSeleccionada?.value === "mensual" ||
-            graficaSeleccionada?.value === "todas") && (
+          {/* -- Actividad mensual ----------------------------------------------- */}
+          {mostrarGrafica("mensual") && (
             <section className="stats-section">
               <h1 className="section-title">
                 📉 Actividades Registradas al mes
               </h1>
               <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={dataMensual}>
+                <AreaChart data={dataMensual ?? []}>
                   <defs>
                     <linearGradient
                       id="colorSolicitudes"
@@ -592,358 +623,190 @@ function Estadisticas() {
             </section>
           )}
 
-          {(graficaSeleccionada?.value === "porAnalista" ||
-            graficaSeleccionada?.value === "todas") && (
+          {/* -- Procesos por analista ------------------------------------------- */}
+          {mostrarGrafica("porAnalista") && (
             <section className="stats-section">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
+              <div className="flex justify-between items-center">
                 <h1 className="section-title">⚙️ Procesos por analista</h1>
-                <div style={{ width: "250px" }}>
-                  <Select
-                    options={[
-                      { value: "Todos", label: "Todos" },
-                      ...analistaOptions.filter((a) => a.value !== "Todos"),
-                    ]}
+                <div className="w-62.5">
+                  <Select<ILabelValue>
+                    options={analistaOptions}
                     value={analistaFiltro}
-                    onChange={(value) =>
-                      setAnalistaFiltro(
-                        value || { value: "Todos", label: "Todos" },
-                      )
-                    }
+                    onChange={(v) => setAnalistaFiltro(v ?? OPCION_TODOS)}
                     placeholder="Selecciona un analista"
                     isClearable
                   />
                 </div>
               </div>
 
-              {/* Cálculo de datos y conteos */}
-              {(() => {
-                // ➤ Elegir origen de datos: SIEMPRE usar "procesos" (procesos adaptados)
-                const procesosFiltradosPorAnalista =
-                  analistaFiltro.value === "Todos"
-                    ? procesos
-                    : procesos.filter(
-                        (p) => p.analista === analistaFiltro.value,
-                      );
-
-                // ➤ Función para contar estados
-                const contarTexto = (textoEstado) =>
-                  procesosFiltradosPorAnalista.filter(
-                    (p) => p.estado === textoEstado,
-                  ).length;
-
-                // ➤ Conteos individuales
-                const citado = contarTexto("Citado");
-                const evaluado = contarTexto("Evaluado");
-                const procesamiento = contarTexto("En procesamiento");
-                const revision = contarTexto("En revisión");
-                const firma = contarTexto("En firma");
-                const notificado = contarTexto("Notificado");
-
-                // ➤ Total de procesos
-                const totalProcesos = procesosFiltradosPorAnalista.length;
-
-                // ➤ Datos para gráfica
-                const dataFiltrada = [
-                  { name: "Citado", value: citado },
-                  { name: "Evaluado", value: evaluado },
-                  { name: "En procesamiento", value: procesamiento },
-                  { name: "En revisión", value: revision },
-                  { name: "En firma", value: firma },
-                  { name: "Notificado", value: notificado },
-                ];
-
-                return (
-                  <>
-                    {/* Label con conteos */}
-                    <label className="stats-label">
-                      {totalProcesos} Procesos — {citado} Citado, {evaluado}{" "}
-                      Evaluado, {procesamiento} En procesamiento, {revision} En
-                      revisión, {firma} En firma, {notificado} Notificado
-                    </label>
-
-                    {/* Gráfica */}
-                    <div className="chart-container">
-                      <ResponsiveContainer width="100%" height={320}>
-                        <PieChart>
-                          <Pie
-                            data={dataFiltrada}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            outerRadius={108}
-                            fill="#82ca9d"
-                            dataKey="value"
-                            label
-                          >
-                            {dataFiltrada.map((entry, index) => (
-                              <Cell
-                                key={`cell2-${index}`}
-                                fill={COLORS2[index % COLORS2.length]}
-                              />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                          <Legend />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </>
-                );
-              })()}
+              {/* FIX: se eliminó el IIFE (() => { ... })() en el JSX.
+                  Es un patrón problemático: dificulta la legibilidad, mezcla
+                  lógica con markup y no se beneficia de memoización.
+                  Los datos se calculan en useMemo fuera del render. */}
+              <label className="stats-label">
+                {totalAnalistaChart} Procesos —{" "}
+                {dataAnalistaChart
+                  .map((d) => `${d.value} ${d.name}`)
+                  .join(", ")}
+              </label>
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={320}>
+                  <PieChart>
+                    <Pie
+                      data={dataAnalistaChart}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      outerRadius={108}
+                      dataKey="value"
+                      label
+                    >
+                      {dataAnalistaChart.map((_, index) => (
+                        <Cell
+                          key={`cell-an-${index}`}
+                          fill={COLORS_PIE2[index % COLORS_PIE2.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </section>
           )}
 
-          {(graficaSeleccionada?.value === "evaluacion" ||
-            graficaSeleccionada?.value === "todas") && (
+          {/* -- Resultados de evaluación ---------------------------------------- */}
+          {mostrarGrafica("evaluacion") && (
             <section className="stats-section">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <h1 className="section-title">📈 Resultados de evaluación</h1>
-              </div>
+              <h1 className="section-title">📈 Resultados de evaluación</h1>
 
-              <div
-                style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}
-              >
-                {/* Combo analista */}
-                <div style={{ width: "250px" }}>
-                  <Select
+              <div className="flex gap-4 mb-4">
+                <div className="w-62.5">
+                  {/* FIX: el options de este Select usaba analistas.map() directamente
+                      pero analistas era IGetUsuarios (objeto), no un array.
+                      Ahora se usa el array de usuarios ya extraído. */}
+                  <Select<ILabelValue>
                     options={[
-                      { value: "Todos", label: "Todos los analistas" },
+                      OPCION_TODOS_ANALISTAS,
                       ...analistas.map((a) => ({
-                        value: a.idAcceso,
-                        label: `${a.nombre} ${a.primerApellido} ${a.segundoApellido || ""}`,
+                        value: String(a.idAcceso),
+                        label:
+                          `${a.nombre} ${a.primerApellido} ${a.segundoApellido ?? ""}`.trim(),
                       })),
                     ]}
                     value={analistaFiltroEval}
-                    onChange={(value) =>
-                      setAnalistaFiltroEval(
-                        value || {
-                          value: "Todos",
-                          label: "Todos los analistas",
-                        },
-                      )
+                    onChange={(v) =>
+                      setAnalistaFiltroEval(v ?? OPCION_TODOS_ANALISTAS)
                     }
                     placeholder="Selecciona un analista"
                     isClearable
                   />
                 </div>
 
-                {/* Combo mes */}
-                <div style={{ width: "250px" }}>
-                  <Select
-                    options={(() => {
-                      const meses = [];
-                      const hoy = new Date();
-                      for (let i = 0; i < 4; i++) {
-                        const fecha = new Date(
-                          hoy.getFullYear(),
-                          hoy.getMonth() - i,
-                          1,
-                        );
-                        const mesNombre = fecha.toLocaleString("es-ES", {
-                          month: "long",
-                          year: "numeric",
-                        });
-                        meses.push({
-                          value: `${fecha.getFullYear()}-${fecha.getMonth() + 1}`,
-                          label:
-                            mesNombre.charAt(0).toUpperCase() +
-                            mesNombre.slice(1),
-                        });
-                      }
-                      return meses;
-                    })()}
+                <div className="w-62.5">
+                  <Select<ILabelValue>
+                    options={mesesOptions}
                     value={mesFiltroEval}
-                    onChange={(value) => setMesFiltroEval(value)}
+                    onChange={(v) => setMesFiltroEval(v ?? null)}
                     placeholder="Selecciona un mes"
                     isClearable
                   />
                 </div>
               </div>
 
-              {(() => {
-                // 🔍 Filtrado base: solo procesos con fechaNotificacion != NULL
-                const procesosConFecha = procesosRaw.filter(
-                  (p) =>
-                    p.fechaNotificacion !== null && p.fechaNotificacion !== "",
-                );
+              {/* FIX: se eliminó el IIFE en JSX — igual que en "por analista" */}
+              <label className="stats-label">
+                Mostrando {dataEvaluacionChart.total} procesos con resultado de
+                evaluación{" "}
+                {mesFiltroEval
+                  ? `en ${mesFiltroEval.label}`
+                  : "de los últimos meses"}{" "}
+                {analistaFiltroEval.value === "Todos"
+                  ? "de todos los analistas"
+                  : `de ${analistaFiltroEval.label}`}
+              </label>
 
-                // 🔍 Filtrado por analista
-                const filtradoPorAnalista =
-                  analistaFiltroEval?.value === "Todos" || !analistaFiltroEval
-                    ? procesosConFecha
-                    : procesosConFecha.filter(
-                        (p) => p.FKIdAcceso === analistaFiltroEval.value,
-                      );
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart
+                    data={dataEvaluacionChart.data}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis allowDecimals={false} />
+                    <Tooltip />
+                    <Bar dataKey="value" barSize={45}>
+                      {dataEvaluacionChart.data.map((_, index) => (
+                        <Cell
+                          key={`cell-bar-${index}`}
+                          fill={COLORS_BAR[index % COLORS_BAR.length]}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
 
-                // 🔍 Filtrado por mes
-                const filtradoPorMes = !mesFiltroEval
-                  ? filtradoPorAnalista
-                  : filtradoPorAnalista.filter((p) => {
-                      const fecha = new Date(p.fechaNotificacion);
-                      const añoMes = `${fecha.getFullYear()}-${fecha.getMonth() + 1}`;
-                      return añoMes === mesFiltroEval.value;
-                    });
-
-                // 🔢 Agrupamos por resultadoProcesoEvaluacion
-                const resultados = {};
-                filtradoPorMes.forEach((p) => {
-                  const key =
-                    p.resultadoProcesoEvaluacion &&
-                    p.resultadoProcesoEvaluacion.trim() !== ""
-                      ? p.resultadoProcesoEvaluacion
-                      : "Sin resultado";
-                  resultados[key] = (resultados[key] || 0) + 1;
-                });
-
-                const dataBarra = Object.entries(resultados).map(
-                  ([name, value]) => ({
-                    name,
-                    value,
-                  }),
-                );
-
-                const COLORS = [
-                  "#8884d8",
-                  "#82ca9d",
-                  "#ffc658",
-                  "#ff7f50",
-                  "#8dd1e1",
-                  "#d0ed57",
-                  "#a4de6c",
-                  "#d88884",
-                ];
-
-                const totalProcesos = filtradoPorMes.length;
-
-                return (
-                  <>
-                    <label className="stats-label">
-                      Mostrando {totalProcesos} procesos con resultado de
-                      evaluación{" "}
-                      {mesFiltroEval
-                        ? `en ${mesFiltroEval.label}`
-                        : "de los últimos meses"}{" "}
-                      {analistaFiltroEval?.value === "Todos" ||
-                      !analistaFiltroEval
-                        ? "de todos los analistas"
-                        : `de ${analistaFiltroEval.label}`}
-                    </label>
-
-                    {/* Gráfico de barras */}
-                    <div className="chart-container">
-                      <ResponsiveContainer width="100%" height={350}>
-                        <BarChart
-                          data={dataBarra}
-                          margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" />
-                          <YAxis allowDecimals={false} />
-                          <Tooltip />
-                          <Bar dataKey="value" barSize={45}>
-                            {dataBarra.map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={COLORS[index % COLORS.length]}
-                              />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    {/* Leyenda personalizada */}
+              <div className="flex wrap-normal justify-center gap-4 mt-4">
+                {dataEvaluacionChart.data.map((entry, index) => (
+                  <div
+                    key={`legend-eval-${index}`}
+                    className="flex items-center gap-2 text-[0.9rem]"
+                  >
                     <div
                       style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        justifyContent: "center",
-                        gap: "1rem",
-                        marginTop: "1rem",
+                        backgroundColor: COLORS_BAR[index % COLORS_BAR.length],
                       }}
-                    >
-                      {dataBarra.map((entry, index) => (
-                        <div
-                          key={`legend-${index}`}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.5rem",
-                            fontSize: "0.9rem",
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: "16px",
-                              height: "16px",
-                              backgroundColor: COLORS[index % COLORS.length],
-                              borderRadius: "3px",
-                            }}
-                          ></div>
-                          <span>{entry.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                );
-              })()}
+                      className="w-4 h-4 border rounded-[3px]"
+                    />
+                    <span>{entry.name}</span>
+                  </div>
+                ))}
+              </div>
             </section>
           )}
 
-          {/* 📑 Procesos con filtros y tabla */}
+          {/* -- Tabla de procesos ----------------------------------------------- */}
           <section className="stats-section">
             <h1 className="section-title">⚙️ Procesos</h1>
 
             <div className="filtros-combobox">
               <div>
                 <label>Estado</label>
-                <Select
-                  options={estadoOptions}
+                <Select<ILabelValue>
+                  options={ESTADO_OPTIONS}
                   value={filtrosProcesos.estado}
-                  onChange={(value) =>
-                    setFiltrosProcesos((prev) => ({ ...prev, estado: value }))
+                  onChange={(v) =>
+                    setFiltrosProcesos((prev) => ({ ...prev, estado: v }))
                   }
                   isClearable
                 />
               </div>
               <div>
                 <label>Analista</label>
-                <Select
+                <Select<ILabelValue>
                   options={analistaOptions}
                   value={filtrosProcesos.analista}
-                  onChange={(value) =>
-                    setFiltrosProcesos((prev) => ({ ...prev, analista: value }))
+                  onChange={(v) =>
+                    setFiltrosProcesos((prev) => ({ ...prev, analista: v }))
                   }
                   isClearable
                 />
               </div>
               <div>
                 <label>Dependencia</label>
-                <Select
+                <Select<ILabelValue>
                   options={dependenciaOptions}
                   value={filtrosProcesos.dependencia}
-                  onChange={(value) =>
-                    setFiltrosProcesos((prev) => ({
-                      ...prev,
-                      dependencia: value,
-                    }))
+                  onChange={(v) =>
+                    setFiltrosProcesos((prev) => ({ ...prev, dependencia: v }))
                   }
                   isClearable
                 />
               </div>
-              <div className="filtro-busqueda" style={{ marginTop: "2.8%" }}>
+              <div className="filtro-busqueda mt-[2.8%]">
                 <FaSearch className="search-icon" />
                 <input
                   type="text"
@@ -968,53 +831,53 @@ function Estadisticas() {
                   </tr>
                 </thead>
                 <tbody>
-                  {procesosFiltrados.map((p) => {
-                    const procesoOriginal = procesosRaw.find(
-                      (s) => s.idProceso === p.id,
-                    );
-                    return (
-                      <tr
-                        key={p.id}
-                        onDoubleClick={() =>
-                          navigate("/evaluacion", { state: procesoOriginal })
-                        }
-                        style={{ cursor: "pointer" }} // 🖱️ Opcional: muestra que es clickeable
-                        title="Doble clic para abrir en evaluación"
-                      >
-                        <td>{p.folio}</td>
-                        <td>{p.nombre}</td>
-                        <td>{p.analista}</td>
-                        <td>{p.estado}</td>
-                        <td>{p.dependencia}</td>
-                      </tr>
-                    );
-                  })}
+                  {procesosFiltrados.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="text-center">
+                        No hay procesos con los filtros seleccionados.
+                      </td>
+                    </tr>
+                  ) : (
+                    procesosFiltrados.map((p) => {
+                      const procesoOriginal = procesosRaw.find(
+                        (r) => r.idProceso === p.id,
+                      );
+                      return (
+                        <tr
+                          key={p.id}
+                          onDoubleClick={() =>
+                            navigate("/evaluacion", { state: procesoOriginal })
+                          }
+                          className="cursor-pointer"
+                          title="Doble clic para abrir en evaluación"
+                        >
+                          <td>{p.folio}</td>
+                          <td>{p.nombre}</td>
+                          <td>{p.analista}</td>
+                          <td>{p.estado}</td>
+                          <td>{p.dependencia}</td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             )}
           </section>
 
-          {/* Solicitudes con tabla */}
-          {/* 📑 Solicitudes */}
+          {/* -- Tabla de solicitudes ------------------------------------------- */}
           <section className="stats-section">
             <h1 className="section-title">📑 Solicitudes</h1>
 
-            {/* Filtros */}
             <div className="filtros-bar">
               <div className="filtro-estado">
-                <Select
-                  options={[
-                    { value: "Todos", label: "Todos" },
-                    { value: "Pendiente (cita)", label: "Pendiente (cita)" },
-                    { value: "Entregado (cita)", label: "Entregado (cita)" },
-                    { value: "Citado", label: "Citado" },
-                  ]}
-                  value={estadoFiltro}
-                  onChange={(value) => setEstadoFiltro(value)}
+                <Select<ILabelValue>
+                  options={ESTADO_SOLICITUD_OPTIONS}
+                  value={estadoFiltroSolicitud}
+                  onChange={(v) => v && setEstadoFiltroSolicitud(v)}
                   isClearable={false}
                 />
               </div>
-
               <div className="filtro-busqueda">
                 <FaSearch className="search-icon" />
                 <input
@@ -1026,8 +889,7 @@ function Estadisticas() {
               </div>
             </div>
 
-            {/* Tabla de solicitudes */}
-            {loadingSolicitudes ? (
+            {loadingProcesos ? (
               <p className="mensaje-info">Cargando solicitudes...</p>
             ) : solicitudesFiltradas.length === 0 ? (
               <div className="mensaje-vacio-container">
@@ -1048,7 +910,7 @@ function Estadisticas() {
                     <tr
                       key={s.id}
                       onDoubleClick={() => handleEditarSolicitud(s)}
-                      style={{ cursor: "pointer" }}
+                      className="cursor-pointer"
                       title="Doble clic para asignar solicitud"
                     >
                       <td>{s.folio}</td>

@@ -1,127 +1,115 @@
-import { useState, useEffect, SubmitEvent, useId } from "react";
+import { useId } from "react";
+import { useLocation } from "react-router-dom";
 
 import "./CandidatoNoBeneficiado.css";
-import { useLocation } from "react-router-dom";
+
+// Interfaces de UI ---------------------------------------------------------
+interface ICandidatoNoBeneficiado {
+  nombre: string;
+  profesion: string;
+  region: string;
+  resultado: string;
+  fechaEvaluacion: string;
+  numCarpeta: number | string;
+}
+const CANDIDATO_VACIO: ICandidatoNoBeneficiado = {
+  nombre: "",
+  profesion: "",
+  region: "",
+  resultado: "",
+  fechaEvaluacion: "",
+  numCarpeta: "",
+};
 
 function CandidatoNoBeneficiado() {
   const fieldID = useId();
-
-  const [formData, setFormData] = useState({
-    nombre: "",
-    profesion: "",
-    region: "",
-    resultado: "",
-    fechaEvaluacion: "",
-    carpetaDigital: "",
-  });
-
   const location = useLocation();
-  const cedulaFromNav = location.state?.cedula || null;
-  useEffect(() => {
-    if (location.state && location.state.candidato) {
-      const c = location.state.candidato;
-      setFormData({
-        nombre: c.nombre || "",
-        profesion: c.profesion || "",
-        region: c.region || "",
-        resultado: c.resultado || "",
-        fechaEvaluacion: c.fechaEvaluacion || "",
-        carpetaDigital: c.numCarpeta || "",
-      });
-    }
-  }, [location.state]);
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleSubmit = (e: SubmitEvent) => {
-    e.preventDefault();
-    console.log("Candidato No Beneficiado: ", formData);
-  };
+  // Obtencion de datos de query ----------------------------------------------
+  const candidato: ICandidatoNoBeneficiado = location.state?.candidato
+    ? {
+        nombre: location.state.candidato.nombre ?? "",
+        profesion: location.state.candidato.profesion ?? "",
+        region: location.state.candidato.region ?? "",
+        resultado: location.state.candidato.resultado ?? "",
+        fechaEvaluacion: location.state.candidato.fechaEvaluacion ?? "",
+        numCarpeta: location.state.candidato.numCarpeta ?? "",
+      }
+    : CANDIDATO_VACIO;
 
   return (
     <main className="main-content">
       <div className="page-header2">
         <h1 className="page-title2">Candidato No Beneficiado</h1>
       </div>
+
       <div className="contenido-cedula-inner">
-        <form className="form-grid" onSubmit={handleSubmit}>
-          {/* Campos */}
+        {/* Sin onSubmit: formulario de solo lectura, no envía datos */}
+        <form className="form-grid">
           <div className="form-group">
-            <label htmlFor={`${fieldID}-nombreCandidato`}>Nombre</label>
+            <label htmlFor={`${fieldID}-nombre`}>Nombre</label>
             <input
-              id={`${fieldID}-nombreCandidato`}
+              id={`${fieldID}-nombre`}
               type="text"
               className="form-input"
-              value={formData.nombre}
-              onChange={(e) => handleInputChange("nombre", e.target.value)}
+              defaultValue={candidato.nombre}
               readOnly
             />
           </div>
+
           <div className="form-group">
             <label htmlFor={`${fieldID}-profesion`}>Profesión</label>
             <input
               id={`${fieldID}-profesion`}
               type="text"
               className="form-input"
-              value={formData.profesion}
-              onChange={(e) => handleInputChange("profesion", e.target.value)}
+              defaultValue={candidato.profesion}
               readOnly
             />
           </div>
+
           <div className="form-group">
             <label htmlFor={`${fieldID}-region`}>Región</label>
             <input
               id={`${fieldID}-region`}
               type="text"
               className="form-input"
-              value={formData.region}
-              onChange={(e) => handleInputChange("region", e.target.value)}
+              defaultValue={candidato.region}
               readOnly
             />
           </div>
+
           <div className="form-group">
             <label htmlFor={`${fieldID}-resultado`}>Resultado</label>
             <input
               id={`${fieldID}-resultado`}
               type="text"
               className="form-input"
-              value={formData.resultado}
-              onChange={(e) => handleInputChange("resultado", e.target.value)}
+              defaultValue={candidato.resultado}
               readOnly
             />
           </div>
+
           <div className="form-group">
-            <label htmlFor={`${fieldID}-fechaEvaluacionCompetencias`}>
+            <label htmlFor={`${fieldID}-fechaEvaluacion`}>
               Fecha de Evaluación de Competencias
             </label>
             <input
-              id={`${fieldID}-fechaEvaluacionCompetencias`}
+              id={`${fieldID}-fechaEvaluacion`}
               type="date"
               className="form-input"
-              value={formData.fechaEvaluacion}
-              onChange={(e) =>
-                handleInputChange("fechaEvaluacion", e.target.value)
-              }
+              defaultValue={candidato.fechaEvaluacion}
               readOnly
             />
           </div>
+
           <div className="form-group">
-            <label htmlFor={`${fieldID}-numCarpetaDigital`}>
-              N. Carpeta Digital
-            </label>
+            <label htmlFor={`${fieldID}-numCarpeta`}>N. Carpeta Digital</label>
             <input
-              id={`${fieldID}-numCarpetaDigital`}
+              id={`${fieldID}-numCarpeta`}
               type="text"
               className="form-input"
-              value={formData.carpetaDigital}
-              onChange={(e) =>
-                handleInputChange("carpetaDigital", e.target.value)
-              }
+              defaultValue={String(candidato.numCarpeta)}
               readOnly
             />
           </div>
