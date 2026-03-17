@@ -1,7 +1,4 @@
 import { useState, useContext, useEffect } from "react";
-import UserContext from "@/utils/UserContext.jsx";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import SolicitudService from "@/services/SolicitudService.js";
 import {
   oficio51y52,
   oficio41y42,
@@ -10,19 +7,19 @@ import {
   oficio43Medica,
   copiaCarbon,
 } from "@/utils/Constants";
+import { Toast } from "@/components/Alert/Floating/Toast";
+import { useToast } from "@/hooks/useToast";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import IResponseHTTP from "@/interfaces/http/Response";
 
 function GenerarOficio() {
-  const { currentUser } = useContext(UserContext);
+  const { toast, mostrarToast } = useToast();
 
-  const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
-
-  const [tipoOficio, setTipoOficio] = useState(""); // ⬅ Nuevo estado
+  const [tipoOficio, setTipoOficio] = useState("");
 
   const datosProceso = JSON.parse(
     sessionStorage.getItem("datosOficio") || "{}",
   );
-
-  const SolicitudService = new SolicitudService();
 
   const [formData, setFormData] = useState({
     idProcesoContratacion: datosProceso.idProcesoContratacion || "",
@@ -34,7 +31,7 @@ function GenerarOficio() {
     categoriaAutorizada: datosProceso.categoriaAutorizada || "",
     candidato: datosProceso.candidato || "",
     cuerpo: "",
-    copiaCarbon: "", //
+    copiaCarbon: "",
   });
 
   const handleInputChange = (field, value) => {
@@ -69,7 +66,7 @@ function GenerarOficio() {
     }
 
     if (formData.copiaCarbon.trim() === "") {
-      setFormData((prev) => ({ ...prev, copiaCarbon: copiaCarbon() }));
+      setFormData((prev) => ({ ...prev, copiaCarbon: copiaCarbon }));
     }
   }, [
     tipoOficio,
@@ -97,23 +94,13 @@ function GenerarOficio() {
         machote: formData.cuerpo,
         piePagina: formData.copiaCarbon,
         tipo: tipoOficio,
+        // Verificar en backend
+        idOficio: 1,
       };
-      const token = sessionStorage.getItem("token");
-      const respuesta = await SolicitudService.registrarOficio(
-        datosBackend,
-        token,
-      );
+      const respuesta: IResponseHTTP<string> =
+        await new ProcesoContratacionService().postOficio(datosBackend);
 
-      console.log("Respuesta backend:", respuesta);
-
-      setMensaje({
-        texto: "✅ Oficio guardado correctamente",
-        tipo: "exito",
-      });
-
-      setTimeout(() => {
-        setMensaje({ texto: "", tipo: "" });
-      }, 2500);
+      mostrarToast("✅ Oficio guardado correctamente", "exito");
     } catch (error) {
       console.error("Error al registrar oficio", error);
 
@@ -125,8 +112,9 @@ function GenerarOficio() {
   };
 
   return (
-    <div className="iniciar-solicitud-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
+    <>
+      {/* Toast de notificación */}
+      <Toast texto={toast.texto} tipo={toast.tipo} />
 
       <main className="main-content-solicitud">
         {mensaje.texto && (
@@ -329,7 +317,7 @@ function GenerarOficio() {
           </div>
         </form>
       </main>
-    </div>
+    </>
   );
 }
 

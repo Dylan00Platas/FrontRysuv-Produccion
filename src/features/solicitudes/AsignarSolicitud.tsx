@@ -1,13 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useContext } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 import "./AsignarSolicitud.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import CatalogoCedula from "@/services/CatalogoCedulas.js";
-import UsuarioServicio from "@/services/UsuarioService.js";
-import UserContext from "@/utils/UserContext.jsx";
+import { useToast } from "@/hooks/useToast";
+import { Toast } from "@/components/Alert/Floating/Toast";
+import { useCedulaTipos } from "@/hooks/useCedulaTipos";
+import { IGetTiposCedula } from "@/schemas/catalogos/GetTipoCedula";
+import ILabelValue from "@/interfaces/LabelValue";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import IResponseHTTP from "@/interfaces/http/Response";
+import IPutProcesoContratacion from "@/schemas/procesos-contratacion/PutProcesoContratacion";
 
+// Interfaces de UI ---------------------------------------------------------
+interface IFormData {
+  analista: string;
+  avaladoPor: string;
+  citaVirtual: boolean;
+  educacionFormal: string;
+  estado: string;
+  familiaFuncional: string;
+  fechaAsignacionAnalista: string;
+  fechaEntrevista: string;
+  folio: string;
+  funcion: string;
+  hermes: string;
+  nombreCandidato: string;
+  numeroCarpeta: string;
+  observaciones: string;
+  tipo: string;  
+}
 const FAMILIA_KEYWORDS = {
   "N1. Académico Administrativo": "académico administrativo",
   "N2. Administrativo Académico": "administrativo académico",
@@ -23,12 +46,41 @@ const FAMILIA_KEYWORDS = {
 };
 
 function AsignarSolicitud() {
-  const solicitudSeleccionada = location.state?.solicitud || {};
-  const usuarioServicio = new UsuarioServicio();
-  const SolicitudService = new SolicitudService();
-  const token = localStorage.getItem("token");
-  const { currentUser } = useContext(UserContext);
-  const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
+  // Utils ------------------------------------------------------------------
+  const { toast, mostrarToast } = useToast();
+  const navigate = useNavigate();
+  const fieldID = useId();
+  // Tipos de cedulas -------------------------------------------------------
+  const {
+      data: dataCedulaTipos,
+      loading: loadingCedulaTipos,
+      error: errorCedulaTipos,
+    } = useCedulaTipos();
+    const [tiposCedula, setTiposCedula] = useState<IGetTiposCedula | null>();
+    useEffect(() => {
+      setTiposCedula(dataCedulaTipos);
+    }, [dataCedulaTipos]);
+  // Tipos de cedulas -------------------------------------------------------
+  const [formData, setFormData] = useState<IFormData>({
+    analista: "",
+    avaladoPor: "",
+    citaVirtual: false,
+    educacionFormal: "",
+    estado: "",
+    familiaFuncional: "",
+    fechaAsignacionAnalista: "",
+    fechaEntrevista: "",
+    folio: "",
+    funcion: "",
+    hermes: "",
+    nombreCandidato: "",
+    numeroCarpeta: "",
+    observaciones: "",
+    tipo: "",
+  });
+  const location = useLocation();
+  const solicitudSeleccionada = location.state?.solicitud || {};  
+  const [analistas, setAnalistas] = useState([]);
   const [permiteAsignarAnalista, setPermiteAsignarAnalista] = useState(true);
   const [funcionesOptions, setFuncionesOptions] = useState([]);
   const [funcionesFiltradas, setFuncionesFiltradas] = useState([]);
@@ -60,44 +112,6 @@ function AsignarSolicitud() {
     });
   };
 
-  const [formData, setFormData] = useState({
-    tipo: "",
-    folio: "",
-    hermes: "",
-    numeroCarpeta: "",
-    candidato: "",
-    funcion: "",
-    familia: "",
-    fechaEntrevista: "",
-    analista: "",
-    estado: "",
-    educacionFormal: "",
-    avaladoPor: "",
-    fechaAsignacionAnalista: "",
-    citaVirtual: false,
-    observaciones: "",
-  });
-
-  const [analistas, setAnalistas] = useState([]);
-
-  useEffect(() => {
-    const cargarFunciones = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const catalogo = new CatalogoCedula();
-        const cedulas = await catalogo.cargarCedulas(token);
-        const opciones = cedulas.map((c) => ({
-          value: c.idClasificacionCedulas,
-          label: `${c.numCedula}. ${c.nombre}`,
-        }));
-        setFuncionesOptions(opciones);
-      } catch (error) {
-        console.error("Error cargando funciones (cédulas):", error);
-      }
-    };
-    cargarFunciones();
-  }, []);
-
   useEffect(() => {
     if (!formData.familia) {
       setFuncionesFiltradas([]);
@@ -110,7 +124,7 @@ function AsignarSolicitud() {
       return;
     }
 
-    const normalizar = (texto) =>
+    const normalizar = (texto: string) =>
       texto
         ?.toLowerCase()
         .normalize("NFD")
@@ -120,7 +134,7 @@ function AsignarSolicitud() {
 
     const kw = normalizar(keyword);
 
-    const filtradas = funcionesOptions.filter((f) => {
+    const filtradas = funcionesOptions.filter((f: ILabelValue) => {
       const texto = normalizar(f.label);
 
       // Casos específicos: coincidencia estricta con la familia
@@ -151,28 +165,30 @@ function AsignarSolicitud() {
   useEffect(() => {
     if (solicitudSeleccionada && Object.keys(solicitudSeleccionada).length) {
       setFormData({
-        tipo: tipoInicial,
-        folio: solicitudSeleccionada.folio || "",
-        hermes: solicitudSeleccionada.hermesNotificacion || "",
-        //numeroCarpeta: solicitudSeleccionada.numCarpeta || "",
-        candidato: solicitudSeleccionada.nombreCandidato || "",
-        funcion: solicitudSeleccionada.funcionDesempeniar || "",
-        familia: solicitudSeleccionada.familiaFuncional || "",
-        fechaEntrevista: solicitudSeleccionada.fechaEntrevista
-          ? new Date(solicitudSeleccionada.fechaEntrevista)
-              .toISOString()
-              .split("T")[0]
-          : "",
         analista: solicitudSeleccionada.idAnalista || "",
-        estado: solicitudSeleccionada.FKIdEstadoProcesoContratacion || "",
-        educacionFormal: solicitudSeleccionada.educacionFormal || "",
+        avaladoPor: solicitudSeleccionada.avaladoPor || "",
         citaVirtual:
           solicitudSeleccionada.citaVirtual === true ||
           solicitudSeleccionada.citaVirtual === "Sí" ||
           solicitudSeleccionada.citaVirtual === 1
             ? true
             : false,
+        educacionFormal: solicitudSeleccionada.educacionFormal || "",
+        estado: solicitudSeleccionada.FKIdEstadoProcesoContratacion || "",
+        familia: solicitudSeleccionada.familiaFuncional || "",
+        fechaAsignacionAnalista: solicitudSeleccionada.fechaAsignacionAnalista,
+        fechaEntrevista: solicitudSeleccionada.fechaEntrevista
+          ? new Date(solicitudSeleccionada.fechaEntrevista)
+              .toISOString()
+              .split("T")[0]
+          : "",
+        folio: solicitudSeleccionada.folio || "",
+        funcion: solicitudSeleccionada.funcionDesempeniar || "",
+        hermes: solicitudSeleccionada.hermesNotificacion || "",
+        nombreCandidato: solicitudSeleccionada.nombreCandidato || "",
+        numeroCarpeta: String(solicitudSeleccionada.numeroCarpeta || 0),
         observaciones: solicitudSeleccionada.observaciones || "",
+        tipo: tipoInicial,
       });
       setPermiteAsignarAnalista(true);
     }
@@ -256,18 +272,10 @@ function AsignarSolicitud() {
 
     try {
       if (!formData.analista || formData.analista === "") {
-        await SolicitudService.editarSolicitud(
-          solicitudSeleccionada.idProceso,
-          datosAEnviar,
-          token,
-        );
-
-        setMensaje({
-          texto: "✅ Solicitud actualizada correctamente",
-          tipo: "exito",
-        });
-        setTimeout(() => navigate("/solicitudes"), 2000);
-        setTimeout(() => setMensaje(""), 3000);
+        const response: IResponseHTTP<string> = await new ProcesoContratacionService().putProcesoContratacion(solicitudSeleccionada.idProceso, formData);
+        
+        mostrarToast(" ✅ Solicitud actualizada correctamente", "exito"); 
+        navigate("/solicitudes");
       } else {
         const fechaActual = new Date().toISOString().split("T")[0];
 
@@ -277,44 +285,29 @@ function AsignarSolicitud() {
           idAcceso: Number(formData.analista),
           fechaAsignacionAnalista: fechaActual,
         };
-        await SolicitudService.editarSolicitud(
-          solicitudSeleccionada.idProceso,
-          datosConAnalista,
-          token,
-        );
-        setMensaje({
-          texto: "✅ Solicitud asignada a analista",
-          tipo: "exito",
-        });
-        setTimeout(() => navigate("/solicitudes"), 2000);
-        setTimeout(() => setMensaje(""), 3000);
+        const response: IResponseHTTP<string> = await new ProcesoContratacionService().putProcesoContratacion(solicitudSeleccionada.idProceso, formData);
+        mostrarToast(" ✅ Solicitud actualizada correctamente", "exito"); 
+        navigate("/solicitudes");
       }
     } catch (error) {
       console.error("Error al guardar la solicitud:", error);
-      setMensaje({ texto: `❌ Error: ${error.message}`, tipo: "error" });
-      setTimeout(() => setMensaje(""), 3000);
+      mostrarToast(" ❌ Error al modificar la solicitud.", "error"); 
     }
   };
 
   return (
-    <div className="asignar-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
+    <>
+      <Toast texto={toast.texto} tipo={toast.tipo} />
 
       <main className="main-content">
-        {/*  Mensaje flotante */}
-        {mensaje.texto && (
-          <div className={`mensaje-flotante ${mensaje.tipo}`}>
-            {mensaje.texto}
-          </div>
-        )}
-
         <h1 className="page-title4">Asignación de Solicitud</h1>
 
         <div className="contenido-asignacion-inner">
           <form className="form-grid" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label-evaluacionl">Folio</label>
+              <label htmlFor={`${fieldID}-folio`} className="form-label-evaluacionl">Folio</label>
               <input
+                id={`${fieldID}-folio`}
                 type="text"
                 className="form-input"
                 value={formData.folio}
@@ -323,8 +316,9 @@ function AsignarSolicitud() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacionl">Hermes</label>
+              <label htmlFor={`${fieldID}-hermesNotificacion`} className="form-label-evaluacionl">Hermes</label>
               <input
+                id={`${fieldID}-hermesNotificacion`}
                 type="text"
                 className="form-input"
                 value={formData.hermes}
@@ -332,36 +326,38 @@ function AsignarSolicitud() {
               />
             </div>
 
-            {/*
               <div className="form-group">
-                <label className="form-label-evaluacionl">Número de Carpeta</label>
-                <input
+                <label htmlFor={`${fieldID}-numCarpeta`} className="form-label-evaluacionl">Número de Carpeta</label>
+              <input
+                id={`${fieldID}-numCarpeta`}
                   type="text"
                   className="form-input"
                   value={formData.numeroCarpeta}
                   onChange={(e) => handleInputChange("numeroCarpeta", e.target.value)}
                 />
-              </div>*/}
+              </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacionl">
+              <label htmlFor={`${fieldID}-nombreCandidato`} className="form-label-evaluacionl">
                 Nombre de Candidato
               </label>
               <input
+                id={`${fieldID}-nombreCandidato`}
                 type="text"
                 className="form-input"
-                value={formData.candidato}
+                value={formData.nombreCandidato}
                 onChange={(e) => handleInputChange("candidato", e.target.value)}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacionl">
+              <label htmlFor={`${fieldID}-familiaFuncional`} className="form-label-evaluacionl">
                 Familia Funcional
               </label>
               <select
+                id={`${fieldID}-familiaFuncional`}
                 className="form-input"
-                value={formData.familia}
+                value={formData.familiaFuncional}
                 onChange={(e) => handleInputChange("familia", e.target.value)}
               >
                 <option value="" disabled hidden>
@@ -393,10 +389,11 @@ function AsignarSolicitud() {
 
             {/*  Función a desempeñar como combo box */}
             <div className="form-group">
-              <label className="form-label-evaluacionl">
+              <label htmlFor={`${fieldID}-funcion`} className="form-label-evaluacionl">
                 Función a Desempeñar
               </label>
               <Select
+                id={`${fieldID}-funcion`}
                 options={funcionesFiltradas}
                 value={
                   funcionesFiltradas.find(
@@ -420,8 +417,9 @@ function AsignarSolicitud() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacionl">Fecha de cita</label>
+              <label htmlFor={`${fieldID}-fechaEntrevista`} className="form-label-evaluacionl">Fecha entrevista</label>
               <input
+                id={`${fieldID}-fechaEntrevista`}
                 type="date"
                 className="form-input"
                 value={formData.fechaEntrevista || ""}
@@ -432,8 +430,9 @@ function AsignarSolicitud() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacionl">Educación formal</label>
+              <label htmlFor={`${fieldID}-educacionFormal`} className="form-label-evaluacionl">Educación formal</label>
               <input
+                id={`${fieldID}-educacionFormal`}
                 type="text"
                 className="form-input"
                 value={formData.educacionFormal}
@@ -445,7 +444,7 @@ function AsignarSolicitud() {
 
             {/*  Avalado por - botones seleccionables */}
             <div className="form-group">
-              <label className="form-label-evaluacionl">Avalado por</label>
+              <label htmlFor={`${fieldID}-avaladoPor`} className="form-label-evaluacionl">Avalado por</label>
               <div className="avalado-buttons">
                 {[
                   "Título",
@@ -455,6 +454,7 @@ function AsignarSolicitud() {
                   "Constancia",
                 ].map((opcion) => (
                   <button
+                    id={`${fieldID}-avaladoPor`}
                     key={opcion}
                     type="button"
                     className={`avalado-btn ${
@@ -469,8 +469,9 @@ function AsignarSolicitud() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacionl">Estado</label>
+              <label htmlFor={`${fieldID}-estado`} className="form-label-evaluacionl">Estado</label>
               <select
+                id={`${fieldID}-estado`}
                 className="form-input"
                 value={formData.estado}
                 onChange={(e) => handleInputChange("estado", e.target.value)}
@@ -485,17 +486,16 @@ function AsignarSolicitud() {
             </div>
 
             <div
-              className="checkbox-group-solicitud"
-              style={{ paddingRight: "300px", paddingBottom: "20px" }}
+              className="checkbox-group-solicitud pr-75 pb-5"
             >
               <label
-                className="form-label-evaluacionl"
-                style={{ whiteSpace: "nowrap", marginBottom: "10px" }}
+                htmlFor={`${fieldID}-citaVirtual`}
+                className="form-label-evaluacionl whitespace-nowrap mb-2.5"
               >
                 Cita virtual
               </label>
-
               <input
+                id={`${fieldID}-citaVirtual`}
                 type="checkbox"
                 checked={formData.citaVirtual}
                 onChange={(e) =>
@@ -504,11 +504,12 @@ function AsignarSolicitud() {
               />
             </div>
 
-            <div className="form-group" style={{ gridColumn: "1 / -1" }}>
-              <label className="form-label-evaluacionl">
+            <div className="form-group grid-cols-1">
+              <label htmlFor={`${fieldID}-observaciones`} className="form-label-evaluacionl">
                 Observaciones registro
               </label>
               <textarea
+                id={`${fieldID}-observaciones`}
                 className="form-input textarea-large"
                 value={formData.observaciones}
                 onChange={(e) =>
@@ -520,12 +521,13 @@ function AsignarSolicitud() {
             {permiteAsignarAnalista && (
               <div className="form-group analista-combobox">
                 <label
-                  className="form-label-evaluacionl"
-                  style={{ fontSize: "14px", fontWeight: 700 }}
+                  htmlFor={`${fieldID}-analista`}
+                  className="form-label-evaluacionl text-[14px] font-bold"
                 >
                   Analista
                 </label>
                 <select
+                  id={`${fieldID}-analista`}
                   className="form-input"
                   value={formData.analista}
                   onChange={(e) =>
@@ -547,8 +549,9 @@ function AsignarSolicitud() {
             )}
 
             <div className="form-group tipo-combobox">
-              <label className="form-label-evaluacionl">Tipo</label>
+              <label htmlFor={`${fieldID}-tipo`} className="form-label-evaluacionl">Tipo</label>
               <select
+                id={`${fieldID}-tipo`}
                 className="form-input"
                 value={formData.tipo}
                 onChange={(e) => handleInputChange("tipo", e.target.value)}
@@ -595,7 +598,7 @@ function AsignarSolicitud() {
           </div>
         )}
       </main>
-    </div>
+    </>
   );
 }
 

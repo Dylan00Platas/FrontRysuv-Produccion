@@ -1148,6 +1148,7 @@ function CrearConstancia() {
                   >
                     <label className="form-label-evaluacion">{label}</label>
                     <textarea
+                      id=""
                       className="large-textarea"
                       value={String(formData[key] ?? "")}
                       onChange={(e) =>
@@ -1229,7 +1230,8 @@ function CrearConstancia() {
                     if (!archivo) return;
                     setNombreArchivo(archivo.name);
                     setFilePDF(archivo);
-                    const base64 = await ManageFiles.pdfToBase64(archivo);
+                    const base64: string =
+                      await ManageFiles.pdfToBase64(archivo);
                     setArchivoBase64(base64);
                   }}
                 />
