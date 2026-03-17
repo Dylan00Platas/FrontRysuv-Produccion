@@ -4,18 +4,23 @@ import { FaSearch, FaBell, FaExclamationTriangle } from "react-icons/fa";
 import Select from "react-select";
 
 import "./Procesos.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import UsuarioService from "@/services/UsuarioService.js";
 import SolicitudService from "@/services/SolicitudService.js";
-import UserContext from "@/utils/UserContext.jsx";
 
 function Procesos() {
+
+  interface IAnalista {
+    idAcceso: number;
+    nombre: string;
+    primerApellido: string;
+    segundoApellido: string;
+  }
+
   const navigate = useNavigate();
   const [procesos, setProcesos] = useState([]);
   const [procesosRaw, setProcesosRaw] = useState([]);
   const [analistas, setAnalistas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { currentUser } = useContext(UserContext);
 
   const [analistaOptions, setAnalistaOptions] = useState([
     { value: "Todos", label: "Todos" },
@@ -49,7 +54,7 @@ function Procesos() {
         setAnalistas(analistasData);
 
         const analistasMap = {};
-        analistasData.forEach((a) => {
+        analistasData.forEach((a: IAnalista) => {
           analistasMap[a.idAcceso] =
             `${a.nombre} ${a.primerApellido} ${a.segundoApellido || ""}`.trim();
         });

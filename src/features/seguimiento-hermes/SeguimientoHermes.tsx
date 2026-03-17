@@ -1,12 +1,25 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FaSearch } from "react-icons/fa";
-
+import { Toast } from "@/components/Alert/Floating/Toast";
+import { IPostSeguimientoHermes, ISeguimientoHermesBase } from "@/schemas/procesos-contratacion/PostSeguimientoHermes";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import { useToast } from "@/hooks/useToast";
 import "./SeguimientoHermes.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import SolicitudService from "@/services/SolicitudService.js";
-import UserContext from "@/utils/UserContext.jsx";
 
-const columnas = [
+interface ISeguimientoHermes {
+  Folio: string,
+  "Fecha de Recepción": string,
+  Importancia: string
+  "Tipo de Envío": string,
+  "Requiere Respuesta": string,
+  Solicita: string,
+  "Entidad/Dependencia": string,
+  Asunto: string,
+  Estatus: string,
+  Acciones: string
+}
+
+const columnas: Columna[] = [
   "Folio",
   "Fecha de Recepción",
   "Importancia",
@@ -19,37 +32,34 @@ const columnas = [
   "Acciones",
 ];
 
-function SeguimientoHermes() {
-  const { currentUser } = useContext(UserContext);
-  const [registros, setRegistros] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const solicitudService = new SolicitudService();
+type Columna = keyof ISeguimientoHermes;
 
-  const [filtros, setFiltros] = useState(
+function SeguimientoHermes() {
+  const [registros, setRegistros] = useState<ISeguimientoHermes[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const ServicioProcesoContratacion = new ProcesoContratacionService();
+  const {toast,mostrarToast} = useToast();
+
+  const [filtros, setFiltros] = useState<Record<string, string>>(
     columnas.reduce((acc, col) => {
       acc[col] = "Todos";
       return acc;
-    }, {}),
+    }, {} as Record<string,string>),
   );
   const columnasSinFiltro = ["Entidad/Dependencia", "Asunto", "Acciones"];
 
-  const getOpcionesColumna = (col) => {
-    const valores = registros
+  const getOpcionesColumna = (col: Columna) => {
+  const valores = registros
       .map((r) => r[col])
       .filter((v) => v && v.toString().trim() !== "");
-
     return ["Todos", ...Array.from(new Set(valores))];
   };
 
   useEffect(() => {
     const cargarSeguimientoHermes = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const data =
-          await solicitudService.obtenerTodosSeguimientoHermes(token);
-
-        //  Adaptar backend → tabla
-        const registrosMapeados = data.map((r) => ({
+        const data = await ServicioProcesoContratacion.getSeguimientoHermes();
+        const registrosMapeados:ISeguimientoHermes[] = data.mensaje.seguimientos.map((r) => ({
           Folio: r.folio ?? "",
           "Fecha de Recepción": r.fechaRecepcion ?? "",
           Importancia: r.importancia ?? "",
@@ -61,24 +71,23 @@ function SeguimientoHermes() {
           Estatus: r.estatus ?? "",
           Acciones: r.acciones ?? "",
         }));
-
         setRegistros(registrosMapeados);
       } catch (error) {
-        console.error("Error al cargar Seguimiento Hermes:", error);
-        alert("No se pudieron cargar los registros de Seguimiento Hermes");
+        console.error("SeguimientoHermes.tsx - Error al cargar Seguimiento Hermes: " + error);
+        mostrarToast("No se pudieron cargar los registros de Seguimiento Hermes", "error")
       }
     };
 
     cargarSeguimientoHermes();
   }, []);
 
-  const handleChange = (rowIndex, colName, value) => {
+  const handleChange = (rowIndex: number, colName: Columna, value: string) => {
     const nuevos = [...registros];
     nuevos[rowIndex][colName] = value;
     setRegistros(nuevos);
   };
 
-  const handlePaste = (e) => {
+  const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     const clip = e.clipboardData.getData("text");
     const filas = clip.split(/\r?\n/).filter((f) => f.trim() !== "");
@@ -86,10 +95,10 @@ function SeguimientoHermes() {
     const foliosExistentes = new Set(
       registros.map((r) => r.Folio).filter((f) => f && f.trim() !== ""),
     );
-    const nuevasFilas = [];
+    const nuevasFilas: ISeguimientoHermes[] = [];
     filas.forEach((fila) => {
       const celdas = fila.split("\t");
-      const registro = {};
+      const registro = {} as ISeguimientoHermes;
       columnas.forEach((col, i) => {
         registro[col] = celdas[i] || "";
       });
@@ -127,26 +136,38 @@ function SeguimientoHermes() {
     const filtrosReset = columnas.reduce((acc, col) => {
       acc[col] = "Todos";
       return acc;
-    }, {});
+    }, {} as Record<string, string>); 
     setFiltros(filtrosReset);
   };
 
   const handleGuardarTodos = async () => {
-    const token = localStorage.getItem("token");
     try {
-      await solicitudService.registrarSeguimientoHermes(registros, token);
-      alert("Registros guardados correctamente");
+      const Datos:IPostSeguimientoHermes = {
+        registros: registros.map((seguimiento) => ({
+          folio: seguimiento.Folio,
+          fechaRecepcion: seguimiento["Fecha de Recepción"],
+          importancia: seguimiento.Importancia,
+          tipoEnvio: seguimiento["Tipo de Envío"],
+          requiereRespuesta: seguimiento["Requiere Respuesta"] === "Sí" ? true : false,
+          solicita: seguimiento.Solicita,
+          entidadDependencia: seguimiento["Entidad/Dependencia"],
+          asunto: seguimiento.Asunto,
+          estatus: seguimiento.Estatus,
+          acciones: seguimiento.Acciones
+        }))
+      }
+      const Response = ServicioProcesoContratacion.postSeguimientoHermes(Datos)
+      mostrarToast("Registros guardados correctamente","exito")
     } catch (err) {
-      console.error(err);
-      alert("Error al guardar registros");
+      mostrarToast("Error al guardar registros.","error")
+      console.log("SeguimientoHermes.tsx - Error al guardar registros: "+err);
     }
   };
 
   return (
     <div className="seguimiento-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
-
       <main className="main-content">
+        <Toast texto={toast.texto} tipo={toast.tipo} />
         <div className="seguimiento-header">
           <h1 className="seguimiento-title">Seguimiento Hermes</h1>
         </div>

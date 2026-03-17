@@ -1,55 +1,124 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { FaSearch, FaClock, FaCaretDown, FaCaretUp } from "react-icons/fa";
 import { useRef } from "react";
-
+import { useToast } from "@/hooks/useToast";
+import IPutProcesoContratacion from "@/schemas/procesos-contratacion/PutProcesoContratacion";
+import CatalogoService from "@/services/CatalogosService";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import "./Evaluacion.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import CatalogoDependencia from "@/services/CatalogoDependencia.js";
-import EvaluacionServicio from "@/services/EvaluacionService.js";
-import UserContext from "@/utils/UserContext.jsx";
+import IPostControlVersion from "@/schemas/control-versiones/PostControlVersion";
+import { Toast } from "@/components/Alert/Floating/Toast";
+
+const mapTipoProceso = {
+  1: "asignacion",
+  2: "requisicion",
+  3: "bolsa",
+} as const;
+
+const mapTemporalDefinitiva = {
+  1: "Temporal",
+  2: "Definitiva",
+} as const;
+
+
+const mapEstadoProceso = {
+  1: "Citado",
+  2: "Evaluado",
+  4: "En revision",
+  5: "En firma",
+  6: "Notificado",
+  7: "Cancelado",
+  8: "Terminado",
+  13: "Inicio procesamiento",
+  14: "Procesamiento oficio",
+  15: "Fin procesamiento",
+} as const;
+
+interface IPutProceso {
+  idProcesoContratacion: number,
+  folio: string,
+  hermes: string,
+  fechaRecibido: string,
+  numDependencia: string,
+  entidad: string,
+  area: string,
+  region: string,
+  tipoPersonal: string,
+  numPlaza: string,
+  categoria: string,
+  titular: string,
+  lineamiento: string,
+  motivo: string,
+  fechaPropuesta: string,
+  fechaLiberacion: string,
+  pInicio: string
+  pTermino: string,
+  categoriaAutorizada: string,
+  tipo: typeof mapTemporalDefinitiva[keyof typeof mapTemporalDefinitiva];
+  observacionesRegistro: string,
+  analista: string,
+  estado: typeof mapEstadoProceso[keyof typeof mapEstadoProceso]
+  tipoAsignacion: typeof mapTipoProceso[keyof typeof mapTipoProceso]
+  nCarpeta: string,
+  candidato: string,
+  funcion: string,
+  familia: string,
+  fechaEntrevista: string,
+  fechaCompetencias: string,
+  fechaProcesamiento: string,
+  experienciaLaboral: string,
+  resultadoConocimiento: string,
+  fechaEnvioEval: string,
+  resultadoReferencias: string,
+  resultadoOrtografia: string,
+  resultadoWord: string,
+  resultadoExcel: string,
+  resultadoEvaluacion: string,
+  beneficiado: string,
+  fechaRevision: string,
+  fechaEnvio: string,
+  fechaNotificacion: string,
+  tiempoProceso: string,
+  observacionesAnalista: string,
+  consecutivo: string,
+  seguimientoDesempeno: string,
+  resultadoSeguimiento: string,
+  estadoFinal: string,
+  terminado: boolean,
+  FKIdDependencia: number | null,
+  fechaEvaluacionDesempeno: string
+}
+
+interface ICalculoEstado {
+  fechaEntrevista: string,
+  fechaCompetencias: string,
+  fechaProcesamiento: string,
+  fechaRevision: string,
+  fechaEnvio: string,
+  fechaNotificacion: string
+}
 
 function Evaluacion() {
-  const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
-  const { currentUser } = useContext(UserContext);
-  const soloLectura = currentUser.FKidTipoAcceso === 2;
+  const location = useLocation();
+  const soloLectura = true //currentUser.FKidTipoAcceso === 2;
   const procesoSeleccionado = location.state || {};
   const [step, setStep] = useState(1);
-  const evaluacionServicio = new EvaluacionServicio();
+  const ProcesoServicio = new ProcesoContratacionService();
   const [showPopup, setShowPopup] = useState(false);
-  const [versiones, setVersiones] = useState([]);
-  const SolicitudService = new SolicitudService();
-  const [tarjetasAbiertas, setTarjetasAbiertas] = useState({});
+  const [versiones, setVersiones] = useState<any>([]);
+  const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
+  const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
+  const [tarjetasAbiertas, setTarjetasAbiertas] = useState<boolean[]>([]);
+  const {toast,mostrarToast} = useToast();
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return "";
     return new Date(dateString).toISOString().split("T")[0];
   };
 
-  const mapTipoProceso = {
-    1: "asignacion",
-    2: "requisicion",
-    3: "bolsa",
-  };
-
-  const mapTemporalDefinitiva = {
-    1: "Temporal",
-    2: "Definitiva",
-  };
-
-  const mapEstadoProceso = {
-    1: "Citado",
-    2: "Evaluado",
-    4: "En revision",
-    5: "En firma",
-    6: "Notificado",
-    7: "Cancelado",
-    8: "Terminado",
-    13: "Inicio procesamiento",
-    14: "Procesamiento oficio",
-    15: "Fin procesamiento",
-  };
-
-  const calcularEstado = (data) => {
+  const calcularEstado = (data: ICalculoEstado) => {
     if (
       !data.fechaEntrevista &&
       !data.fechaCompetencias &&
@@ -69,7 +138,7 @@ function Evaluacion() {
     return "Terminado";
   };
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IPutProceso>({
     // Grid 1
     idProcesoContratacion: procesoSeleccionado.idProceso,
     folio: procesoSeleccionado.folio || "",
@@ -91,12 +160,12 @@ function Evaluacion() {
     pTermino: formatDate(procesoSeleccionado.periodoAutorizadoOficioFin),
     categoriaAutorizada: procesoSeleccionado.categoriaAutorizadaOficio || "",
     tipo:
-      mapTemporalDefinitiva[procesoSeleccionado.FKIdTemporalDefinitiva] || "",
+      mapTemporalDefinitiva[procesoSeleccionado.FKIdTemporalDefinitiva as keyof typeof mapTemporalDefinitiva] || "",
     observacionesRegistro: procesoSeleccionado.observaciones || "",
     analista: procesoSeleccionado.analista || "",
     estado:
-      mapEstadoProceso[procesoSeleccionado.FKIdEstadoProcesoContratacion] || "",
-    tipoAsignacion: mapTipoProceso[procesoSeleccionado.FKIdTipoProceso] || "",
+      mapEstadoProceso[procesoSeleccionado.FKIdEstadoProcesoContratacion as keyof typeof mapEstadoProceso] || "",
+    tipoAsignacion: mapTipoProceso[procesoSeleccionado.FKIdTipoProceso as keyof typeof mapTipoProceso] || "",
 
     // Grid 2
     nCarpeta: procesoSeleccionado.numCarpeta || "",
@@ -153,88 +222,144 @@ function Evaluacion() {
     fechaNotificacion: formData.fechaNotificacion,
   });
 
-  const toggleTarjeta = (index) => {
+  const toggleTarjeta = (index: number) => {
     setTarjetasAbiertas((prev) => ({
       ...prev,
       [index]: !prev[index], // alterna entre abierto/cerrado
     }));
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof IPutProceso, value: string | number) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  useEffect(() => {
+    async function cargarDependencias() {
+      if (dependencias.length === 0 && dependenciasCargadas !== true) {
+        try {
+          const ServicioCatalogo = new CatalogoService();
+          const response = await ServicioCatalogo.getDependencias();
+          setDependencias(response.mensaje.dependencias)
+          setDependenciasCargadas(true);
+        } catch (err) {
+          console.error("IniciarSolicitud.tsx - Error cargando dependencias: ", err);
+          mostrarToast("Error al cargar dependencias", "error")
+        }
+      }else{
+        setDependenciasCargadas(true);
+      }
+    }
+    cargarDependencias();
+  }, [dependenciasCargadas]);
+
+  const mapFormDataToDto = (form: IPutProceso): IPutProcesoContratacion => {
+  const findKey = <T extends object>(map: T, value: string): number =>
+    Number(Object.entries(map).find(([, v]) => v === value)?.[0] ?? 0);
+    return {
+      folio: form.folio,
+      hermesNotificacion: form.hermes,
+      fechaRecibido: form.fechaRecibido,
+      numPlaza: form.numPlaza,
+      categoriaPuestoOrigen: form.categoria,
+      titularPlaza: form.titular,
+      lineamientoOficioContinuidad: form.lineamiento,
+      motivo: form.motivo,
+      fechaElaboracionPropuesta: form.fechaPropuesta,
+      fechaLiberacionOficio: form.fechaLiberacion,
+      periodoAutorizadoOficioInicio: form.pInicio,
+      periodoAutorizadoOficioFin: form.pTermino,
+      categoriaAutorizadaOficio: form.categoriaAutorizada,
+      observaciones: form.observacionesRegistro,
+      FKIdEstadoProcesoContratacion: findKey(mapEstadoProceso, form.estado),
+      FKIdTemporalDefinitiva: findKey(mapTemporalDefinitiva, form.tipo),
+      FKIdTipoProceso: findKey(mapTipoProceso, form.tipoAsignacion),
+      FKIdDependencia: form.FKIdDependencia ?? 0,
+
+      // Grid 2
+      numCarpeta: form.nCarpeta,
+      nombreCandidato: form.candidato,
+      funcionDesempeniar: form.funcion,
+      familiaFuncional: form.familia,
+      fechaEntrevista: form.fechaEntrevista,
+      fechaEvaluacionCompetencias: form.fechaCompetencias,
+      fechaInicioProcesamiento: form.fechaProcesamiento,
+      experienciaLaboralSolicitada: form.experienciaLaboral,
+      resultadoEvaluacionConocimiento: form.resultadoConocimiento,
+      fechaEnvioEvaluacionDesempenio: form.fechaEnvioEval,
+      resultadoReferenciasLaborales: form.resultadoReferencias,
+      resultadoOrtografia: form.resultadoOrtografia,
+      resultadoHabilidadesWord: form.resultadoWord,
+      resultadoHabilidadesExcel: form.resultadoExcel,
+      resultadoProcesoEvaluacion: form.resultadoEvaluacion,
+      beneficiado: form.beneficiado === "si",
+      fechaRevisionOfiEval: form.fechaRevision,
+      fechaEnvioDEyDP: form.fechaEnvio,
+      fechaNotificacion: form.fechaNotificacion,
+      diasProceso: form.tiempoProceso,
+      observacionesAnalista: form.observacionesAnalista,
+      consecutivoExpediente: form.consecutivo,
+      seguimientoEvaluacionDesempenio: form.seguimientoDesempeno === "Si",
+      resultadoSeguimientoEvaluacionDesempenio: form.resultadoSeguimiento,
+
+      // Campos sin equivalente en IPutProceso — ajusta según tu lógica
+      atendioCita: false,
+      avaladoPor: "",
+      capacitado: false,
+      citaVirtual: false,
+      educacionFormal: "",
+      fechaAsignacionAnalista: "",
+      FKIdAcceso: 0,
+      FKIdTipoPersonal: Number(form.tipoPersonal) || 0,
+      resultadoEvaluacionCompetencias: "",
+    };
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       const token = localStorage.getItem("token");
       const idProceso = procesoSeleccionado.idProceso;
-      const respuesta = await evaluacionServicio.registrarEvaluacion(
-        idProceso,
-        formData,
-        token,
-      );
+      const dto = mapFormDataToDto(formData)
+      const respuesta = await ProcesoServicio.putProcesoContratacion(idProceso,dto)
 
       if (respuesta && respuesta.error === false) {
         try {
-          const nombreCompleto = usuario.nombre;
-          await SolicitudService.registrarControlVersion(
-            {
-              nombreCompleto,
-              idProceso: idProceso,
-              jsonDatos: JSON.stringify(formData),
-            },
-            token,
-          );
-          setMensaje({ texto: "✅ Evaluación registrada ", tipo: "exito" });
+          const nombreCompleto = "Usuario" //usuario.nombre;
+          const ControlPost:IPostControlVersion = {
+            nombreCompleto: nombreCompleto,
+            jsonDatos: JSON.stringify(dto),
+            FKIdProceso: idProceso
+          }
+          await ProcesoServicio.postControlVersion(ControlPost);
+          mostrarToast("Evaluación registrada", "exito")
         } catch (versionError) {
-          console.error("Error al registrar control de versión:", versionError);
-          setMensaje({
-            texto: `⚠️ Evaluación guardada, pero **no se pudo registrar el control de cambios**.`,
-            tipo: "error",
-          });
+          console.error("Evaluacion.tsx - Error al registrar control de versión: "+versionError);
+          mostrarToast("Evaluación guardada, pero NO se pudo registrar el control de cambios.", "error")
         }
-
-        setTimeout(() => setMensaje({ texto: "", tipo: "" }), 5000);
       } else {
         if (
           respuesta &&
-          respuesta.detalles &&
-          Array.isArray(respuesta.detalles)
+          respuesta.estado === 400
         ) {
-          const mensajes = respuesta.detalles
-            .map((err) => `• **${err.campo}**: ${err.mensaje}`)
-            .join("\n");
-
-          setMensaje({
-            texto: `❌ **Errores de validación**:\n${mensajes}`,
-            tipo: "error",
-          });
+          mostrarToast("El formato de los datos es inválido.", "error")
         } else {
-          setMensaje({
-            texto: `❌ Ocurrió un error al guardar la evaluación.`,
-            tipo: "error",
-          });
+          mostrarToast("Ocurrió un error al guardar la evaluación.", "error")
         }
-        console.log("Respuesta del servidor:", respuesta);
-        setTimeout(() => setMensaje({ texto: "", tipo: "" }), 5000);
+        console.log("Evaluacion.tsx - Respuesta del servidor:", respuesta);
       }
     } catch (error) {
-      console.error("Error al guardar evaluación:", error);
-      setMensaje({
-        texto: `❌ Error de conexión al guardar: ${error.message}`,
-        tipo: "error",
-      });
-      setTimeout(() => setMensaje({ texto: "", tipo: "" }), 5000);
+      console.error("Evaluacion.tsx - Error al guardar evaluación:", error);
+      mostrarToast("Ocurrió un error al guardar los cambios de la evaluación.", "error")
     }
   };
 
   useEffect(() => {
-    const fechasActuales = {
+    type FechasClave = "fechaEntrevista" | "fechaCompetencias" | "fechaProcesamiento" | "fechaRevision" | "fechaEnvio" | "fechaNotificacion";
+    const fechasActuales: Record<FechasClave, string> = {
       fechaEntrevista: formData.fechaEntrevista,
       fechaCompetencias: formData.fechaCompetencias,
       fechaProcesamiento: formData.fechaProcesamiento,
@@ -242,17 +367,16 @@ function Evaluacion() {
       fechaEnvio: formData.fechaEnvio,
       fechaNotificacion: formData.fechaNotificacion,
     };
-
-    const hayCambio = Object.keys(fechasActuales).some(
+    const hayCambio = (Object.keys(fechasActuales) as FechasClave[]).some(
       (key) => fechasActuales[key] !== fechasInicialesRef.current[key],
     );
 
     if (hayCambio) {
       const nuevoEstado = calcularEstado(formData);
-      if (formData.estado !== nuevoEstado) {
+      if (formData.estado !== nuevoEstado && nuevoEstado !== "") {
         setFormData((prev) => ({
           ...prev,
-          estado: nuevoEstado,
+          estado: nuevoEstado as IPutProceso["estado"],
         }));
       }
     }
@@ -292,8 +416,7 @@ function Evaluacion() {
 
   const handleBuscarDependencia = () => {
     const numDep = formData.numDependencia.trim();
-    const dep =
-      CatalogoDependencia.obtenerDependenciaPorNumeroDependencia(numDep);
+    const dep = dependencias.find(dependencia => dependencia.numDependencia === numDep)
     if (dep) {
       handleInputChange("entidad", dep.nombre);
       handleInputChange("area", dep.areaOrganizacional);
@@ -301,6 +424,7 @@ function Evaluacion() {
       handleInputChange("FKIdDependencia", dep.idDependencia);
     }
   };
+
   useEffect(() => {
     if (
       formData.lineamiento === "4.1 y 4.2" ||
@@ -318,14 +442,8 @@ function Evaluacion() {
 
   return (
     <div className="evaluacion-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />{" "}
       <main className="main-content-evaluacion">
-        {mensaje.texto && (
-          <div className={`mensaje-flotante ${mensaje.tipo}`}>
-            {mensaje.texto}
-          </div>
-        )}
-
+        <Toast texto={toast.texto} tipo={toast.tipo} />
         <div className="page-header-evaluacion">
           <h1 className="page-title-evaluacion">Evaluación</h1>
           <div className="combobox-header-evaluacion">
@@ -353,16 +471,18 @@ function Evaluacion() {
             </div>
 
             {/* Folio y Hermes */}
-            {[
-              { label: "Folio", field: "folio" },
-              { label: "Hermes de Notificación", field: "hermes" },
-            ].map((f, i) => (
+            {(
+              [
+                { label: "Folio", field: "folio" },
+                { label: "Hermes de Notificación", field: "hermes" },
+              ] as { label: string; field: keyof IPutProceso }[]
+            ).map((f, i) => (
               <div key={i} className="form-group">
                 <label className="form-label-evaluacion">{f.label}</label>
                 <input
                   type="text"
                   className="form-input-evaluacion"
-                  value={formData[f.field]}
+                  value={formData[f.field] as string}
                   onChange={(e) => handleInputChange(f.field, e.target.value)}
                   disabled={soloLectura}
                 />
@@ -370,39 +490,21 @@ function Evaluacion() {
             ))}
 
             {/* Fechas */}
-            {[
-              {
-                label: "Fecha de recibido",
-                field: "fechaRecibido",
-                type: "date",
-              },
-              {
-                label: "Fecha de Elaboración Propuesta",
-                field: "fechaPropuesta",
-                type: "date",
-              },
-              {
-                label: "Fecha de liberación de oficio",
-                field: "fechaLiberacion",
-                type: "date",
-              },
-              {
-                label: "Periodo Autorizado en oficio (inicio)",
-                field: "pInicio",
-                type: "date",
-              },
-              {
-                label: "Periodo Autorizado en oficio (Termino)",
-                field: "pTermino",
-                type: "date",
-              },
-            ].map((f, i) => (
+            {(
+              [
+                { label: "Fecha de recibido", field: "fechaRecibido", type: "date" },
+                { label: "Fecha de Elaboración Propuesta", field: "fechaPropuesta", type: "date" },
+                { label: "Fecha de liberación de oficio", field: "fechaLiberacion", type: "date" },
+                { label: "Periodo Autorizado en oficio (inicio)", field: "pInicio", type: "date" },
+                { label: "Periodo Autorizado en oficio (Termino)", field: "pTermino", type: "date" },
+              ] as { label: string; field: keyof IPutProceso; type: string }[]
+            ).map((f, i) => (
               <div key={i} className="form-group">
                 <label className="form-label-evaluacion">{f.label}</label>
                 <input
                   type={f.type}
                   className="form-input-evaluacion"
-                  value={formData[f.field]}
+                  value={formData[f.field] as string}
                   onChange={(e) => handleInputChange(f.field, e.target.value)}
                   disabled={soloLectura}
                 />
@@ -438,30 +540,25 @@ function Evaluacion() {
             </div>
 
             {/* Otros campos */}
-            {[
-              { label: "Entidad académica o Dependencia", field: "entidad" },
-              { label: "Área Organizacional", field: "area" },
-              { label: "Región", field: "region" },
-              {
-                label: "Tipo de Personal",
-                field: "tipoPersonal",
-                type: "select",
-              },
-              { label: "Número de Plaza", field: "numPlaza" },
-              { label: "Categoría/Puesto (origen)", field: "categoria" },
-              { label: "Titular de la Plaza", field: "titular" },
-              { label: "Motivo", field: "motivo" },
-              {
-                label: "Categoría por autorizar",
-                field: "categoriaAutorizada",
-              },
-            ].map(({ label, field, type = "text" }, i) => (
+            {(
+              [
+                { label: "Entidad académica o Dependencia", field: "entidad" },
+                { label: "Área Organizacional", field: "area" },
+                { label: "Región", field: "region" },
+                { label: "Tipo de Personal", field: "tipoPersonal", type: "select" },
+                { label: "Número de Plaza", field: "numPlaza" },
+                { label: "Categoría/Puesto (origen)", field: "categoria" },
+                { label: "Titular de la Plaza", field: "titular" },
+                { label: "Motivo", field: "motivo" },
+                { label: "Categoría por autorizar", field: "categoriaAutorizada" },
+              ] as { label: string; field: keyof IPutProceso; type?: string }[]
+            ).map(({ label, field, type = "text" }, i) => (
               <div key={i} className="form-group">
                 <label className="form-label-evaluacion">{label}</label>
                 {type === "select" ? (
                   <select
                     className="form-input-evaluacion"
-                    value={formData[field]}
+                    value={formData[field] as string}
                     onChange={(e) => handleInputChange(field, e.target.value)}
                     disabled={soloLectura}
                   >
@@ -473,7 +570,7 @@ function Evaluacion() {
                   <input
                     type={type}
                     className="form-input-evaluacion"
-                    value={formData[field]}
+                    value={formData[field] as string}
                     onChange={(e) => handleInputChange(field, e.target.value)}
                     disabled={soloLectura}
                   />
@@ -572,32 +669,35 @@ function Evaluacion() {
                 Guardar
               </button>
 
-              {currentUser.FKidTipoAcceso !== 2 && (
-                <button
-                  type="button"
-                  className="btn-crear-oficio"
-                  onClick={() => {
-                    const data = {
-                      idProcesoContratacion: formData.idProcesoContratacion,
-                      folio: formData.folio,
-                      plaza: formData.numPlaza,
-                      motivo: formData.motivo,
-                      titularPlaza: formData.titular,
-                      categoriaOrigen: formData.categoria,
-                      categoriaAutorizada: formData.categoriaAutorizada,
-                      candidato: formData.candidato,
-                    };
+              {/* Checar como obtener el id tipo de acceso
+                {currentUser.FKidTipoAcceso !== 2 && (
+                  <button
+                    type="button"
+                    className="btn-crear-oficio"
+                    onClick={() => {
+                      const data = {
+                        idProcesoContratacion: formData.idProcesoContratacion,
+                        folio: formData.folio,
+                        plaza: formData.numPlaza,
+                        motivo: formData.motivo,
+                        titularPlaza: formData.titular,
+                        categoriaOrigen: formData.categoria,
+                        categoriaAutorizada: formData.categoriaAutorizada,
+                        candidato: formData.candidato,
+                      };
 
-                    const token = localStorage.getItem("token");
-                    sessionStorage.setItem("token", token || "");
-                    sessionStorage.setItem("datosOficio", JSON.stringify(data));
+                      const token = localStorage.getItem("token");
+                      sessionStorage.setItem("token", token || "");
+                      sessionStorage.setItem("datosOficio", JSON.stringify(data));
 
-                    window.open("/generar-oficio", "_blank");
-                  }}
-                >
-                  Crear Oficio
-                </button>
-              )}
+                      window.open("/generar-oficio", "_blank");
+                    }}
+                  >
+                    Crear Oficio
+                  </button>
+                )}
+                */}
+              
 
               <button
                 type="button"
@@ -644,17 +744,19 @@ function Evaluacion() {
 
             <h3 className="section-title">Información del procesamiento</h3>
 
-            {[
-              { label: "Nombre de Candidato", field: "candidato" },
-              { label: "Función a desempeñar", field: "funcion" },
-              { label: "Familia Funcional", field: "familia" },
-            ].map((f, i) => (
+            {(
+              [
+                { label: "Nombre de Candidato", field: "candidato" },
+                { label: "Función a desempeñar", field: "funcion" },
+                { label: "Familia Funcional", field: "familia" },
+              ] as { label: string; field: keyof IPutProceso }[]
+            ).map((f, i) => (
               <div key={i} className="form-group">
                 <label className="form-label-evaluacion">{f.label}</label>
                 <input
                   type="text"
                   className="form-input-evaluacion"
-                  value={formData[f.field]}
+                  value={formData[f.field] as string}
                   onChange={(e) => handleInputChange(f.field, e.target.value)}
                 />
               </div>
@@ -662,27 +764,20 @@ function Evaluacion() {
 
             <h3 className="section-title">Procesamiento</h3>
 
-            {[
-              { label: "Fecha de entrevista", field: "fechaEntrevista" },
-              {
-                label: "Fecha de evaluación competencias",
-                field: "fechaCompetencias",
-              },
-              {
-                label: "Fecha de inicio procesamiento",
-                field: "fechaProcesamiento",
-              },
-              {
-                label: "Fecha de envio de evaluación de desempeño",
-                field: "fechaEnvioEval",
-              },
-            ].map((f, i) => (
+            {(
+              [
+                { label: "Fecha de entrevista", field: "fechaEntrevista" },
+                { label: "Fecha de evaluación competencias", field: "fechaCompetencias" },
+                { label: "Fecha de inicio procesamiento", field: "fechaProcesamiento" },
+                { label: "Fecha de envio de evaluación de desempeño", field: "fechaEnvioEval" },
+              ] as { label: string; field: keyof IPutProceso }[]
+            ).map((f, i) => (
               <div key={i} className="form-group">
                 <label className="form-label-evaluacion">{f.label}</label>
                 <input
                   type="date"
                   className="form-input-evaluacion"
-                  value={formData[f.field]}
+                  value={formData[f.field] as string}
                   onChange={(e) => handleInputChange(f.field, e.target.value)}
                 />
               </div>
@@ -707,31 +802,20 @@ function Evaluacion() {
               </select>
             </div>
 
-            {/* Resultados */}
-            {[
-              {
-                label: "Resultado de evaluación conocimiento",
-                field: "resultadoConocimiento",
-              },
-              {
-                label: "Resultado de ortografía y redacción",
-                field: "resultadoOrtografia",
-              },
-              {
-                label: "Resultado de habilidades Word",
-                field: "resultadoWord",
-              },
-              {
-                label: "Resultado de habilidades Excel",
-                field: "resultadoExcel",
-              },
-            ].map((f, i) => (
+            {(
+              [
+                { label: "Resultado de evaluación conocimiento", field: "resultadoConocimiento" },
+                { label: "Resultado de ortografía y redacción", field: "resultadoOrtografia" },
+                { label: "Resultado de habilidades Word", field: "resultadoWord" },
+                { label: "Resultado de habilidades Excel", field: "resultadoExcel" },
+              ] as { label: string; field: keyof IPutProceso; type?: string }[]
+            ).map((f, i) => (
               <div key={i} className="form-group">
                 <label className="form-label-evaluacion">{f.label}</label>
                 <input
                   type={f.type || "text"}
                   className="form-input-evaluacion"
-                  value={formData[f.field]}
+                  value={formData[f.field] as string}
                   onChange={(e) => {
                     const valor = e.target.value;
                     if (!f.type || f.type !== "number" || /^\d*$/.test(valor)) {
@@ -806,20 +890,19 @@ function Evaluacion() {
             </div>
 
             {/* Fechas */}
-            {[
-              {
-                label: "Fecha de revisión Oficina Eval",
-                field: "fechaRevision",
-              },
-              { label: "Fecha de envio a DEyDP", field: "fechaEnvio" },
-              { label: "Fecha de Notificación", field: "fechaNotificacion" },
-            ].map((f, i) => (
+            {(
+              [
+                { label: "Fecha de revisión Oficina Eval", field: "fechaRevision" },
+                { label: "Fecha de envio a DEyDP", field: "fechaEnvio" },
+                { label: "Fecha de Notificación", field: "fechaNotificacion" },
+              ] as { label: string; field: keyof IPutProceso }[]
+            ).map((f, i) => (
               <div key={i} className="form-group">
                 <label className="form-label-evaluacion">{f.label}</label>
                 <input
                   type="date"
                   className="form-input-evaluacion"
-                  value={formData[f.field]}
+                  value={formData[f.field] as string}
                   onChange={(e) => handleInputChange(f.field, e.target.value)}
                 />
               </div>
@@ -868,22 +951,18 @@ function Evaluacion() {
             </div>
 
             {/* Otros campos */}
-            {[
-              {
-                label: "Consecutivo Expediente (Fisico)",
-                field: "consecutivo",
-              },
-              {
-                label: "Resultado a seguimiento de evaluación de desempeño",
-                field: "resultadoSeguimiento",
-              },
-            ].map((f, i) => (
+            {(
+              [
+                { label: "Consecutivo Expediente (Fisico)", field: "consecutivo" },
+                { label: "Resultado a seguimiento de evaluación de desempeño", field: "resultadoSeguimiento" },
+              ] as { label: string; field: keyof IPutProceso }[]
+            ).map((f, i) => (
               <div key={i} className="form-group">
                 <label className="form-label-evaluacion">{f.label}</label>
                 <input
                   type="text"
                   className="form-input-evaluacion"
-                  value={formData[f.field]}
+                  value={formData[f.field] as string}
                   onChange={(e) => handleInputChange(f.field, e.target.value)}
                 />
               </div>
@@ -958,6 +1037,7 @@ function Evaluacion() {
                 Guardar
               </button>
 
+              {/* 
               {currentUser.FKidTipoAcceso !== 2 && (
                 <button
                   type="button"
@@ -983,7 +1063,7 @@ function Evaluacion() {
                 >
                   Crear Oficio
                 </button>
-              )}
+              )} */}
 
               <button
                 type="button"
@@ -1013,21 +1093,20 @@ function Evaluacion() {
           onClick={async () => {
             try {
               const token = localStorage.getItem("token");
-              const servicio = new SolicitudService();
+              const servicio = new ProcesoContratacionService();
               const idProceso = procesoSeleccionado.idProceso;
 
               console.log("ID del proceso:", idProceso);
               console.log("Token:", token);
-              const listaJson = await servicio.ObtenerVersionesPorID(
+              const listaJson = await servicio.getControlesVersionByProcesoId(
                 idProceso,
-                token,
               );
               console.log("Respuesta cruda del backend:", listaJson);
-              if (!listaJson || listaJson.length === 0) {
-                console.warn("No se recibieron versiones desde el backend");
+              if (!listaJson || listaJson.mensaje.controlesVersiones.length === 0) {
+                mostrarToast("No se recibieron versiones desde el backend", "error");
               }
 
-              const versionesFormateadas = listaJson.map((item) => {
+              const versionesFormateadas = listaJson.mensaje.controlesVersiones.map((item) => {
                 console.log("Item original:", item);
 
                 let datosJson = item.jsonDatos;
@@ -1041,32 +1120,21 @@ function Evaluacion() {
                       "jsonDatos:",
                       item.jsonDatos,
                     );
-                    datosJson = {};
+                    datosJson = "";
                   }
                 }
 
-                const fechaFormateada = item.fechaModificacion
-                  ? new Date(item.fechaModificacion).toLocaleDateString()
-                  : "";
-
                 return {
                   NombreCompleto: item.nombreCompleto,
-                  fecha: fechaFormateada,
                   jsonDatos: datosJson,
                 };
               });
-
               console.log("Versiones formateadas:", versionesFormateadas);
-
               setVersiones(versionesFormateadas);
               setShowPopup(true);
             } catch (error) {
-              console.error("Error al cargar versiones:", error);
-              setMensaje({
-                texto: "❌ Error al cargar versiones",
-                tipo: "error",
-              });
-              setTimeout(() => setMensaje({ texto: "", tipo: "" }), 5000);
+              console.error("Evaluacion.tsx - Error al cargar versiones: ", error);
+              mostrarToast("Error al cargar versiones", "error")
             }
           }}
         >
@@ -1080,7 +1148,7 @@ function Evaluacion() {
               {versiones.length === 0 ? (
                 <p>No hay versiones disponibles.</p>
               ) : (
-                versiones.map((item, index) => {
+                versiones.map((item: any, index: number) => {
                   const abierta = tarjetasAbiertas[index] || false; // por defecto cerrada
                   return (
                     <div className="json-card" key={index}>

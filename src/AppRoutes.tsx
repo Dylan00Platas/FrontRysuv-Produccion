@@ -102,7 +102,13 @@ function AppRoutes() {
         <Route path="/generar-oficio" element={<GenerarOficio />} />
         <Route path="/ver-oficios" element={<VerOficios />} />
         <Route path="/ver-detalles-oficio" element={<VerDetallesOficio />} />
-        <Route path="/seguimiento-hermes" element={<SeguimientoHermes />} />
+        <Route 
+          path="/seguimiento-hermes" 
+          element={
+            <MainLayout>
+              <SeguimientoHermes />
+            </MainLayout>
+        }/>
       </Routes>
     </AnimatePresence>
   );
