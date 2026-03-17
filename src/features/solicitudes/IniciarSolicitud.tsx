@@ -1,22 +1,81 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserLock, FaSearch } from "react-icons/fa";
-
+import CatalogoService from "@/services/CatalogosService";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import { Toast } from "@/components/Alert/Floating/Toast";
+import { useToast } from "@/hooks/useToast";
 import "./IniciarSolicitud.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import CatalogoDependencia from "@/services/CatalogoDependencia.js";
-import UserContext from "@/utils/UserContext.jsx";
+import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
+import IPostProcesoContratacion from "@/schemas/procesos-contratacion/PostProcesoContratacion";
+
+interface ICandidato {
+  nombre: string;
+  fechaCita: string;
+}
+
+export interface IProcesoContratacion {
+  folio: string;
+  hermes: string;
+  fechaRecibido: string;
+  numDependencia: string;
+  dependencia: string;
+  area: string;
+  region: string;
+  tipoPersonal: string;
+  numPlaza: string;
+  categoriaOrigen: string;
+  titularPlaza: string;
+  lineamiento: string;
+  motivo: string;
+  fechaPropuesta: string;
+  fechaOficio: string;
+  periodoInicio: string;
+  periodoTermino: string;
+  categoriaAutorizada: string;
+  tipo: string;
+  estado: number;
+  autorizacion: boolean;
+  observaciones: string;
+  numeroCarpeta: string;
+  candidato: string;
+  funcion: string;
+  familia: string;
+  fechaEntrevista: string;
+  fechaCompetencias: string;
+  fechaProcesamiento: string;
+  resultadoConocimiento: string;
+  experiencia: string;
+  referencias: string;
+  fechaEnvioDes: string;
+  resultadoWord: string;
+  resultadoExcel: string;
+  resultadoOrtografia: string;
+  resultadoEvaluacion: string;
+  beneficiado: boolean;
+  fechaOfiEval: string;
+  fechaEnvioDEyDP: string;
+  fechaNotificacion: string;
+  tiempoProceso: string;
+  observacionesAnalista: string;
+  consecutivoExpediente: string;
+  seguimientoDesempeno: string;
+  resultadoSeguimiento: string;
+  idDependencia: number;
+  fechaEvaluacionDesempenio: string;
+  cantidadCandidatos: string;
+  candidatos: ICandidato[];
+}
 
 function IniciarSolicitud() {
   const navigate = useNavigate();
   const [tipoSolicitud, setTipoSolicitud] = useState("");
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
-  const token = localStorage.getItem("token");
-  const { currentUser } = useContext(UserContext);
+  const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
+  const {toast, mostrarToast} = useToast();
+  const ServicioCatalogo = new CatalogoService();
 
-  const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
-
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IProcesoContratacion>({
     folio: "",
     hermes: "",
     fechaRecibido: "",
@@ -36,7 +95,7 @@ function IniciarSolicitud() {
     periodoTermino: "",
     categoriaAutorizada: "",
     tipo: "",
-    estado: "",
+    estado: 0,
     autorizacion: false,
     observaciones: "",
     numeroCarpeta: "",
@@ -54,7 +113,7 @@ function IniciarSolicitud() {
     resultadoExcel: "",
     resultadoOrtografia: "",
     resultadoEvaluacion: "",
-    beneficiado: "",
+    beneficiado: false,
     fechaOfiEval: "",
     fechaEnvioDEyDP: "",
     fechaNotificacion: "",
@@ -63,29 +122,29 @@ function IniciarSolicitud() {
     consecutivoExpediente: "",
     seguimientoDesempeno: "",
     resultadoSeguimiento: "",
-    idDependencia: "",
+    idDependencia: 0,
     fechaEvaluacionDesempenio: "",
-    cantidadCandidatos: 1,
+    cantidadCandidatos: "1",
     candidatos: [{ nombre: "", fechaCita: "" }],
   });
 
   useEffect(() => {
     async function cargarDependencias() {
-      if (CatalogoDependencia.obtenerDependencias().length === 0) {
-        const catalogo = new CatalogoDependencia();
+      if (dependencias.length === 0 && dependenciasCargadas !== true) {
         try {
-          await catalogo.cargarDependencias(token);
+          const response = await ServicioCatalogo.getDependencias();
+          setDependencias(response.mensaje.dependencias)
           setDependenciasCargadas(true);
         } catch (err) {
-          console.error("Error cargando dependencias:", err);
-          setMensaje({ texto: "Error al cargar dependencias", tipo: "error" });
+          console.error("IniciarSolicitud.tsx - Error cargando dependencias: ", err);
+          mostrarToast("Error al cargar dependencias", "error")
         }
-      } else {
+      }else{
         setDependenciasCargadas(true);
       }
     }
     cargarDependencias();
-  }, [token]);
+  }, [dependenciasCargadas]);
 
   {
     !dependenciasCargadas && (
@@ -96,24 +155,18 @@ function IniciarSolicitud() {
     );
   }
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof IProcesoContratacion, value: string | number | boolean | ICandidato[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setMensaje({ texto: "", tipo: "" });
     if (!formData.folio.trim() && !formData.hermes.trim()) {
-      setMensaje({
-        texto: "⚠️ Debes ingresar al menos un Folio o Hermes de notificación",
-        tipo: "error",
-      });
+      mostrarToast("Debes ingresar al menos un Folio o Hermes de notificación", "error")
       return;
     }
-
     try {
-      const token = localStorage.getItem("token");
-      const SolicitudService = new SolicitudService();
+      const ProcesoContratacionServicio = new ProcesoContratacionService();
       const cantidad = parseInt(formData.cantidadCandidatos, 10) || 1;
       for (let i = 0; i < cantidad; i++) {
         const dataConCandidato = {
@@ -122,26 +175,25 @@ function IniciarSolicitud() {
           fechaCita: formData.candidatos[i].fechaCita,
         };
         let response;
+        const DatosCandidato: IPostProcesoContratacion = {
+          autorizacion: dataConCandidato.autorizacion, beneficiado: dataConCandidato.beneficiado, categoriaAutorizadaOficio: dataConCandidato.categoriaAutorizada, categoriaPuestoOrigen: dataConCandidato.categoriaOrigen,
+          consecutivoExpediente: dataConCandidato.consecutivoExpediente, diasProceso: dataConCandidato.tiempoProceso, experienciaLaboralSolicitada: dataConCandidato.experiencia, familiaFuncional: dataConCandidato.familia,
+          fechaElaboracionPropuesta: dataConCandidato.fechaPropuesta, fechaEntrevista: dataConCandidato.fechaEntrevista, fechaEnvioDEyDP: dataConCandidato.fechaEnvioDEyDP, fechaEnvioEvaluacionDesempenio: dataConCandidato.fechaEvaluacionDesempenio,
+          fechaEvaluacionCompetencias: dataConCandidato.fechaCompetencias, fechaInicioProcesamiento: dataConCandidato.fechaProcesamiento, fechaLiberacionOficio: dataConCandidato.fechaOficio, fechaNotificacion: dataConCandidato.fechaNotificacion,
+          fechaRecibido: dataConCandidato.fechaRecibido, fechaRevisionOfiEval: dataConCandidato.fechaOfiEval, folio: dataConCandidato.folio, FKIdAcceso: 1, FKIdDependencia: dataConCandidato.idDependencia, FKIdEstadoProcesoContratacion: dataConCandidato.estado, FKIdTemporalDefinitiva: dataConCandidato.tipo === "temporal" ? 1 : 2,
+          FKIdTipoPersonal: dataConCandidato.tipoPersonal === "eventual" ? 1 : 2, FKIdTipoProceso: 0, funcionDesempeniar: dataConCandidato.funcion, hermesNotificacion: dataConCandidato.hermes, lineamientoOficioContinuidad: dataConCandidato.lineamiento, motivo: dataConCandidato.motivo,
+          nombreCandidato: formData.candidatos[i].nombre, numCarpeta: dataConCandidato.numeroCarpeta, numPlaza: dataConCandidato.numPlaza, observaciones: dataConCandidato.observaciones, observacionesAnalista: dataConCandidato.observacionesAnalista, periodoAutorizadoOficioFin: dataConCandidato.periodoInicio,
+          periodoAutorizadoOficioInicio: dataConCandidato.periodoTermino, resultadoEvaluacionCompetencias: dataConCandidato.resultadoEvaluacion, resultadoEvaluacionConocimiento: dataConCandidato.resultadoConocimiento, resultadoHabilidadesExcel: dataConCandidato.resultadoExcel, resultadoHabilidadesWord: dataConCandidato.resultadoWord,
+          resultadoOrtografia: dataConCandidato.resultadoOrtografia, resultadoProcesoEvaluacion: dataConCandidato.resultadoEvaluacion, resultadoReferenciasLaborales: dataConCandidato.referencias, resultadoSeguimientoEvaluacionDesempenio: dataConCandidato.resultadoSeguimiento, titularPlaza: dataConCandidato.titularPlaza
+        } 
         if (tipoSolicitud === "bolsa") {
-          response = await SolicitudService.crearSolicitudBolsaTrabajo(
-            dataConCandidato,
-            token,
-            tipoSolicitud,
-          );
+          response = await ProcesoContratacionServicio.postProcesoContratacion(DatosCandidato)
         } else {
-          response = await SolicitudService.crearSolicitudAsignacionRequisicion(
-            dataConCandidato,
-            token,
-            tipoSolicitud,
-          );
+          response = await ProcesoContratacionServicio.postProcesoContratacion(DatosCandidato)
         }
         console.log(`Solicitud ${i + 1} creada:`, response);
       }
-
-      setMensaje({
-        texto: `✅ ${cantidad > 1 ? `${cantidad} solicitudes creadas correctamente` : "Solicitud creada correctamente"}`,
-        tipo: "exito",
-      });
+      mostrarToast( `${cantidad} solicitude(s) creadas correctamente`, "error")
       setTimeout(() => {
         navigate("/solicitudes");
       }, 2000);
@@ -166,8 +218,10 @@ function IniciarSolicitud() {
         periodoTermino: "",
         categoriaAutorizada: "",
         tipo: "",
-        estado: "",
+        estado: 0,
+        idDependencia: 0,
         autorizacion: false,
+        beneficiado: false,
         observaciones: "",
         numeroCarpeta: "",
         candidato: "",
@@ -184,7 +238,6 @@ function IniciarSolicitud() {
         resultadoExcel: "",
         resultadoOrtografia: "",
         resultadoEvaluacion: "",
-        beneficiado: "",
         fechaOfiEval: "",
         fechaEnvioDEyDP: "",
         fechaNotificacion: "",
@@ -194,30 +247,26 @@ function IniciarSolicitud() {
         seguimientoDesempeno: "",
         resultadoSeguimiento: "",
         fechaEvaluacionDesempenio: "",
-        cantidadCandidatos: 1,
+        cantidadCandidatos: "1",
         candidatos: [{ nombre: "", fechaCita: "" }],
       });
     } catch (error) {
-      console.error("Error al iniciar solicitud:", error.message);
-      setMensaje({ texto: `❌ Error: ${error.message}`, tipo: "error" });
+      console.error("IniciarSolicitud.tsx - Error al iniciar solicitud:" + error);
+      mostrarToast("Error al crear solicitud","error")
     }
   };
 
-  const handleBuscarDependencia = (e) => {
+  const handleBuscarDependencia = (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent) => {
     e.preventDefault();
     const numDep = formData.numDependencia.trim();
-    const dep =
-      CatalogoDependencia.obtenerDependenciaPorNumeroDependencia(numDep);
+    const dep = dependencias.find(dependecia => dependecia.numDependencia = numDep)
     if (dep) {
       handleInputChange("dependencia", dep.nombre);
       handleInputChange("area", dep.areaOrganizacional);
       handleInputChange("region", dep.zona);
       formData.idDependencia = dep.idDependencia;
     } else {
-      setMensaje({
-        texto: "⚠️ No se encontró la dependencia ingresada",
-        tipo: "error",
-      });
+      mostrarToast("No se encontró la dependencia ingresada", "error")
     }
   };
 
@@ -239,15 +288,7 @@ function IniciarSolicitud() {
   return (
     <div className="iniciar-solicitud-page">
       <main className="main-content-solicitud">
-        <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
-
-        {/*  Mensaje flotante */}
-        {mensaje.texto && (
-          <div className={`mensaje-flotante ${mensaje.tipo}`}>
-            {mensaje.texto}
-          </div>
-        )}
-
+        <Toast texto={toast.texto} tipo={toast.tipo}/>
         <div className="page-header-solicitud">
           <h1 className="page-title-solicitud">Iniciar Solicitud</h1>
           <select
@@ -753,7 +794,7 @@ function IniciarSolicitud() {
                   <label className="form-label-solicitud">Beneficiado</label>
                   <select
                     className="form-input-solicitud"
-                    value={formData.beneficiado}
+                    value={formData.beneficiado ? "si" : "no"}
                     onChange={(e) =>
                       handleInputChange("beneficiado", e.target.value)
                     }

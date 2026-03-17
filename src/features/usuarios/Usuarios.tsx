@@ -1,28 +1,26 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
+import AccesoService from "@/services/AccesoService";
+import { IUsuarioBase } from "@/schemas/acceso/GetUsuario";
+import { Toast } from "@/components/Alert/Floating/Toast";
+import { useToast } from "@/hooks/useToast";
 import "./Usuarios.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import UsuarioService from "@/services/UsuarioService.js";
-import UserContext from "@/utils/UserContext.jsx";
 
 function Usuarios() {
   const navigate = useNavigate();
-  const [usuarios, setUsuarios] = useState([]);
+  const {toast, mostrarToast} = useToast();
+  const [usuarios, setUsuarios] = useState<IUsuarioBase[]>();
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
-  const currentUser = useContext(UserContext);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const data = await new UsuarioService().obtenerUsuarios();
-        const usuariosActivos = data.filter((u) => u.estado === true);
+        const data = await new AccesoService().getUsuarios();
+        const usuariosActivos = data.mensaje.usuarios.filter((usuario: IUsuarioBase) => usuario.estado === 1);
         setUsuarios(usuariosActivos);
       } catch (err) {
-        console.error("Error al cargar usuarios:", err);
-        setError("No se pudieron cargar los usuarios");
+        console.error("Usuarios.tsx - Error al obtener usuarios: " + err)
+        mostrarToast("Error al obtener usuarios","error")
       } finally {
         setCargando(false);
       }
@@ -35,7 +33,7 @@ function Usuarios() {
     navigate("/crear-usuario");
   };
 
-  const handleEditarUsuario = (usuario) => {
+  const handleEditarUsuario = (usuario: IUsuarioBase) => {
     navigate("/editar-usuario", { state: { usuario } });
   };
 
@@ -53,11 +51,10 @@ function Usuarios() {
         </div>
 
         {cargando && <p>Cargando usuarios...</p>}
-        {error && <p className="error">{error}</p>}
-
-        {!cargando && !error && (
+        <Toast texto={toast.texto} tipo={toast.tipo}/>
+        {!cargando && !(toast.tipo !== "error") && (
           <ul className="usuarios-list">
-            {usuarios.map((user) => (
+            {usuarios?.map((user) => (
               <li key={user.idAcceso} onClick={() => handleEditarUsuario(user)}>
                 <span>
                   {user.nombre} {user.primerApellido}{" "}

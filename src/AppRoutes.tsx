@@ -30,7 +30,7 @@ import IniciarSolicitud from "./features/solicitudes/IniciarSolicitud";
 import Solicitudes from "./features/solicitudes/Solicitudes";
 import CrearUsuario from "./features/usuarios/CrearUsuario";
 import EditarUsuario from "./features/usuarios/EditarUsuario";
-import Usuarios from "./features/usuarios/Usuarios";
+import Usuarios from "./features/usuarios/Usuarios.js";
 import { Login } from "@/pages/login/Login";
 import { MainMenu } from "@/layout/main-menu/MainMenu";
 import MainLayout from "./layout/main-layout/main-layout";
@@ -63,9 +63,22 @@ function AppRoutes() {
             </MainLayout>
           }
         />
-        <Route path="/crear-usuario" element={<CrearUsuario />} />
+        <Route 
+          path="/crear-usuario" 
+          element={
+            <MainLayout>
+              <CrearUsuario />
+            </MainLayout>
+          } 
+        />
         <Route path="/usuarios" element={<Usuarios />} />
-        <Route path="/iniciar-solicitud" element={<IniciarSolicitud />} />
+        <Route 
+          path="/iniciar-solicitud" 
+          element={
+            <MainLayout>
+              <IniciarSolicitud />
+            </MainLayout>
+          } />
         <Route path="/crear-cedula" element={<CrearConstancia />} />
         <Route path="/no-beneficiados" element={<NoBeneficiados />} />
         <Route
@@ -78,7 +91,13 @@ function AppRoutes() {
         <Route path="/asignar-solicitud" element={<AsignarSolicitud />} />
         <Route path="/procesos" element={<Procesos />} />
         <Route path="/solicitudes" element={<Solicitudes />} />
-        <Route path="/editar-usuario" element={<EditarUsuario />} />
+        <Route 
+          path="/editar-usuario" 
+          element={
+            <MainLayout>
+              <EditarUsuario />
+            </MainLayout>
+          }/>
         <Route path="/panorama" element={<Panorama />} />
         <Route path="/generar-oficio" element={<GenerarOficio />} />
         <Route path="/ver-oficios" element={<VerOficios />} />

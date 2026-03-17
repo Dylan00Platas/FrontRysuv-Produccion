@@ -1,34 +1,32 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import AccesoService from "@/services/AccesoService";
+import { Toast } from "@/components/Alert/Floating/Toast";
+import type IPutUsuario from "@/schemas/acceso/PutUser";
 import "./CrearUsuario.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import UsuarioServicio from "@/services/UsuarioService.js";
-import UserContext from "@/utils/UserContext.jsx";
+import { useToast } from "@/hooks/useToast";
 
 function EditarUsuario() {
   const navigate = useNavigate();
   const location = useLocation();
+  const {toast, mostrarToast} = useToast();
   const usuarioAEditar = location.state?.usuario || null;
-  const currentUser = useContext(UserContext);
-
-  const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
-
   const [showPassword, setShowPassword] = useState(false);
+  const usuarioServicio = new AccesoService();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IPutUsuario >({
     usuario: usuarioAEditar?.usuario || "",
-    nombres: usuarioAEditar?.nombre || "",
+    nombre: usuarioAEditar?.nombre || "",
     primerApellido: usuarioAEditar?.primerApellido || "",
     segundoApellido: usuarioAEditar?.segundoApellido || "",
     rol: usuarioAEditar ? mapFKATipo(usuarioAEditar.FKIdTipoAcceso) : "",
     idAcceso: usuarioAEditar?.idAcceso,
-    contrasena: "",
+    contrasenia: "",
   });
 
-  function mapFKATipo(fk) {
-    switch (fk) {
+  function mapFKATipo(idTipoDeUsuario: number) {
+    switch (idTipoDeUsuario) {
       case 1:
         return "admin";
       case 2:
@@ -42,7 +40,7 @@ function EditarUsuario() {
     }
   }
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof IPutUsuario, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -51,94 +49,58 @@ function EditarUsuario() {
 
   const togglePassword = () => setShowPassword(!showPassword);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const regexContrasena =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-    if (formData.contrasena && !regexContrasena.test(formData.contrasena)) {
-      setMensaje({
-        texto:
-          "⚠️ La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial",
-        tipo: "error",
-      });
-
-      setTimeout(() => {
-        setMensaje("");
-      }, 3000);
-
+    if (formData.contrasenia && !regexContrasena.test(formData.contrasenia)) {
+      mostrarToast("La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial", "error")
       return;
     }
-
     try {
-      const token = localStorage.getItem("token");
-      const usuarioServicio = new UsuarioServicio();
-      const response = await usuarioServicio.actualizarUsuario(formData, token);
-      console.log("Usuario actualizado:", response);
-      setMensaje({
-        texto: "✅ Usuario modificado correctamente",
-        tipo: "exito",
-      });
-      setTimeout(() => {
-        navigate("/usuarios");
-      }, 1500);
+      const response = await usuarioServicio.putUsuario(formData.idAcceso, formData)
+      if(response.estado === 200){
+        mostrarToast("Usuario modificado correctamente", "exito")
+        setTimeout(() => {
+          navigate("/usuarios");
+        }, 1500);
+      }
     } catch (error) {
-      console.error("Error al editar usuario:", error.message);
-      setMensaje({ texto: `❌ Error: ${error.message}`, tipo: "error" });
-
-      setTimeout(() => {
-        setMensaje("");
-      }, 3000);
+      console.error("EditarUsuario.tsx - Error al editar usuario: "+error);
+      mostrarToast("Error al editar el usuario", "error")
     }
   };
 
   const handleDesactivarUsuario = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const usuarioServicio = new UsuarioServicio();
-      const response = await usuarioServicio.desactivarUsuario(
-        formData.idAcceso,
-        token,
-      );
-      console.log("Usuario desactivado:", response);
-      setMensaje({
-        texto: "🚫 Usuario desactivado correctamente",
-        tipo: "exito",
-      });
+      const response = await usuarioServicio.putBanUsuario(formData.idAcceso)
+      mostrarToast("Usuario desactivado de manera éxitosa", "exito")
       setTimeout(() => navigate("/usuarios"), 1500);
     } catch (error) {
-      console.error("Error al desactivar usuario:", error.message);
-      setMensaje({ texto: `❌ Error: ${error.message}`, tipo: "error" });
-      setTimeout(() => setMensaje(""), 3000);
+      console.error("EditarUsuario.tsx - Error al desactivar usuario:", error);
+      mostrarToast("Error al desactivar el usuario", "error")
     }
   };
 
   return (
     <div className="crear-usuario-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
-
       <main className="main-content-evaluacion">
-        {/*  Mensaje flotante */}
-        {mensaje.texto && (
-          <div className={`mensaje-flotante ${mensaje.tipo}`}>
-            {mensaje.texto}
-          </div>
-        )}
+        <Toast texto={toast.texto} tipo={toast.tipo}/>
         <h1 className="page-title3">Editar Usuario</h1>
 
         <form className="form-grid" onSubmit={handleSubmit}>
-          {/* Fila 1 */}
           <div className="form-group">
             <label className="form-label">Nombre(s)</label>
             <input
               type="text"
               className="form-input"
-              value={formData.nombres}
+              value={formData.nombre}
               onChange={(e) => {
-                handleInputChange("nombres", e.target.value);
+                handleInputChange("nombre", e.target.value);
                 e.target.setCustomValidity("");
               }}
-              onInvalid={(e) => {
-                e.target.setCustomValidity("El nombre es obligatorio");
+              onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity("El nombre es obligatorio");
               }}
               required
             />
@@ -154,8 +116,8 @@ function EditarUsuario() {
                 handleInputChange("primerApellido", e.target.value);
                 e.target.setCustomValidity("");
               }}
-              onInvalid={(e) => {
-                e.target.setCustomValidity("El primer apellido es obligatorio");
+              onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity("El primer apellido es obligatorio");
               }}
               required
             />
@@ -184,8 +146,8 @@ function EditarUsuario() {
                 handleInputChange("usuario", e.target.value);
                 e.target.setCustomValidity("");
               }}
-              onInvalid={(e) => {
-                e.target.setCustomValidity(
+              onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity(
                   "El nombre de usuario es obligatorio",
                 );
               }}
@@ -202,8 +164,8 @@ function EditarUsuario() {
                 handleInputChange("rol", e.target.value);
                 e.target.setCustomValidity("");
               }}
-              onInvalid={(e) => {
-                e.target.setCustomValidity("Debe seleccionar un rol");
+              onInvalid={(e: React.FormEvent<HTMLSelectElement>) => {
+                e.currentTarget.setCustomValidity("Debe seleccionar un rol");
               }}
               required
             >
@@ -224,9 +186,9 @@ function EditarUsuario() {
               <input
                 type={showPassword ? "text" : "password"}
                 className="form-input password-input-usuario"
-                value={formData.contrasena}
+                value={formData.contrasenia}
                 onChange={(e) =>
-                  handleInputChange("contrasena", e.target.value)
+                  handleInputChange("contrasenia", e.target.value)
                 }
                 placeholder="Opcional"
               />
@@ -238,9 +200,9 @@ function EditarUsuario() {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
-            {formData.contrasena &&
+            {formData.contrasenia &&
               !/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(
-                formData.contrasena,
+                formData.contrasenia,
               ) && (
                 <span className="error">
                   La contraseña debe tener mínimo 8 caracteres, al menos una
@@ -248,15 +210,11 @@ function EditarUsuario() {
                 </span>
               )}
           </div>
-          {/* ⭐ Fin del Campo de Contraseña Modificado */}
-
-          {/* Botón */}
           <div className="form-group action-buttons">
             <button type="submit" className="btn-crear-usuario">
               Editar usuario
             </button>
           </div>
-
           <div className="form-group action-buttons">
             <button
               type="button"

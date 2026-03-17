@@ -1,20 +1,26 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
 import "./CrearUsuario.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import UsuarioServicio from "@/services/UsuarioService.js";
-import UserContext from "@/utils/UserContext.jsx";
+import { useToast } from "@/hooks/useToast";
+import AuthService from "@/services/AuthService";
+import type IPostUsuario from "@/schemas/acceso/PostUser";
+import { Toast } from "@/components/Alert/Floating/Toast";
+
+interface IUserData  {
+    usuario: string;
+    nombres: string;
+    primerApellido: string;
+    segundoApellido: string;
+    contrasena: string;
+    rol: string;
+}
 
 function CrearUsuario() {
-  const { currentUser } = useContext(UserContext);
+  const { toast, mostrarToast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-
-  const [mensaje, setMensaje] = useState({ texto: "", tipo: "" });
-
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IUserData>({
     usuario: "",
     nombres: "",
     primerApellido: "",
@@ -23,8 +29,8 @@ function CrearUsuario() {
     rol: "",
   });
 
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
+  const handleInputChange = (field: keyof IUserData, value: string) => {
+  setFormData((prev: IUserData) => ({
       ...prev,
       [field]: value,
     }));
@@ -32,30 +38,27 @@ function CrearUsuario() {
 
   const togglePassword = () => setShowPassword(!showPassword);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const regexContrasena =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     if (!regexContrasena.test(formData.contrasena)) {
-      setMensaje({
-        texto:
-          "⚠️ La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial",
-        tipo: "error",
-      });
-
-      setTimeout(() => {
-        setMensaje("");
-      }, 3000);
-      return;
+        mostrarToast("La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial","error")
+        return;
     }
 
     try {
-      const token = localStorage.getItem("token");
-      const usuarioServicio = new UsuarioServicio();
-      const response = await usuarioServicio.crearUsuario(formData, token);
-      console.log("Usuario creado:", response);
+      const PostUsuario: IPostUsuario = {
+        contrasenia: formData.contrasena,
+        nombre: formData.nombres,
+        primerApellido: formData.primerApellido,
+        segundoApellido: formData.segundoApellido,
+        usuario: formData.usuario,
+        FKIdTipoAcceso: formData.rol
+      }
 
-      setMensaje({ texto: "✅ Usuario creado correctamente", tipo: "exito" });
+      const response = new AuthService().register(PostUsuario)
+      mostrarToast("Usuario creado correctamente", "exito")
       setTimeout(() => {
         navigate("/usuarios");
       }, 1500);
@@ -69,29 +72,18 @@ function CrearUsuario() {
         rol: "",
       });
     } catch (error) {
-      console.error("Error al crear usuario:", error.message);
-      setMensaje({ texto: `❌ Error: ${error.message}`, tipo: "error" });
-
-      setTimeout(() => {
-        setMensaje("");
-      }, 3000);
+      console.error("CrearUsuario.tsx - Error al registrar usuario:" + error);
+      mostrarToast(`Error al crear usuario`,"error")
     }
   };
 
   return (
     <div className="crear-usuario-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
       {/* Main Content */}
       <main className="main-content-evaluacion">
         {/*  Mensaje flotante */}
-        {mensaje.texto && (
-          <div className={`mensaje-flotante ${mensaje.tipo}`}>
-            {mensaje.texto}
-          </div>
-        )}
-
+        <Toast texto={toast.texto} tipo={toast.tipo} />
         <h1 className="page-title3">Crear Usuarios</h1>
-
         <form className="form-grid" onSubmit={handleSubmit}>
           {/* Fila 1 */}
           <div className="form-group">
@@ -104,8 +96,8 @@ function CrearUsuario() {
                 handleInputChange("nombres", e.target.value);
                 e.target.setCustomValidity("");
               }}
-              onInvalid={(e) => {
-                e.target.setCustomValidity("El nombre es obligatorio");
+              onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity("El nombre es obligatorio");
               }}
               required
             />
@@ -121,8 +113,8 @@ function CrearUsuario() {
                 handleInputChange("primerApellido", e.target.value);
                 e.target.setCustomValidity("");
               }}
-              onInvalid={(e) => {
-                e.target.setCustomValidity("El primer apellido es obligatorio");
+              onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity("El primer apellido es obligatorio");
               }}
               required
             />
@@ -151,8 +143,8 @@ function CrearUsuario() {
                 handleInputChange("usuario", e.target.value);
                 e.target.setCustomValidity("");
               }}
-              onInvalid={(e) => {
-                e.target.setCustomValidity(
+              onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
+                e.currentTarget.setCustomValidity(
                   "El nombre de usuario es obligatorio",
                 );
               }}
@@ -173,15 +165,15 @@ function CrearUsuario() {
                   handleInputChange("contrasena", e.target.value);
                   e.target.setCustomValidity("");
                 }}
-                onInvalid={(e) => {
+                onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
                   const regexContrasena =
                     /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
                   if (!regexContrasena.test(formData.contrasena)) {
-                    e.target.setCustomValidity(
+                    e.currentTarget.setCustomValidity(
                       "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial",
                     );
                   } else {
-                    e.target.setCustomValidity("La contraseña es obligatoria");
+                    e.currentTarget.setCustomValidity("La contraseña es obligatoria");
                   }
                 }}
                 required
@@ -214,8 +206,8 @@ function CrearUsuario() {
                 handleInputChange("rol", e.target.value);
                 e.target.setCustomValidity("");
               }}
-              onInvalid={(e) => {
-                e.target.setCustomValidity("Debe seleccionar un rol");
+              onInvalid={(e: React.FormEvent<HTMLSelectElement>) => {
+                e.currentTarget.setCustomValidity("Debe seleccionar un rol");
               }}
               required
             >

@@ -2,23 +2,29 @@ import { useEffect, useState, useContext } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
-
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import {IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import "./Solicitudes.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import SolicitudService from "@/services/SolicitudService.js";
-import UserContext from "@/utils/UserContext.jsx";
+
+interface ISolicitudTabla {
+  id: number;
+  hermesNotificacion: string;
+  folio: string;
+  puesto: string;
+  estado: string;
+  candidato: string;
+}
 
 function Solicitudes() {
   const navigate = useNavigate();
-  const [solicitudes, setSolicitudes] = useState([]);
-  const [solicitudesRaw, setSolicitudesRaw] = useState([]);
+  const [solicitudes, setSolicitudes] = useState<ISolicitudTabla[]>([]);
+  const [solicitudesRaw, setSolicitudesRaw] = useState<IProcesoContratacionBase[]>([]);
   const [loading, setLoading] = useState(true);
-  const { currentUser } = useContext(UserContext);
 
-  const handleEditarSolicitud = (solicitudAdaptada) => {
+  const handleEditarSolicitud = (solicitudAdaptada: ISolicitudTabla) => {
     // Buscamos la solicitud completa por id
-    const solicitudCompleta = solicitudesRaw.find(
-      (s) => s.idProceso === solicitudAdaptada.id,
+    const solicitudCompleta = solicitudesRaw?.find(
+      (s) => s.idProceso === solicitudAdaptada.id
     );
     console.log(solicitudCompleta);
     navigate("/asignar-solicitud", { state: { solicitud: solicitudCompleta } });
@@ -39,13 +45,12 @@ function Solicitudes() {
     const fetchSolicitudes = async () => {
       try {
         const token = localStorage.getItem("token");
-        const servicio = new SolicitudService();
-        const data = await servicio.obtenerSolicitudes(token);
-
-        setSolicitudesRaw(data);
+        const ProcesoServicio = new ProcesoContratacionService();
+        const data = await ProcesoServicio.getProcesosContratacion()
+        setSolicitudesRaw(data.mensaje.procesos);
 
         //  Filtramos solo solicitudes sin analista asignado
-        const dataSinBolsa = data.filter((s) => s.FKIdTipoProceso !== 3);
+        const dataSinBolsa = data.mensaje.procesos.filter((s) => s.FKIdTipoProceso !== 3);
         const dataSinAnalista = dataSinBolsa.filter(
           (s) => s.FKIdAcceso === null,
         );
@@ -71,7 +76,7 @@ function Solicitudes() {
     fetchSolicitudes();
   }, []);
 
-  function mapEstado(fk) {
+  function mapEstado(fk: number) {
     switch (fk) {
       case 9:
         return "Pendiente (cita)";
@@ -97,7 +102,6 @@ function Solicitudes() {
 
   return (
     <div className="solicitudes-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content">
         <div className="page-header2">
@@ -109,7 +113,7 @@ function Solicitudes() {
             <Select
               options={estadoOptions}
               value={estadoFiltro}
-              onChange={(value) => setEstadoFiltro(value)}
+              onChange={(value) => {if (value) setEstadoFiltro(value);}}
               isClearable={false}
             />
           </div>
