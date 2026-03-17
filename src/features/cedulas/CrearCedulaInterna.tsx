@@ -9,7 +9,7 @@ import {
   PDFTextField,
   PDFCheckBox,
   PDFDropdown,
-  PDFRadioGroup
+  PDFRadioGroup,
 } from "pdf-lib";
 import Select from "react-select";
 
@@ -20,16 +20,17 @@ import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompet
 import { useToast } from "@/hooks/useToast";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import { useDependencias } from "@/hooks/useDependencias";
-import {
-  IDependenciaBase,
-} from "@/schemas/catalogos/GetDependencia";
+import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import { ITipoCedulaBase } from "@/schemas/catalogos/GetTipoCedula";
 import { useCedulaTipos } from "@/hooks/useCedulaTipos";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { IGetProcesoContratacion } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import { useDependenciaById } from "@/hooks/useDependenciaById";
 import CatalogoService from "@/services/CatalogosService";
-import { getNombreCompetenciaKey, nombreCompetenciaMap } from "@/utils/Constants";
+import {
+  getNombreCompetenciaKey,
+  nombreCompetenciaMap,
+} from "@/utils/Constants";
 import ManageFiles from "@/utils/ManageFiles";
 
 // Interfaces de UI ---------------------------------------------------------
@@ -38,7 +39,7 @@ interface IPostCedulaInternaForm {
   revisa: string;
   elabora: string;
   avaladoPor: string;
-  adscripcion: IDependenciaFormCedula | null,
+  adscripcion: IDependenciaFormCedula | null;
   //-----
   analista: string;
   antecedentesFamiliaresUV: string;
@@ -194,10 +195,10 @@ function CrearCedulaInterna() {
       avaladoPor: cedulaFromNav.avaladoPor ?? "",
       adscripcion: dep
         ? {
-          idDependencia: dep.idDependencia,
-          nombre: dep.nombre,
-          zona: dep.zona,
-        }
+            idDependencia: dep.idDependencia,
+            nombre: dep.nombre,
+            zona: dep.zona,
+          }
         : null,
       analista: "",
       antecedentesFamiliaresUV: "",
@@ -277,10 +278,10 @@ function CrearCedulaInterna() {
           proceso.procesoContratación.resultadoEvaluacionConocimiento || "",
         adscripcion: dep
           ? {
-            idDependencia: dep.idDependencia,
-            nombre: dep.nombre,
-            zona: dep.zona,
-          }
+              idDependencia: dep.idDependencia,
+              nombre: dep.nombre,
+              zona: dep.zona,
+            }
           : null,
       }));
     } catch (error) {
@@ -479,7 +480,9 @@ function CrearCedulaInterna() {
         const i = index + 1;
         const nombreCompetencia = item.nombreCompetencia ?? "";
         const perfil = Number(item.perfil) || 0;
-        const keyPsicometrias = getNombreCompetenciaKey(item.nombreCompetencia) as keyof IPostCedulaInternaForm;
+        const keyPsicometrias = getNombreCompetenciaKey(
+          item.nombreCompetencia,
+        ) as keyof IPostCedulaInternaForm;
         const valorPsicometria = Number(formData[keyPsicometrias]) || 0;
 
         sumaPerfil += perfil;
@@ -487,15 +490,15 @@ function CrearCedulaInterna() {
 
         try {
           form.getTextField(`competencia${i}`).setText(nombreCompetencia);
-        } catch { }
+        } catch {}
         try {
           form.getTextField(`perfil${i}`).setText(perfil.toString());
-        } catch { }
+        } catch {}
         try {
           form
             .getTextField(`psicometria${i}`)
             .setText(valorPsicometria.toString());
-        } catch { }
+        } catch {}
       });
 
       const resultadoCuantitativoPorcentaje =
@@ -523,7 +526,9 @@ function CrearCedulaInterna() {
 
       form.flatten();
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([ManageFiles.toArrayBuffer(pdfBytes)], { type: "application/pdf" });
+      const blob = new Blob([ManageFiles.toArrayBuffer(pdfBytes)], {
+        type: "application/pdf",
+      });
       const fileName = `CedulaInterna_${formData.hermesNotificacion || "SinHermes"}.pdf`;
       saveAs(blob, fileName);
       // FIX: el toast de éxito usaba tipo "error"
@@ -786,10 +791,10 @@ function CrearCedulaInterna() {
                     "adscripcion",
                     selected
                       ? {
-                        idDependencia: selected.idDependencia,
-                        nombre: selected.nombre,
-                        zona: selected.zona,
-                      }
+                          idDependencia: selected.idDependencia,
+                          nombre: selected.nombre,
+                          zona: selected.zona,
+                        }
                       : null,
                   );
                 }}
@@ -879,9 +884,11 @@ function CrearCedulaInterna() {
                 </thead>
                 <tbody>
                   {competencias?.competencias &&
-                    competencias.competencias.length > 0 ? (
+                  competencias.competencias.length > 0 ? (
                     competencias.competencias.map((item, i) => {
-                      const key = getNombreCompetenciaKey(item.nombreCompetencia)
+                      const key = getNombreCompetenciaKey(
+                        item.nombreCompetencia,
+                      );
                       return (
                         <tr key={i}>
                           <td>{item.nombreCompetencia}</td>

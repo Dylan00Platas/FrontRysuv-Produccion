@@ -55,7 +55,8 @@ function Agenda() {
   const [eventos, setEventos] = useState<IEventoAgenda[]>([]);
   // Interfaces de UI -------------------------------------------------------
   const [modalAbierto, setModalAbierto] = useState(false);
-  const [eventoSeleccionado, setEventoSeleccionado] = useState<IEventoSeleccionado | null>(null);
+  const [eventoSeleccionado, setEventoSeleccionado] =
+    useState<IEventoSeleccionado | null>(null);
   useEffect(() => {
     async function cargarEventos(): Promise<void> {
       try {
@@ -121,19 +122,19 @@ function Agenda() {
         prev.map((ev) =>
           ev.id === String(eventoSeleccionado.id)
             ? {
-              ...ev,
-              start: eventoSeleccionado.fecha,
-              backgroundColor: colorFinal,
-              borderColor: eventoSeleccionado.citaVirtual
-                ? "#3498db"
-                : colorFinal,
-              extendedProps: {
-                ...ev.extendedProps,
-                estado: eventoSeleccionado.estado,
-                citaVirtual: eventoSeleccionado.citaVirtual,
-                atendioCita: eventoSeleccionado.atendioCita,
-              },
-            }
+                ...ev,
+                start: eventoSeleccionado.fecha,
+                backgroundColor: colorFinal,
+                borderColor: eventoSeleccionado.citaVirtual
+                  ? "#3498db"
+                  : colorFinal,
+                extendedProps: {
+                  ...ev.extendedProps,
+                  estado: eventoSeleccionado.estado,
+                  citaVirtual: eventoSeleccionado.citaVirtual,
+                  atendioCita: eventoSeleccionado.atendioCita,
+                },
+              }
             : ev,
         ),
       );
@@ -180,11 +181,11 @@ function Agenda() {
         prev.map((ev) =>
           ev.id === idEventoSeleccionado
             ? {
-              ...ev,
-              start: nuevaFecha,
-              backgroundColor: colorFinal,
-              borderColor: payload.citaVirtual ? "#3498db" : colorFinal,
-            }
+                ...ev,
+                start: nuevaFecha,
+                backgroundColor: colorFinal,
+                borderColor: payload.citaVirtual ? "#3498db" : colorFinal,
+              }
             : ev,
         ),
       );

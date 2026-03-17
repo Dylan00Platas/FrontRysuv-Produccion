@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, useCallback, useMemo, useContext } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+  useContext,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { saveAs } from "file-saver";
 import { PDFTextField, PDFCheckBox, PDFDropdown, PDFRadioGroup } from "pdf-lib";
@@ -693,11 +700,13 @@ function CrearConstancia() {
       const gillSansFont = await pdfDoc.embedFont(fontBytes);
       form.getFields().forEach((field) => {
         try {
-          if (field instanceof PDFTextField) field.updateAppearances(gillSansFont);
-          else if (field instanceof PDFDropdown) field.updateAppearances(gillSansFont);
+          if (field instanceof PDFTextField)
+            field.updateAppearances(gillSansFont);
+          else if (field instanceof PDFDropdown)
+            field.updateAppearances(gillSansFont);
           else if (field instanceof PDFCheckBox) field.updateAppearances();
           else if (field instanceof PDFRadioGroup) field.updateAppearances();
-        } catch { }
+        } catch {}
       });
       form.flatten();
 
@@ -783,7 +792,10 @@ function CrearConstancia() {
         pdfBytes.byteOffset,
         pdfBytes.byteOffset + pdfBytes.byteLength,
       ) as ArrayBuffer;
-      saveAs(new Blob([buffer], { type: "application/pdf" }), `CedulaResultados_${formData.hermesNotificacion || "SinHermes"}.pdf`);
+      saveAs(
+        new Blob([buffer], { type: "application/pdf" }),
+        `CedulaResultados_${formData.hermesNotificacion || "SinHermes"}.pdf`,
+      );
     } catch (err) {
       console.error("CrearConstancia.tsx - Error generando PDF:\n", err);
       mostrarToast("❌ Error al generar el PDF.", "error");
