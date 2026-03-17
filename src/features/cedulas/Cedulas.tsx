@@ -70,7 +70,7 @@ function Cedulas() {
     setSearchTerm,
     cedulasFiltradas,
     resetFilters,
-  } = useCedulasFiltradas(cedulasNormalizadas); // ✅ nombre correcto
+  } = useCedulasFiltradas(cedulasNormalizadas);
 
   // Selección de cedulas -----------------------------------------------------
   const [selectedCedulas, setSelectedCedulas] = useState<number[]>([]);

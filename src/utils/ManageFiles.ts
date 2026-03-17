@@ -56,4 +56,10 @@ export default class ManageFiles {
     link.click();
     URL.revokeObjectURL(link.href);
   }
+
+  static toArrayBuffer = (bytes: Uint8Array): ArrayBuffer =>
+    bytes.buffer.slice(
+      bytes.byteOffset,
+      bytes.byteOffset + bytes.byteLength,
+    ) as ArrayBuffer;
 }

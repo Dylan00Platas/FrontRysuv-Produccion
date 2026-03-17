@@ -3,7 +3,14 @@ import { useLocation } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { FiHelpCircle } from "react-icons/fi";
 import { saveAs } from "file-saver";
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import {
+  PDFDocument,
+  StandardFonts,
+  PDFTextField,
+  PDFCheckBox,
+  PDFDropdown,
+  PDFRadioGroup
+} from "pdf-lib";
 import Select from "react-select";
 
 import "./CrearCedulaInterna.css";
@@ -15,20 +22,53 @@ import { Toast } from "@/components/Alert/Floating/Toast";
 import { useDependencias } from "@/hooks/useDependencias";
 import {
   IDependenciaBase,
-  IGetDependencias,
-  IDependenciaFormCedula,
 } from "@/schemas/catalogos/GetDependencia";
-import {
-  IGetTiposCedula,
-  ITipoCedulaBase,
-} from "@/schemas/catalogos/GetTipoCedula";
+import { ITipoCedulaBase } from "@/schemas/catalogos/GetTipoCedula";
 import { useCedulaTipos } from "@/hooks/useCedulaTipos";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { IGetProcesoContratacion } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import { useDependenciaById } from "@/hooks/useDependenciaById";
 import CatalogoService from "@/services/CatalogosService";
-import { nombreCompetenciaMap } from "@/utils/Constants";
-import { IPostCedulaInternaForm } from "@/schemas/cedulas/PostCedula";
+import { getNombreCompetenciaKey, nombreCompetenciaMap } from "@/utils/Constants";
+import ManageFiles from "@/utils/ManageFiles";
+
+// Interfaces de UI ---------------------------------------------------------
+interface IPostCedulaInternaForm {
+  // Verificar en back que dato y de que
+  revisa: string;
+  elabora: string;
+  avaladoPor: string;
+  adscripcion: IDependenciaFormCedula | null,
+  //-----
+  analista: string;
+  antecedentesFamiliaresUV: string;
+  conclusiones: string;
+  edad: string;
+  educacionFormal: string;
+  evaluacionConocimientos: string;
+  expectativaLaboral: string;
+  experiencia: string;
+  experienciaRelacionada: string;
+  fechaElaboracionPropuesta: string;
+  FKIdProceso: number;
+  hermesNotificacion: string;
+  idCedula: number;
+  nombreCandidato: string;
+  numPlaza: string;
+  perfil: string;
+  puesto: string;
+  referidoPor: string;
+  resultados: string;
+  resultadoHabilidadesExcel: string;
+  resultadoHabilidadesWord: string;
+  resultadoOrtografia: string;
+}
+
+interface IDependenciaFormCedula {
+  idDependencia: number;
+  nombre: string;
+  zona: string;
+}
 
 function CrearCedulaInterna() {
   // Utils ------------------------------------------------------------------
@@ -63,6 +103,7 @@ function CrearCedulaInterna() {
       idCedula: 0,
       nombreCandidato: "",
       numPlaza: "",
+      perfil: "",
       puesto: "",
       referidoPor: "",
       resultados: "",
@@ -78,11 +119,6 @@ function CrearCedulaInterna() {
     loading: loadingDependencias,
     error: errorDependencias,
   } = useDependencias();
-  const [dependencias, setDependencias] = useState<IGetDependencias | null>();
-  useEffect(() => {
-    setDependencias(dataDependencias);
-  }, [dataDependencias]);
-
   const {
     data: dataDependenciaById,
     loading: loadingDependenciaById,
@@ -97,10 +133,6 @@ function CrearCedulaInterna() {
     loading: loadingCedulaTipos,
     error: errorCedulaTipos,
   } = useCedulaTipos();
-  const [tiposCedula, setTiposCedula] = useState<IGetTiposCedula | null>();
-  useEffect(() => {
-    setTiposCedula(dataCedulaTipos);
-  }, [dataCedulaTipos]);
 
   // Obtener competencias clasificacion cedula ----------------------------------
   const [competencias, setCompetencias] =
@@ -132,12 +164,12 @@ function CrearCedulaInterna() {
 
   // Mapea los valores de psicometría al formData cuando llegan competencias
   useEffect(() => {
-    if (!cedulaFromNav || competencias?.competencias?.length === 0) return;
+    if (!cedulaFromNav || !competencias?.competencias?.length) return;
 
     const valoresPsicometria = competencias!!.competencias.reduce<
       Record<string, string>
     >((acc, comp) => {
-      const key = nombreCompetenciaMap[comp.nombreCompetencia];
+      const key = getNombreCompetenciaKey(comp.nombreCompetencia);
       if (key) {
         acc[key] = cedulaFromNav[key] ?? "";
       }
@@ -149,9 +181,9 @@ function CrearCedulaInterna() {
 
   // Carga inicial desde la navegación
   useEffect(() => {
-    if (!cedulaFromNav || !dependencias) return;
+    if (!cedulaFromNav || !dataDependencias) return;
     const dep =
-      dependencias.dependencias.find(
+      dataDependencias.dependencias.find(
         (d) => d.idDependencia === cedulaFromNav.idDependencia,
       ) ?? null;
 
@@ -162,10 +194,10 @@ function CrearCedulaInterna() {
       avaladoPor: cedulaFromNav.avaladoPor ?? "",
       adscripcion: dep
         ? {
-            idDependencia: dep.idDependencia,
-            nombre: dep.nombre,
-            zona: dep.zona,
-          }
+          idDependencia: dep.idDependencia,
+          nombre: dep.nombre,
+          zona: dep.zona,
+        }
         : null,
       analista: "",
       antecedentesFamiliaresUV: "",
@@ -193,7 +225,7 @@ function CrearCedulaInterna() {
       resultadoHabilidadesWord: "",
       resultadoOrtografia: "",
     }));
-  }, [cedulaFromNav, dependencias, loadingDependencias]);
+  }, [cedulaFromNav, dataDependencias, loadingDependencias]);
 
   // Actualizar campos ----------------------------------------------------------
   const handleInputChange = <K extends keyof IPostCedulaInternaForm>(
@@ -229,26 +261,26 @@ function CrearCedulaInterna() {
       setFormData((prev) => ({
         ...prev,
         hermesNotificacion:
-          proceso.procesoContratación.hermesNotificacion ?? "",
-        educacionFormal: proceso.procesoContratación.educacionFormal ?? "",
-        avaladoPor: proceso.procesoContratación.avaladoPor ?? "",
-        FKIdProceso: proceso.procesoContratación.idProceso ?? prev.FKIdProceso,
-        numPlaza: proceso.procesoContratación.numPlaza ?? "",
-        nombreCandidato: proceso.procesoContratación.nombreCandidato ?? "",
+          proceso.procesoContratación.hermesNotificacion || "",
+        educacionFormal: proceso.procesoContratación.educacionFormal || "",
+        avaladoPor: proceso.procesoContratación.avaladoPor || "",
+        FKIdProceso: proceso.procesoContratación.idProceso || prev.FKIdProceso,
+        numPlaza: proceso.procesoContratación.numPlaza || "",
+        nombreCandidato: proceso.procesoContratación.nombreCandidato || "",
         resultadoHabilidadesWord:
-          Number(proceso.procesoContratación.resultadoHabilidadesWord) ?? 0,
+          String(proceso.procesoContratación.resultadoHabilidadesWord) || "",
         resultadoHabilidadesExcel:
-          Number(proceso.procesoContratación.resultadoHabilidadesExcel) ?? 0,
+          String(proceso.procesoContratación.resultadoHabilidadesExcel) || "",
         resultadoOrtografia:
-          proceso.procesoContratación.resultadoOrtografia ?? "",
+          String(proceso.procesoContratación.resultadoOrtografia) || "",
         evaluacionConocimientos:
-          proceso.procesoContratación.resultadoEvaluacionConocimiento ?? "",
+          proceso.procesoContratación.resultadoEvaluacionConocimiento || "",
         adscripcion: dep
           ? {
-              idDependencia: dep.idDependencia,
-              nombre: dep.nombre,
-              zona: dep.zona,
-            }
+            idDependencia: dep.idDependencia,
+            nombre: dep.nombre,
+            zona: dep.zona,
+          }
           : null,
       }));
     } catch (error) {
@@ -409,7 +441,7 @@ function CrearCedulaInterna() {
       form.getTextField("puesto").setText(formData.puesto ?? "");
       form
         .getTextField("adscripcion")
-        .setText(formData.adscripcion?.nombreCandidato ?? "");
+        .setText(formData.adscripcion?.nombre ?? "");
       form.getTextField("referido").setText(formData.referidoPor ?? "");
       form
         .getTextField("antecedentesFamiliares")
@@ -447,25 +479,23 @@ function CrearCedulaInterna() {
         const i = index + 1;
         const nombreCompetencia = item.nombreCompetencia ?? "";
         const perfil = Number(item.perfil) || 0;
-        const keyPsicometria = nombreCompetenciaMap[
-          item.nombreCompetencia
-        ] as keyof IPostCedulaInternaForm;
-        const valorPsicometria = Number(formData[keyPsicometria]) || 0;
+        const keyPsicometrias = getNombreCompetenciaKey(item.nombreCompetencia) as keyof IPostCedulaInternaForm;
+        const valorPsicometria = Number(formData[keyPsicometrias]) || 0;
 
         sumaPerfil += perfil;
         sumaPsicometria += valorPsicometria;
 
         try {
           form.getTextField(`competencia${i}`).setText(nombreCompetencia);
-        } catch {}
+        } catch { }
         try {
           form.getTextField(`perfil${i}`).setText(perfil.toString());
-        } catch {}
+        } catch { }
         try {
           form
             .getTextField(`psicometria${i}`)
             .setText(valorPsicometria.toString());
-        } catch {}
+        } catch { }
       });
 
       const resultadoCuantitativoPorcentaje =
@@ -479,16 +509,21 @@ function CrearCedulaInterna() {
 
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
       form.getFields().forEach((field) => {
-        field.updateAppearances(font);
-        try {
-          field.acroField.setBorderWidth(0);
-          field.acroField.setBorderColor(undefined);
-        } catch {}
+        // Cast al tipo concreto para acceder a updateAppearances
+        if (field instanceof PDFTextField) {
+          field.updateAppearances(font);
+        } else if (field instanceof PDFCheckBox) {
+          field.updateAppearances();
+        } else if (field instanceof PDFDropdown) {
+          field.updateAppearances(font);
+        } else if (field instanceof PDFRadioGroup) {
+          field.updateAppearances();
+        }
       });
 
       form.flatten();
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const blob = new Blob([ManageFiles.toArrayBuffer(pdfBytes)], { type: "application/pdf" });
       const fileName = `CedulaInterna_${formData.hermesNotificacion || "SinHermes"}.pdf`;
       saveAs(blob, fileName);
       // FIX: el toast de éxito usaba tipo "error"
@@ -736,7 +771,7 @@ function CrearCedulaInterna() {
               <Select<IDependenciaFormCedula>
                 id={`${fieldID}-adscripcion`}
                 options={
-                  dependencias?.dependencias.map((dep) => ({
+                  dataDependencias?.dependencias.map((dep) => ({
                     idDependencia: dep.idDependencia,
                     nombre: dep.nombre,
                     zona: dep.zona,
@@ -751,10 +786,10 @@ function CrearCedulaInterna() {
                     "adscripcion",
                     selected
                       ? {
-                          idDependencia: selected.idDependencia,
-                          nombre: selected.nombre,
-                          zona: selected.zona,
-                        }
+                        idDependencia: selected.idDependencia,
+                        nombre: selected.nombre,
+                        zona: selected.zona,
+                      }
                       : null,
                   );
                 }}
@@ -844,11 +879,9 @@ function CrearCedulaInterna() {
                 </thead>
                 <tbody>
                   {competencias?.competencias &&
-                  competencias.competencias.length > 0 ? (
+                    competencias.competencias.length > 0 ? (
                     competencias.competencias.map((item, i) => {
-                      const key = nombreCompetenciaMap[
-                        item.nombreCompetencia
-                      ] as keyof IPostCedulaInternaForm;
+                      const key = getNombreCompetenciaKey(item.nombreCompetencia)
                       return (
                         <tr key={i}>
                           <td>{item.nombreCompetencia}</td>
@@ -896,13 +929,13 @@ function CrearCedulaInterna() {
             ).map(({ label, key }) => (
               <div key={key} className="form-group">
                 <label
-                  htmlFor={`${fieldID}-conocimientosEspecificos`}
+                  htmlFor={`${fieldID}-${key}`}
                   className="form-label-evaluacion"
                 >
                   {label}
                 </label>
                 <input
-                  id={`${fieldID}-conocimientosEspecificos`}
+                  id={`${fieldID}-${key}`}
                   type="text"
                   className="form-input"
                   value={(formData[key] as string) ?? ""}
@@ -938,13 +971,13 @@ function CrearCedulaInterna() {
             ).map(({ label, key }) => (
               <div key={key} className="form-group col-span-3">
                 <label
-                  htmlFor={`${fieldID}-conclusiones`}
+                  htmlFor={`${fieldID}-${key}`}
                   className="form-label-evaluacion"
                 >
                   {label}
                 </label>
                 <textarea
-                  id={`${fieldID}-conclusiones`}
+                  id={`${fieldID}-${key}`}
                   className="large-textarea"
                   value={(formData[key] as string) ?? ""}
                   onChange={(e) =>

@@ -6,6 +6,7 @@ const UserProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<ICurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // TODO-Desarrollo: Cambiar lógica al uso de cookies
   useEffect(() => {
     try {
       const userSaved = localStorage.getItem("usuario");

@@ -79,8 +79,6 @@ function GenerarOficio() {
     formData.candidato,
   ]);
 
-  /* ======================================================================== */
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 

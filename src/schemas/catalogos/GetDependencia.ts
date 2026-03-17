@@ -11,7 +11,3 @@ export interface IDependenciaBase {
 export interface IGetDependencias {
   dependencias: IDependenciaBase[];
 }
-
-export type IDependenciaFormCedula = Partial<
-  IDependenciaBase | "idDependencia" | "nombre" | "zona"
->;

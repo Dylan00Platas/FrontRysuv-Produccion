@@ -113,18 +113,11 @@ const OPCION_TODOS_ANALISTAS: ILabelValue = {
   label: "Todos los analistas",
 };
 
-// -----------------------------------------------------------------------------
-// Componente
-// -----------------------------------------------------------------------------
-
 function Estadisticas() {
   const navigate = useNavigate();
   const { toast, mostrarToast } = useToast();
 
-  // -- Datos remotos ------------------------------------------------------------
-  // FIX: antes había 3 useEffect separados que llamaban a getProcesosContratacion()
-  // tres veces innecesariamente. Ahora se hace UNA sola llamada y los datos se
-  // comparten entre todas las secciones.
+  // Datos remotos ------------------------------------------------------------
   const [procesosRaw, setProcesosRaw] = useState<IProcesoContratacionBase[]>(
     [],
   );
@@ -152,15 +145,12 @@ function Estadisticas() {
         if (cancelado) return;
 
         const procesos = responseProcesos.mensaje?.procesos ?? [];
-        // FIX: antes se usaba analistas.usuarios justo después de setAnalistas,
-        // pero el estado no se actualiza síncronamente — se leía el array vacío.
-        // Ahora se trabaja con la variable local directamente.
         const usuariosLista = responseAnalistas.mensaje?.usuarios ?? [];
 
         setProcesosRaw(procesos);
         setAnalistas(usuariosLista);
 
-        // -- Datos mensuales ----------------------------------------------------
+        // Datos mensuales ----------------------------------------------------
         const validas = procesos.filter((p) => p.fechaNotificacion);
 
         if (validas.length > 0) {
@@ -214,13 +204,8 @@ function Estadisticas() {
     };
   }, []);
 
-  // -- Procesos adaptados (con nombre de analista) ------------------------------
-  // MEJORA: useMemo — se recalcula solo cuando cambian procesosRaw o analistas,
-  // no en cada render.
+  // Procesos adaptados (con nombre de analista) -------------------------------
   const procesosAdaptados = useMemo<IProcesoAdaptado[]>(() => {
-    // FIX: antes se construía analistasMap usando analistas del estado
-    // inmediatamente después del set (estado aún vacío). Ahora se deriva
-    // directamente desde el array en el estado ya poblado.
     const analistasMap = Object.fromEntries(
       analistas.map((a) => [
         a.idAcceso,
@@ -241,7 +226,7 @@ function Estadisticas() {
       }));
   }, [procesosRaw, analistas]);
 
-  // -- Solicitudes adaptadas (sin analista, sin tipo bolsa) ---------------------
+  // Solicitudes adaptadas (sin analista, sin tipo bolsa) -----------------------
   const solicitudes = useMemo<ICedulaAdaptada[]>(() => {
     return procesosRaw
       .filter((p) => p.FKIdTipoProceso !== 3 && p.FKIdAcceso === null)
@@ -253,10 +238,7 @@ function Estadisticas() {
       }));
   }, [procesosRaw]);
 
-  // -- Contadores derivados ------------------------------------------------------
-  // MEJORA: en lugar de 8+ useState individuales para cada contador
-  // (pendientes, entregadas, citado, evaluado…), se calculan todos con
-  // un solo useMemo. Elimina ~8 estados y el código de filtrado duplicado.
+  // Contadores derivados --------------------------------------------------------
   const contadores = useMemo(() => {
     const contar = (ids: number[]) =>
       procesosRaw.filter((p) => ids.includes(p.FKIdEstadoProcesoContratacion))
@@ -277,7 +259,7 @@ function Estadisticas() {
     };
   }, [procesosRaw]);
 
-  // -- Opciones de filtros -------------------------------------------------------
+  // Opciones de filtros -------------------------------------------------------
   const analistaOptions = useMemo<ILabelValue[]>(
     () => [
       OPCION_TODOS,
@@ -298,10 +280,10 @@ function Estadisticas() {
     [procesosAdaptados],
   );
 
-  // Opciones de mes (estable — no depende de datos remotos)
+  // Opciones de mes
   const mesesOptions = useMemo(() => generarOpcionesMeses(4), []);
 
-  // -- Filtros de gráficas -------------------------------------------------------
+  // Filtros de gráficas -------------------------------------------------------
   const [graficaSeleccionada, setGraficaSeleccionada] = useState<ILabelValue>(
     GRAFICAS_OPTIONS[0],
   );
@@ -329,7 +311,7 @@ function Estadisticas() {
   );
   const [mesFiltroEval, setMesFiltroEval] = useState<ILabelValue | null>(null);
 
-  // -- Datos filtrados -----------------------------------------------------------
+  // Datos filtrados -----------------------------------------------------------
   const procesosFiltrados = useMemo(() => {
     const term = searchTerm.toLowerCase();
     return procesosAdaptados.filter((p) => {
@@ -371,7 +353,7 @@ function Estadisticas() {
     });
   }, [solicitudes, estadoFiltroSolicitud, searchTermSolicitudes]);
 
-  // -- Datos para gráficas (memoizados) -----------------------------------------
+  // Datos para gráficas -----------------------------------------------------
   const dataSolicitudesChart = useMemo(
     () => [
       { name: "Pendiente (cita)", value: contadores.pendientes },
@@ -456,7 +438,7 @@ function Estadisticas() {
     };
   }, [procesosRaw, analistaFiltroEval, mesFiltroEval]);
 
-  // -- Helpers de navegación -----------------------------------------------------
+  // Helpers de navegación -------------------------------------------------------
   const handleEditarSolicitud = useCallback(
     (solicitudAdaptada: ICedulaAdaptada) => {
       const solicitudCompleta = procesosRaw.find(
@@ -469,7 +451,7 @@ function Estadisticas() {
     [procesosRaw, navigate],
   );
 
-  // -- Totales -------------------------------------------------------------------
+  // Totales -------------------------------------------------------------------
   const totalSolicitudes =
     contadores.pendientes + contadores.entregadas + contadores.notificadas;
   const totalProcesos =
@@ -484,7 +466,6 @@ function Estadisticas() {
     graficaSeleccionada?.value === key ||
     graficaSeleccionada?.value === "todas";
 
-  // -- Render --------------------------------------------------------------------
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
@@ -501,15 +482,12 @@ function Estadisticas() {
             value={graficaSeleccionada}
             onChange={(v) => v && setGraficaSeleccionada(v)}
             placeholder="Selecciona una gráfica..."
-            // FIX: isClearable estaba activado pero el valor nunca podría ser null
-            // porque siempre se muestra "Todas" como default. Se quita para evitar
-            // un estado undefined en graficaSeleccionada?.value
             isClearable={false}
           />
         </div>
 
         <div className="contenido-cedula-inner">
-          {/* -- Solicitudes ---------------------------------------------------- */}
+          {/* Solicitudes */}
           {mostrarGrafica("solicitudes") && (
             <section className="stats-section">
               <h1 className="section-title">
@@ -547,7 +525,7 @@ function Estadisticas() {
             </section>
           )}
 
-          {/* -- Procesos ------------------------------------------------------- */}
+          {/* Procesos */}
           {mostrarGrafica("procesos") && (
             <section className="stats-section">
               <h1 className="section-title">
@@ -588,7 +566,7 @@ function Estadisticas() {
             </section>
           )}
 
-          {/* -- Actividad mensual ----------------------------------------------- */}
+          {/* Actividad mensual */}
           {mostrarGrafica("mensual") && (
             <section className="stats-section">
               <h1 className="section-title">
@@ -623,7 +601,7 @@ function Estadisticas() {
             </section>
           )}
 
-          {/* -- Procesos por analista ------------------------------------------- */}
+          {/* Procesos por analista */}
           {mostrarGrafica("porAnalista") && (
             <section className="stats-section">
               <div className="flex justify-between items-center">
@@ -639,10 +617,6 @@ function Estadisticas() {
                 </div>
               </div>
 
-              {/* FIX: se eliminó el IIFE (() => { ... })() en el JSX.
-                  Es un patrón problemático: dificulta la legibilidad, mezcla
-                  lógica con markup y no se beneficia de memoización.
-                  Los datos se calculan en useMemo fuera del render. */}
               <label className="stats-label">
                 {totalAnalistaChart} Procesos —{" "}
                 {dataAnalistaChart
@@ -676,16 +650,13 @@ function Estadisticas() {
             </section>
           )}
 
-          {/* -- Resultados de evaluación ---------------------------------------- */}
+          {/* Resultados de evaluación */}
           {mostrarGrafica("evaluacion") && (
             <section className="stats-section">
               <h1 className="section-title">📈 Resultados de evaluación</h1>
 
               <div className="flex gap-4 mb-4">
                 <div className="w-62.5">
-                  {/* FIX: el options de este Select usaba analistas.map() directamente
-                      pero analistas era IGetUsuarios (objeto), no un array.
-                      Ahora se usa el array de usuarios ya extraído. */}
                   <Select<ILabelValue>
                     options={[
                       OPCION_TODOS_ANALISTAS,
@@ -715,7 +686,6 @@ function Estadisticas() {
                 </div>
               </div>
 
-              {/* FIX: se eliminó el IIFE en JSX — igual que en "por analista" */}
               <label className="stats-label">
                 Mostrando {dataEvaluacionChart.total} procesos con resultado de
                 evaluación{" "}
@@ -768,7 +738,7 @@ function Estadisticas() {
             </section>
           )}
 
-          {/* -- Tabla de procesos ----------------------------------------------- */}
+          {/* Tabla de procesos */}
           <section className="stats-section">
             <h1 className="section-title">⚙️ Procesos</h1>
 
@@ -865,7 +835,7 @@ function Estadisticas() {
             )}
           </section>
 
-          {/* -- Tabla de solicitudes ------------------------------------------- */}
+          {/* Tabla de solicitudes */}
           <section className="stats-section">
             <h1 className="section-title">📑 Solicitudes</h1>
 

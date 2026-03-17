@@ -20,6 +20,15 @@ export const nombreCompetenciaMap = {
 } as const;
 
 export type NombreCompetencia = keyof typeof nombreCompetenciaMap;
+export type CampoCompetencia = (typeof nombreCompetenciaMap)[NombreCompetencia];
+export const getNombreCompetenciaKey = (
+  nombre: string,
+): CampoCompetencia | undefined => {
+  if (nombre in nombreCompetenciaMap) {
+    return nombreCompetenciaMap[nombre as NombreCompetencia];
+  }
+  return undefined;
+};
 
 // ------------------------------
 // Plantilla Oficio 5.1 y 5.2

@@ -9,30 +9,53 @@ import listPlugin from "@fullcalendar/list";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
 
 import "./Agenda.css";
+import SolicitudService from "@/services/ProcesoContratacionService";
+import IResponseHTTP from "@/interfaces/http/Response";
+import ILabelValue from "@/interfaces/LabelValue";
+import resolverColor from "@/services/CatalogosNoseDonde";
 import { solicitudAEvento } from "@/utils/features/Agendas";
 import { IPutProcesoContratacionAgenda } from "@/schemas/procesos-contratacion/PutProcesoContratacion";
-import IResponseHTTP from "@/interfaces/http/Response";
-import resolverColor from "@/services/CatalogosNoseDonde";
-import SolicitudService from "@/services/ProcesoContratacionService";
-import IEventoAgenda from "@/interfaces/agendas/EventoAgenda";
-import IEventoSeleccionado from "@/interfaces/agendas/EventoSeleccionado";
-import ILabelValue from "@/interfaces/LabelValue";
 import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
+
+// Interfaces de UI ---------------------------------------------------------
+interface IEventoAgenda {
+  id: string;
+  title: string;
+  start: string;
+  allDay: boolean;
+  backgroundColor: string;
+  borderColor: string;
+  display: "block";
+  extendedProps: {
+    candidato: string;
+    citaVirtual: boolean;
+    estado: number;
+    atendioCita: boolean;
+  };
+}
+
+interface IEventoSeleccionado {
+  id: number;
+  title: string;
+  fecha: string;
+  candidato: string;
+  citaVirtual: boolean;
+  estado: number;
+  atendioCita: boolean;
+}
+const ESTADOS_EDITABLES: number[] = [9, 10, 11];
+const OPCIONES_ESTADO: ILabelValue[] = [
+  { value: "9", label: "Pendiente (cita)" },
+  { value: "10", label: "Entregado (cita)" },
+  { value: "11", label: "Citado" },
+];
 
 function Agenda() {
   const fieldID = useId();
   const [eventos, setEventos] = useState<IEventoAgenda[]>([]);
-  // Estado para modal
+  // Interfaces de UI -------------------------------------------------------
   const [modalAbierto, setModalAbierto] = useState(false);
-  const [eventoSeleccionado, setEventoSeleccionado] =
-    useState<IEventoSeleccionado | null>(null);
-  const ESTADOS_EDITABLES: number[] = [9, 10, 11];
-  const OPCIONES_ESTADO: ILabelValue[] = [
-    { value: "9", label: "Pendiente (cita)" },
-    { value: "10", label: "Entregado (cita)" },
-    { value: "11", label: "Citado" },
-  ];
-
+  const [eventoSeleccionado, setEventoSeleccionado] = useState<IEventoSeleccionado | null>(null);
   useEffect(() => {
     async function cargarEventos(): Promise<void> {
       try {
@@ -54,6 +77,7 @@ function Agenda() {
     cargarEventos();
   }, []);
 
+  // Manejadores de eventos -------------------------------------------------
   const handleEventClick = (info: EventClickArg): void => {
     const props = info.event.extendedProps as IEventoAgenda["extendedProps"];
 
@@ -97,19 +121,19 @@ function Agenda() {
         prev.map((ev) =>
           ev.id === String(eventoSeleccionado.id)
             ? {
-                ...ev,
-                start: eventoSeleccionado.fecha,
-                backgroundColor: colorFinal,
-                borderColor: eventoSeleccionado.citaVirtual
-                  ? "#3498db"
-                  : colorFinal,
-                extendedProps: {
-                  ...ev.extendedProps,
-                  estado: eventoSeleccionado.estado,
-                  citaVirtual: eventoSeleccionado.citaVirtual,
-                  atendioCita: eventoSeleccionado.atendioCita,
-                },
-              }
+              ...ev,
+              start: eventoSeleccionado.fecha,
+              backgroundColor: colorFinal,
+              borderColor: eventoSeleccionado.citaVirtual
+                ? "#3498db"
+                : colorFinal,
+              extendedProps: {
+                ...ev.extendedProps,
+                estado: eventoSeleccionado.estado,
+                citaVirtual: eventoSeleccionado.citaVirtual,
+                atendioCita: eventoSeleccionado.atendioCita,
+              },
+            }
             : ev,
         ),
       );
@@ -156,11 +180,11 @@ function Agenda() {
         prev.map((ev) =>
           ev.id === idEventoSeleccionado
             ? {
-                ...ev,
-                start: nuevaFecha,
-                backgroundColor: colorFinal,
-                borderColor: payload.citaVirtual ? "#3498db" : colorFinal,
-              }
+              ...ev,
+              start: nuevaFecha,
+              backgroundColor: colorFinal,
+              borderColor: payload.citaVirtual ? "#3498db" : colorFinal,
+            }
             : ev,
         ),
       );

@@ -6,8 +6,6 @@ import Select from "react-select";
 import "./AsignarSolicitud.css";
 import { useToast } from "@/hooks/useToast";
 import { Toast } from "@/components/Alert/Floating/Toast";
-import { useCedulaTipos } from "@/hooks/useCedulaTipos";
-import { IGetTiposCedula } from "@/schemas/catalogos/GetTipoCedula";
 import ILabelValue from "@/interfaces/LabelValue";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import IResponseHTTP from "@/interfaces/http/Response";
@@ -50,17 +48,6 @@ function AsignarSolicitud() {
   const { toast, mostrarToast } = useToast();
   const navigate = useNavigate();
   const fieldID = useId();
-  // Tipos de cedulas -------------------------------------------------------
-  const {
-      data: dataCedulaTipos,
-      loading: loadingCedulaTipos,
-      error: errorCedulaTipos,
-    } = useCedulaTipos();
-    const [tiposCedula, setTiposCedula] = useState<IGetTiposCedula | null>();
-    useEffect(() => {
-      setTiposCedula(dataCedulaTipos);
-    }, [dataCedulaTipos]);
-  // Tipos de cedulas -------------------------------------------------------
   const [formData, setFormData] = useState<IFormData>({
     analista: "",
     avaladoPor: "",
