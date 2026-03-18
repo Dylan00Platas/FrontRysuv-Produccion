@@ -4,13 +4,42 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 import "./Panorama.css";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
 import SolicitudService from "@/services/SolicitudService";
 import CedulaService from "@/services/CedulaService";
-import UserContext from "@/utils/UserContext.jsx";
+import IResponseHTTP from "@/interfaces/http/Response";
+import { ICedulaBase, IGetCedulas } from "@/schemas/cedulas/GetCedula";
+import ILabelValue from "@/interfaces/LabelValue";
+
+function mapEstado(fk: number) {
+  switch (fk) {
+    case 1:
+      return "Citado";
+    case 2:
+      return "Evaluado";
+    case 3:
+      return "En procesamiento";
+    case 4:
+      return "En revisión";
+    case 5:
+      return "En firma";
+    case 6:
+      return "Notificado";
+    case 7:
+      return "Cancelado";
+    case 8:
+      return "Terminado";
+    case 13:
+      return "Inicio procesamiento";
+    case 14:
+      return "Procesamiento oficio";
+    case 15:
+      return "Fin procesamiento";
+    default:
+      return "Por iniciar";
+  }
+}
 
 function Panorama() {
-  const { currentUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   //  Estados de Evaluaciones
@@ -27,45 +56,18 @@ function Panorama() {
   const [evaluacionesRaw, setEvaluacionesRaw] = useState([]);
 
   //  Estados de Cédulas
-  const [cedulas, setCedulas] = useState([]);
+  const [cedulas, setCedulas] = useState<ICedulaBase[]>([]);
   const [cedulasFiltradas, setCedulasFiltradas] = useState([]);
   const [filtroCedula, setFiltroCedula] = useState({
     value: "Pendiente de validar Jefe de Departamento",
     label: "Pendiente de validar Jefe de Departamento",
   });
-  const [dependenciaCedulaOptions, setDependenciaCedulaOptions] = useState([]);
+  const [dependenciaCedulaOptions, setDependenciaCedulaOptions] = useState<
+    ILabelValue[]
+  >([]);
   const [dependenciaCedulaFiltro, setDependenciaCedulaFiltro] = useState(null);
   const [searchCedula, setSearchCedula] = useState("");
   const [loadingCedulas, setLoadingCedulas] = useState(true);
-
-  function mapEstado(fk) {
-    switch (fk) {
-      case 1:
-        return "Citado";
-      case 2:
-        return "Evaluado";
-      case 3:
-        return "En procesamiento";
-      case 4:
-        return "En revisión";
-      case 5:
-        return "En firma";
-      case 6:
-        return "Notificado";
-      case 7:
-        return "Cancelado";
-      case 8:
-        return "Terminado";
-      case 13:
-        return "Inicio procesamiento";
-      case 14:
-        return "Procesamiento oficio";
-      case 15:
-        return "Fin procesamiento";
-      default:
-        return "Por iniciar";
-    }
-  }
 
   //  Cargar Evaluaciones
   useEffect(() => {
@@ -150,15 +152,16 @@ function Panorama() {
     const cargarCedulas = async () => {
       try {
         setLoadingCedulas(true);
-        const token = localStorage.getItem("token");
-        const servicio = new CedulaService();
-        const data = await servicio.obtenerTodasCedulasDisponibles(token);
+        const response: IResponseHTTP<IGetCedulas> =
+          await new CedulaService().getCedulasInternas();
 
-        const cedulasTipo2 = data.filter((c) => c.FKIdTipoCedula === 2);
+        const cedulasTipo2 = response.mensaje.cedulas.filter(
+          (c) => c.FKIdTipoCedula === 2,
+        );
         setCedulas(cedulasTipo2);
 
         const dependenciasUnicas = [
-          ...new Set(cedulasTipo2.map((c) => c.nombreDependencia || "N/A")),
+          ...new Set(cedulasTipo2.map((c) => c.dependencia || "N/A")),
         ].map((d) => ({ value: d, label: d }));
         setDependenciaCedulaOptions(dependenciasUnicas);
       } catch (err) {
@@ -167,7 +170,7 @@ function Panorama() {
         setLoadingCedulas(false);
       }
     };
-    getClasificacionesCedulas;
+    cargarCedulas();
   }, []);
 
   //  Filtros de Cédulas
@@ -178,13 +181,13 @@ function Panorama() {
       filtradas = filtradas.filter(
         (c) =>
           c.FKIdTipoCedula === 2 &&
-          c.aprobadoJefeOficina === true && // ✔ Ya validado por Jefe de Oficina
-          (c.aprobadoDireccion === null || // ❌ Pendiente por Jefe de Departamento
+          c.aprobadoJefeOficina === true && // Ya validado por Jefe de Oficina
+          (c.aprobadoDireccion === null || //  Pendiente por Jefe de Departamento
             c.aprobadoDireccion === false),
       );
     }
 
-    // 🟧 FILTRO: Pendiente de validar Jefe de Oficina
+    // FILTRO: Pendiente de validar Jefe de Oficina
     else if (filtroCedula?.value === "Pendiente de validar Jefe de Oficina") {
       filtradas = filtradas.filter(
         (c) =>
@@ -194,7 +197,7 @@ function Panorama() {
       );
     }
 
-    // 🟩 FILTRO: Todas las cédulas
+    // FILTRO: Todas las cédulas
     else if (filtroCedula?.value === "Todas las cédulas") {
       filtradas = filtradas.filter((c) => c.FKIdTipoCedula === 2);
     }
@@ -282,7 +285,7 @@ function Panorama() {
 
             <div className="filtros-combobox">
               <div>
-                <label>Estado</label>
+                <p>Estado</p>
                 <Select
                   options={estadoOptions}
                   value={filtros.estado}
@@ -292,7 +295,7 @@ function Panorama() {
               </div>
 
               <div>
-                <label>Dependencia</label>
+                <p>Dependencia</p>
                 <Select
                   options={dependenciaOptions}
                   value={filtros.dependencia}
@@ -370,7 +373,7 @@ function Panorama() {
 
             <div className="filtros-combobox">
               <div>
-                <label>Tipo de filtro</label>
+                <p>Tipo de filtro</p>
                 <Select
                   options={[
                     {
@@ -389,7 +392,7 @@ function Panorama() {
               </div>
 
               <div>
-                <label>Dependencia</label>
+                <p>Dependencia</p>
                 <Select
                   options={dependenciaCedulaOptions}
                   value={dependenciaCedulaFiltro}
@@ -483,7 +486,7 @@ function Panorama() {
                   </thead>
                   <tbody>
                     {competencias.map((c, idx) => (
-                      <tr key={idx}>
+                      <tr key={c.nombreCandidato}>
                         <td>{c.nombreCandidato}</td>
                         <td>{c.competenciaReforzar}</td>
                         <td>{c.competenciaDesarrollar}</td>

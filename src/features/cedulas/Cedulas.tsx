@@ -1,24 +1,206 @@
-// ------------------------------------------------------------------------------
 import { useCallback, useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 import "./cedulas.css";
-import {
-  selectStyles,
-  CedulaBadge,
-  getIdTipoCedula,
-} from "@/utils/features/Cedulas.tsx";
-import { normalizarCedulas } from "@/utils/features/Cedulas";
+import { Toast } from "@/components/Alert/Floating/Toast";
 import CedulaService from "@/services/CedulaService.js";
 import ILabelValue from "@/interfaces/LabelValue";
 import { ICedulaBase } from "@/schemas/cedulas/GetCedula";
-import { useCedulas } from "@/hooks/useCedulas";
-import { getUniqueOptionsLabelValue } from "@/utils/utils";
 import { useToast } from "@/hooks/useToast";
-import { Toast } from "@/components/Alert/Floating/Toast";
+import { useCedulas } from "@/hooks/useCedulas";
 import { useCedulasFiltradas } from "@/hooks/UseCedulasFiltradas";
+import { getUniqueOptionsLabelValue } from "@/utils/utils";
+
+// Utils ---------------------------------------------------------------------
+const selectStyles = {
+  control: (base: object, state: { isFocused: boolean }) => ({
+    ...base,
+    borderColor: state.isFocused ? "#18529d" : "#e2e8f0",
+    boxShadow: state.isFocused ? "0 0 0 3px rgba(24,82,157,0.15)" : "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    backgroundColor: "#f8fafc",
+    "&:hover": { borderColor: "#18529d" },
+    minHeight: "40px",
+  }),
+  option: (
+    base: object,
+    state: { isSelected: boolean; isFocused: boolean },
+  ) => ({
+    ...base,
+    fontSize: "13px",
+    backgroundColor: state.isSelected
+      ? "#18529d"
+      : state.isFocused
+        ? "#eff6ff"
+        : "white",
+    color: state.isSelected ? "white" : "#334155",
+  }),
+  placeholder: (base: object) => ({
+    ...base,
+    color: "#94a3b8",
+    fontSize: "13px",
+  }),
+  singleValue: (base: object) => ({
+    ...base,
+    color: "#1e293b",
+    fontSize: "13px",
+  }),
+};
+function CedulaBadge({ tipo }: { tipo: string }) {
+  const config: Record<string, { label: string; classes: string }> = {
+    Interna: {
+      label: "Interna",
+      classes: "bg-pink-100 text-pink-700 ring-1 ring-pink-200",
+    },
+    Resultados: {
+      label: "Resultados",
+      classes: "bg-slate-100 text-slate-700 ring-1 ring-slate-200",
+    },
+    DeBolsa: {
+      label: "De bolsa",
+      classes: "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
+    },
+  };
+
+  const { label, classes } = config[tipo] ?? {
+    label: tipo,
+    classes: "bg-gray-100 text-gray-600",
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${classes}`}
+    >
+      {label}
+    </span>
+  );
+}
+const getIdTipoCedula = (id: number): string => {
+  switch (id) {
+    case 1:
+      return "Interna";
+    case 2:
+      return "Resultados";
+    case 3:
+      return "De bolsa";
+    default:
+      return "";
+  }
+};
+function normalizarCedulas(data: ICedulaBase[]): ICedulaBase[] {
+  return data.map((cedula) => ({
+    idCedula: cedula.idCedula || 0,
+    analista: cedula.analista || "",
+    antecedentesFamiliaresUV: cedula.antecedentesFamiliaresUV || "",
+    aprobadoDireccion: false,
+    aprobadoJefeOficina: false,
+    archivoAdjunto: false,
+    categoriaPuestoOrigen: cedula.categoriaPuestoOrigen || "",
+    competenciaDesarrollar: cedula.competenciaDesarrollar || "",
+    competenciaReforzar: cedula.competenciaReforzar || "",
+    competenciasSobresaliente: cedula.competenciasSobresaliente || "",
+    conclusiones: cedula.conclusiones || "",
+    consecutivoExpediente: cedula.consecutivoExpediente || "",
+    dependencia: cedula.dependencia || "",
+    descripcionDesarrollar: cedula.descripcionDesarrollar || "",
+    descripcionReforzar: cedula.descripcionReforzar || "",
+    diasProceso: cedula.diasProceso || "",
+    edad: cedula.edad || "",
+    educacionFormal: Array.isArray(cedula.educacionFormal)
+      ? cedula.educacionFormal.find((e) => e) || ""
+      : cedula.educacionFormal || "",
+    efectoContratacion: cedula.efectoContratacion || "",
+    estado: cedula.estado || false,
+    evaluacionConocimientos: cedula.evaluacionConocimientos || "",
+    expectativaLaboral: cedula.expectativaLaboral || "",
+    experiencia: cedula.experiencia || "",
+    experienciaLaboralSolicitada: cedula.experienciaLaboralSolicitada || "",
+    experienciaRelacionada: cedula.experienciaRelacionada || "",
+    familiaFuncional: cedula.familiaFuncional || "",
+    fechaCedulaInterna: cedula.fechaCedulaInterna || "",
+    fechaCedulaResultados: cedula.fechaCedulaResultados || "",
+    fechaElaboracionPropuesta: cedula.fechaElaboracionPropuesta || "",
+    fechaEntrevista: cedula.fechaEntrevista || "",
+    fechaEnvioDEyDP: cedula.fechaEnvioDEyDP || "",
+    fechaEnvioEvaluacionDesempenio: cedula.fechaEnvioEvaluacionDesempenio || "",
+    fechaEvaluacionCompetencias: cedula.fechaEvaluacionCompetencias || "",
+    fechaEvaluacionDesempenio: cedula.fechaEnvioEvaluacionDesempenio || "",
+    fechaInicioProcesamiento: cedula.fechaInicioProcesamiento || "",
+    fechaLiberacionOficio: cedula.fechaLiberacionOficio || "",
+    fechaNotificacion: cedula.fechaNotificacion || "",
+    fechaRecibido: cedula.fechaRecibido || "",
+    fechaRevisionOfiEval: cedula.fechaRevisionOfiEval || "",
+    FKIdClasificacionCedula: cedula.FKIdClasificacionCedula || 0,
+    FKIdProceso: cedula.FKIdResultado || 0,
+    FKIdResultado: cedula.FKIdResultado || 0,
+    FKIdTipoCedula: cedula.FKIdTipoCedula === 1 ? 1 : 2,
+    folio: cedula.folio || "",
+    funcionDesempeniar: cedula.funcionDesempeniar || "",
+    hermesNotificacion: cedula.hermesNotificacion || "",
+    lineamientoOficioContinuidad: cedula.lineamientoOficioContinuidad || "",
+    motivo: cedula.motivo || "",
+    motivoCedulaInterna: cedula.motivoCedulaInterna || "",
+    motivoCedulaResultados: cedula.motivoCedulaResultados || "",
+    nombreCandidato: cedula.nombreCandidato || "N/A",
+    numCarpeta: cedula.numCarpeta || "",
+    numPlaza: cedula.numPlaza || "",
+    observaciones: cedula.observaciones || "",
+    observacionesAnalista: cedula.observacionesAnalista || "",
+    oficioAutorizacionDeOcupacion: cedula.oficioAutorizacionDeOcupacion || "",
+    periodoAutorizadoOficioFin: cedula.periodoAutorizadoOficioFin || "",
+    periodoAutorizadoOficioInicio: cedula.periodoAutorizadoOficioInicio || "",
+    plaza: cedula.plaza || "",
+    puesto: cedula.puesto || "N/A",
+    psicometriaAnalisisProblemas: cedula.psicometriaAnalisisProblemas || "",
+    psicometriaComunicacion: cedula.psicometriaComunicacion || "",
+    psicometriaControlActividades: cedula.psicometriaControlActividades || "",
+    psicometriaDinamismo: cedula.psicometriaDinamismo || "",
+    psicometriaEnfoqueCalidad: cedula.psicometriaEnfoqueCalidad || "",
+    psicometriaEnfoqueResultados: cedula.psicometriaEnfoqueCalidad || "",
+    psicometriaInnovacion: cedula.psicometriaInnovacion || "",
+    psicometriaLiderazgo: cedula.psicometriaLiderazgo || "",
+    psicometriaNegociacion: cedula.psicometriaNegociacion || "",
+    psicometriaOrientacionAlServicio:
+      cedula.psicometriaOrientacionAlServicio || "",
+    psicometriaPensamientoEstrategico:
+      cedula.psicometriaPensamientoEstrategico || "",
+    psicometriaPlaneacionOrganizacion:
+      cedula.psicometriaPlaneacionOrganizacion || "",
+    psicometriaRelacionesInterpersonales:
+      cedula.psicometriaRelacionesInterpersonales || "",
+    psicometriaSensibilidadALineamientos:
+      cedula.psicometriaSensibilidadALineamientos || "",
+    psicometriaTomaDecisiones: cedula.psicometriaTomaDecisiones || "",
+    psicometriaTrabajoEnEquipo: cedula.psicometriaTrabajoEnEquipo || "",
+    referidoPor: cedula.referidoPor || "",
+    resultado: cedula.resultado || "Pendiente",
+    resultadoEvaluacionCompetencias:
+      cedula.resultadoEvaluacionCompetencias || "",
+    resultadoEvaluacionConocimiento:
+      cedula.resultadoEvaluacionConocimiento || "",
+    resultadoHabilidadesExcel: cedula.resultadoHabilidadesExcel || "N/A",
+    resultadoHabilidadesWord: cedula.resultadoHabilidadesWord || "",
+    resultadoOrtografia: cedula.resultadoOrtografia || "",
+    resultadoPorcentaje: cedula.resultadoPorcentaje || "",
+    resultadoProcesoEvaluacion: cedula.resultadoProcesoEvaluacion || "",
+    resultadoReferenciasLaborales: cedula.resultadoReferenciasLaborales || "",
+    resultadoSeguimientoEvaluacionDesempenio:
+      cedula.resultadoSeguimientoEvaluacionDesempenio || "",
+    seguimientoEvaluacionDesempenio:
+      cedula.seguimientoEvaluacionDesempenio || "",
+    titularPlaza: cedula.titularPlaza || "",
+  }));
+}
+
+// Datos fijos ---------------------------------------------------------------
+const CEDULA_OPTIONS: ILabelValue[] = [
+  { value: "Interna", label: "Interna" },
+  { value: "Resultados", label: "Resultados" },
+  { value: "Archivadas", label: "Archivadas" },
+];
 
 function Cedulas() {
   const navigate = useNavigate();
@@ -53,12 +235,6 @@ function Cedulas() {
   }, [cedulasData]);
 
   // Manejo de filtros -------------------------------------------------------
-  const CEDULA_OPTIONS: ILabelValue[] = [
-    { value: "Interna", label: "Interna" },
-    { value: "Resultados", label: "Resultados" },
-    { value: "Archivadas", label: "Archivadas" },
-  ];
-
   const {
     cedulaFiltro,
     setCedulaFiltro,

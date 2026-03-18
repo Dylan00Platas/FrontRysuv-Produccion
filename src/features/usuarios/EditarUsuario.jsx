@@ -128,8 +128,9 @@ function EditarUsuario() {
         <form className="form-grid" onSubmit={handleSubmit}>
           {/* Fila 1 */}
           <div className="form-group">
-            <label className="form-label">Nombre(s)</label>
+            <label htmlFor="editar-nombres" className="form-label">Nombre(s)</label>
             <input
+              id="editar-nombres"
               type="text"
               className="form-input"
               value={formData.nombres}
@@ -145,8 +146,9 @@ function EditarUsuario() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Primer Apellido</label>
+            <label htmlFor="editar-primer-apellido" className="form-label">Primer Apellido</label>
             <input
+              id="editar-primer-apellido"
               type="text"
               className="form-input"
               value={formData.primerApellido}
@@ -162,8 +164,9 @@ function EditarUsuario() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Segundo Apellido</label>
+            <label htmlFor="editar-segundo-apellido" className="form-label">Segundo Apellido</label>
             <input
+              id="editar-segundo-apellido"
               type="text"
               className="form-input"
               value={formData.segundoApellido}
@@ -175,8 +178,9 @@ function EditarUsuario() {
 
           {/* Fila 2 */}
           <div className="form-group">
-            <label className="form-label">Usuario</label>
+            <label htmlFor="editar-usuario" className="form-label">Usuario</label>
             <input
+              id="editar-usuario"
               type="text"
               className="form-input"
               value={formData.usuario}
@@ -194,8 +198,9 @@ function EditarUsuario() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Rol</label>
+            <label htmlFor="editar-rol" className="form-label">Rol</label>
             <select
+              id="editar-rol"
               className="form-input rol-select"
               value={formData.rol}
               onChange={(e) => {
@@ -219,9 +224,10 @@ function EditarUsuario() {
 
           {/* ⭐ Campo de Contraseña Modificado */}
           <div className="form-group password-group">
-            <label className="form-label">Nueva contraseña</label>
+            <label htmlFor="editar-contrasena" className="form-label">Nueva contraseña</label>
             <div className="password-input-container-usuario">
               <input
+                id="editar-contrasena"
                 type={showPassword ? "text" : "password"}
                 className="form-input password-input-usuario"
                 value={formData.contrasena}

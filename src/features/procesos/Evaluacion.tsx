@@ -329,13 +329,13 @@ function Evaluacion() {
         <div className="page-header-evaluacion">
           <h1 className="page-title-evaluacion">Evaluación</h1>
           <div className="combobox-header-evaluacion">
-            <label className="label-opcion-evaluacion">
+            <p className="label-opcion-evaluacion">
               {formData.tipoAsignacion === "asignacion"
                 ? "Asignación"
                 : formData.tipoAsignacion === "requisicion"
                   ? "Requisición"
                   : "Bolsa"}
-            </label>
+            </p>
           </div>
         </div>
 
@@ -344,9 +344,9 @@ function Evaluacion() {
           <form className="form-grid" onSubmit={handleSubmit}>
             {/* Identificador de candidato */}
             <div className="identificador-candidato-container full-row">
-              <label className="identificador-candidato-label">
+              <p className="identificador-candidato-label">
                 Identificador de candidato:
-              </label>
+              </p>
               <span className="identificador-candidato-valor">
                 {formData.idProcesoContratacion || "N/A"}
               </span>
@@ -357,9 +357,10 @@ function Evaluacion() {
               { label: "Folio", field: "folio" },
               { label: "Hermes de Notificación", field: "hermes" },
             ].map((f, i) => (
-              <div key={i} className="form-group">
-                <label className="form-label-evaluacion">{f.label}</label>
+              <div key={f.field} className="form-group">
+                <label htmlFor={f.field} className="form-label-evaluacion">{f.label}</label>
                 <input
+                  id={f.field}
                   type="text"
                   className="form-input-evaluacion"
                   value={formData[f.field]}
@@ -397,9 +398,10 @@ function Evaluacion() {
                 type: "date",
               },
             ].map((f, i) => (
-              <div key={i} className="form-group">
-                <label className="form-label-evaluacion">{f.label}</label>
+              <div key={f.field} className="form-group">
+                <label htmlFor={f.field} className="form-label-evaluacion">{f.label}</label>
                 <input
+                  id={f.field}
                   type={f.type}
                   className="form-input-evaluacion"
                   value={formData[f.field]}
@@ -410,11 +412,12 @@ function Evaluacion() {
             ))}
 
             <div className="form-group" style={{ position: "relative" }}>
-              <label className="form-label-evaluacion">
+              <label htmlFor="numDependencia" className="form-label-evaluacion">
                 Número de Dependencia
               </label>
               <div className="input-with-icon">
                 <input
+                  id="numDependencia"
                   type="text"
                   className="form-input-evaluacion"
                   value={formData.numDependencia}
@@ -455,11 +458,12 @@ function Evaluacion() {
                 label: "Categoría por autorizar",
                 field: "categoriaAutorizada",
               },
-            ].map(({ label, field, type = "text" }, i) => (
-              <div key={i} className="form-group">
-                <label className="form-label-evaluacion">{label}</label>
+            ].map(({ label, field, type = "text" }) => (
+              <div key={field} className="form-group">
+                <label htmlFor={field} className="form-label-evaluacion">{label}</label>
                 {type === "select" ? (
                   <select
+                    id={field}
                     className="form-input-evaluacion"
                     value={formData[field]}
                     onChange={(e) => handleInputChange(field, e.target.value)}
@@ -471,6 +475,7 @@ function Evaluacion() {
                   </select>
                 ) : (
                   <input
+                    id={field}
                     type={type}
                     className="form-input-evaluacion"
                     value={formData[field]}
@@ -483,10 +488,11 @@ function Evaluacion() {
 
             {/* Lineamiento que aplica */}
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label htmlFor="lineamiento" className="form-label-evaluacion">
                 Lineamiento que aplica
               </label>
               <select
+                id="lineamiento"
                 className="form-input-evaluacion"
                 value={formData.lineamiento}
                 onChange={(e) =>
@@ -504,8 +510,9 @@ function Evaluacion() {
 
             {/* Tipo */}
             <div className="form-group">
-              <label className="form-label-evaluacion">Tipo</label>
+              <label htmlFor="tipo-evaluacion" className="form-label-evaluacion">Tipo</label>
               <select
+                id="tipo-evaluacion"
                 className="form-input-evaluacion"
                 value={formData.tipo}
                 onChange={(e) => handleInputChange("tipo", e.target.value)}
@@ -519,10 +526,11 @@ function Evaluacion() {
 
             {/* Observaciones Registro */}
             <div className="form-group" style={{ gridColumn: "span 3" }}>
-              <label className="form-label-evaluacion">
+              <label htmlFor="observaciones-registro" className="form-label-evaluacion">
                 Observaciones Registro
               </label>
               <textarea
+                id="observaciones-registro"
                 className="large-textarea"
                 value={formData.observacionesRegistro}
                 onChange={(e) =>
@@ -534,8 +542,9 @@ function Evaluacion() {
 
             {/* Estado */}
             <div className="form-group">
-              <label className="form-label-evaluacion">Estado</label>
+              <label htmlFor="estado-evaluacion-1" className="form-label-evaluacion">Estado</label>
               <select
+                id="estado-evaluacion-1"
                 className="form-input-evaluacion"
                 value={formData.estado}
                 onChange={(e) => handleInputChange("estado", e.target.value)}
@@ -634,9 +643,9 @@ function Evaluacion() {
           <form className="form-grid" onSubmit={handleSubmit}>
             {/* Identificador de candidato */}
             <div className="identificador-candidato-container full-row">
-              <label className="identificador-candidato-label">
+              <p className="identificador-candidato-label">
                 Identificador de candidato:
-              </label>
+              </p>
               <span className="identificador-candidato-valor">
                 {formData.idProcesoContratacion || "N/A"}
               </span>
@@ -649,9 +658,10 @@ function Evaluacion() {
               { label: "Función a desempeñar", field: "funcion" },
               { label: "Familia Funcional", field: "familia" },
             ].map((f, i) => (
-              <div key={i} className="form-group">
-                <label className="form-label-evaluacion">{f.label}</label>
+              <div key={f.field} className="form-group">
+                <label htmlFor={f.field} className="form-label-evaluacion">{f.label}</label>
                 <input
+                  id={f.field}
                   type="text"
                   className="form-input-evaluacion"
                   value={formData[f.field]}
@@ -677,9 +687,10 @@ function Evaluacion() {
                 field: "fechaEnvioEval",
               },
             ].map((f, i) => (
-              <div key={i} className="form-group">
-                <label className="form-label-evaluacion">{f.label}</label>
+              <div key={f.field} className="form-group">
+                <label htmlFor={f.field} className="form-label-evaluacion">{f.label}</label>
                 <input
+                  id={f.field}
                   type="date"
                   className="form-input-evaluacion"
                   value={formData[f.field]}
@@ -690,10 +701,11 @@ function Evaluacion() {
 
             {/* Experiencia laboral */}
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label htmlFor="experiencia-laboral" className="form-label-evaluacion">
                 Experiencia laboral solicitada
               </label>
               <select
+                id="experiencia-laboral"
                 className="form-input-evaluacion"
                 value={formData.experienciaLaboral}
                 onChange={(e) =>
@@ -726,9 +738,10 @@ function Evaluacion() {
                 field: "resultadoExcel",
               },
             ].map((f, i) => (
-              <div key={i} className="form-group">
-                <label className="form-label-evaluacion">{f.label}</label>
+              <div key={f.field} className="form-group">
+                <label htmlFor={f.field} className="form-label-evaluacion">{f.label}</label>
                 <input
+                  id={f.field}
                   type={f.type || "text"}
                   className="form-input-evaluacion"
                   value={formData[f.field]}
@@ -744,10 +757,11 @@ function Evaluacion() {
 
             {/* Resultado de referencias */}
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label htmlFor="resultado-referencias" className="form-label-evaluacion">
                 Resultado de referencias
               </label>
               <select
+                id="resultado-referencias"
                 className="form-input-evaluacion"
                 value={formData.resultadoReferencias}
                 onChange={(e) =>
@@ -768,10 +782,11 @@ function Evaluacion() {
 
             {/* Resultado de Evaluación */}
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label htmlFor="resultado-evaluacion" className="form-label-evaluacion">
                 Resultado de Evaluación
               </label>
               <select
+                id="resultado-evaluacion"
                 className="form-input-evaluacion"
                 value={formData.resultadoEvaluacion}
                 onChange={(e) =>
@@ -791,8 +806,9 @@ function Evaluacion() {
 
             {/* Beneficiado */}
             <div className="form-group">
-              <label className="form-label-evaluacion">Beneficiado</label>
+              <label htmlFor="beneficiado" className="form-label-evaluacion">Beneficiado</label>
               <select
+                id="beneficiado"
                 className="form-input-evaluacion"
                 value={formData.beneficiado}
                 onChange={(e) =>
@@ -814,9 +830,10 @@ function Evaluacion() {
               { label: "Fecha de envio a DEyDP", field: "fechaEnvio" },
               { label: "Fecha de Notificación", field: "fechaNotificacion" },
             ].map((f, i) => (
-              <div key={i} className="form-group">
-                <label className="form-label-evaluacion">{f.label}</label>
+              <div key={f.field} className="form-group">
+                <label htmlFor={f.field} className="form-label-evaluacion">{f.label}</label>
                 <input
+                  id={f.field}
                   type="date"
                   className="form-input-evaluacion"
                   value={formData[f.field]}
@@ -827,10 +844,11 @@ function Evaluacion() {
 
             {/* Fecha de evaluación de desempeño */}
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label htmlFor="fecha-eval-seguimiento" className="form-label-evaluacion">
                 Fecha de evaluación de seguimiento
               </label>
               <input
+                id="fecha-eval-seguimiento"
                 type="date"
                 className="form-input-evaluacion"
                 value={formData.fechaEvaluacionDesempeno || ""}
@@ -840,10 +858,11 @@ function Evaluacion() {
 
             {/* Tiempo proceso */}
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label htmlFor="tiempo-proceso" className="form-label-evaluacion">
                 Tiempo del proceso (cantidad de días)
               </label>
               <input
+                id="tiempo-proceso"
                 type="number"
                 className="form-input-evaluacion"
                 value={formData.tiempoProceso}
@@ -855,10 +874,11 @@ function Evaluacion() {
 
             {/* Observaciones analista */}
             <div className="form-group" style={{ gridColumn: "span 3" }}>
-              <label className="form-label-evaluacion">
+              <label htmlFor="observaciones-analista" className="form-label-evaluacion">
                 Observaciones del analista
               </label>
               <textarea
+                id="observaciones-analista"
                 className="large-textarea"
                 value={formData.observacionesAnalista}
                 onChange={(e) =>
@@ -878,9 +898,10 @@ function Evaluacion() {
                 field: "resultadoSeguimiento",
               },
             ].map((f, i) => (
-              <div key={i} className="form-group">
-                <label className="form-label-evaluacion">{f.label}</label>
+              <div key={f.field} className="form-group">
+                <label htmlFor={f.field} className="form-label-evaluacion">{f.label}</label>
                 <input
+                  id={f.field}
                   type="text"
                   className="form-input-evaluacion"
                   value={formData[f.field]}
@@ -891,10 +912,11 @@ function Evaluacion() {
 
             {/* Seguimiento de evaluación desempeño */}
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label htmlFor="requiere-seguimiento" className="form-label-evaluacion">
                 Requiere seguimiento
               </label>
               <select
+                id="requiere-seguimiento"
                 className="form-input-evaluacion"
                 value={formData.seguimientoDesempeno}
                 onChange={(e) =>
@@ -908,8 +930,9 @@ function Evaluacion() {
 
             {/* Estado y checkbox */}
             <div className="form-group">
-              <label className="form-label-evaluacion">Estado</label>
+              <label htmlFor="estado-evaluacion-2" className="form-label-evaluacion">Estado</label>
               <select
+                id="estado-evaluacion-2"
                 className="form-input-evaluacion"
                 value={formData.estado}
                 onChange={(e) => handleInputChange("estado", e.target.value)}
@@ -938,8 +961,9 @@ function Evaluacion() {
 
             {/* Número de Carpeta */}
             <div className="form-group">
-              <label className="form-label-evaluacion">Número de Carpeta</label>
+              <label htmlFor="n-carpeta" className="form-label-evaluacion">Número de Carpeta</label>
               <input
+                id="n-carpeta"
                 type="text"
                 className="form-input-evaluacion"
                 value={formData.nCarpeta}
@@ -1074,8 +1098,18 @@ function Evaluacion() {
         </button>
 
         {showPopup && (
-          <div className="popup-overlay" onClick={() => setShowPopup(false)}>
-            <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            role="presentation"
+            className="popup-overlay"
+            onClick={() => setShowPopup(false)}
+            onKeyDown={() => setShowPopup(false)}
+          >
+            <div
+              role="presentation"
+              className="popup-content"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
               <h2>Historial de versiones</h2>
               {versiones.length === 0 ? (
                 <p>No hay versiones disponibles.</p>
@@ -1083,9 +1117,10 @@ function Evaluacion() {
                 versiones.map((item, index) => {
                   const abierta = tarjetasAbiertas[index] || false; // por defecto cerrada
                   return (
-                    <div className="json-card" key={index}>
+                    <div className="json-card" key={item.fecha + item.NombreCompleto}>
                       <h4
                         onClick={() => toggleTarjeta(index)}
+                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleTarjeta(index); }}
                         style={{ cursor: "pointer", userSelect: "none" }}
                       >
                         {item.NombreCompleto} — {item.fecha}{" "}

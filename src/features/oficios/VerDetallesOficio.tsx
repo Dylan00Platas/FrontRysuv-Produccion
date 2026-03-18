@@ -1,15 +1,11 @@
 import { useState, useContext } from "react";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { PDFDocument, PDFFont, PDFPage } from "pdf-lib";
 import * as fontkit from "fontkit";
-
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import UserContext from "@/utils/UserContext.jsx";
+import ManageFiles from "@/utils/ManageFiles";
 
 function VerDetallesOficio() {
-  const { currentUser } = useContext(UserContext);
-
   const datos = JSON.parse(sessionStorage.getItem("detallesOficio") || "{}");
 
   const [formData, setFormData] = useState({
@@ -48,14 +44,14 @@ function VerDetallesOficio() {
       const page = pdfDoc.getPages()[0];
 
       function drawJustifiedText(
-        page,
-        text,
-        x,
-        y,
-        width,
-        font,
-        fontSize,
-        lineHeight,
+        page: PDFPage,
+        text: string,
+        x: number,
+        y: number,
+        width: number,
+        font: PDFFont,
+        fontSize: number,
+        lineHeight: number,
       ) {
         const paragraphs = text.replace(/\r\n/g, "\n").split(/\n{1,}/);
 
@@ -128,7 +124,14 @@ function VerDetallesOficio() {
 
       form.flatten();
 
-      function drawRightAlignedText(page, text, rightX, y, font, fontSize) {
+      function drawRightAlignedText(
+        page: PDFPage,
+        text: string,
+        rightX: number,
+        y: number,
+        font: PDFFont,
+        fontSize: number,
+      ) {
         const textWidth = font.widthOfTextAtSize(text, fontSize);
         page.drawText(text, {
           x: rightX - textWidth,
@@ -150,7 +153,9 @@ function VerDetallesOficio() {
       });
 
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const blob = new Blob([ManageFiles.toArrayBuffer(pdfBytes)], {
+        type: "application/pdf",
+      });
       const url = URL.createObjectURL(blob);
 
       const link = document.createElement("a");
@@ -220,9 +225,7 @@ function VerDetallesOficio() {
   };
 
   return (
-    <div className="iniciar-solicitud-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
-
+    <>
       <main className="main-content-solicitud">
         <div className="page-header-solicitud">
           <h1 className="page-title-solicitud">Detalles del Oficio</h1>
@@ -232,8 +235,11 @@ function VerDetallesOficio() {
           <h3 className="section-title">Datos del oficio</h3>
 
           <div className="form-group-solicitud">
-            <label className="form-label-solicitud">Folio del oficio</label>
+            <label htmlFor="ver-folio-oficio" className="form-label-solicitud">
+              Folio del oficio
+            </label>
             <input
+              id="ver-folio-oficio"
               type="text"
               className="form-input-solicitud"
               value={formData.folioOficio}
@@ -242,8 +248,11 @@ function VerDetallesOficio() {
           </div>
 
           <div className="form-group-solicitud">
-            <label className="form-label-solicitud">Fecha del oficio</label>
+            <label htmlFor="ver-fecha-oficio" className="form-label-solicitud">
+              Fecha del oficio
+            </label>
             <input
+              id="ver-fecha-oficio"
               type="text"
               className="form-input-solicitud"
               value={formData.fechaOficio}
@@ -252,8 +261,11 @@ function VerDetallesOficio() {
           </div>
 
           <div className="form-group-solicitud">
-            <label className="form-label-solicitud">Destinatario</label>
+            <label htmlFor="ver-destinatario" className="form-label-solicitud">
+              Destinatario
+            </label>
             <input
+              id="ver-destinatario"
               type="text"
               className="form-input-solicitud"
               value={formData.destinatario}
@@ -262,10 +274,14 @@ function VerDetallesOficio() {
           </div>
 
           <div className="form-group-solicitud">
-            <label className="form-label-solicitud">
+            <label
+              htmlFor="ver-puesto-destinatario"
+              className="form-label-solicitud"
+            >
               Puesto (destinatario)
             </label>
             <input
+              id="ver-puesto-destinatario"
               type="text"
               className="form-input-solicitud"
               value={formData.puestoDestinatario}
@@ -277,8 +293,11 @@ function VerDetallesOficio() {
             className="form-group-solicitud"
             style={{ gridColumn: "span 3" }}
           >
-            <label className="form-label-solicitud">Cuerpo del Oficio</label>
+            <label htmlFor="ver-cuerpo-oficio" className="form-label-solicitud">
+              Cuerpo del Oficio
+            </label>
             <textarea
+              id="ver-cuerpo-oficio"
               className="large-textarea-solicitud2"
               value={formData.cuerpo}
               readOnly
@@ -289,8 +308,11 @@ function VerDetallesOficio() {
             className="form-group-solicitud"
             style={{ gridColumn: "span 3" }}
           >
-            <label className="form-label-solicitud">Copia Carbón</label>
+            <label htmlFor="ver-copia-carbon" className="form-label-solicitud">
+              Copia Carbón
+            </label>
             <textarea
+              id="ver-copia-carbon"
               className="large-textarea-solicitud3"
               value={formData.copiaCarbon}
               readOnly
@@ -316,7 +338,7 @@ function VerDetallesOficio() {
           </div>
         </form>
       </main>
-    </div>
+    </>
   );
 }
 

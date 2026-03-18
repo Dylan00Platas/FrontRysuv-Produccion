@@ -1,0 +1,10 @@
+﻿
+  const totalAnalistaChart = useMemo(
+    () =>
+      analistaFiltro.value === "Todos"
+        ? procesosAdaptados.length
+        : procesosAdaptados.filter((p) => p.analista === analistaFiltro.value)
+            .length,
+    [procesosAdaptados, analistaFiltro],
+  );
+

@@ -1,57 +1,48 @@
+import { Toast } from "@/components/Alert/Floating/Toast";
+import { useToast } from "@/hooks/useToast";
+import IResponseHTTP from "@/interfaces/http/Response";
+import {
+  IGetOficiosProcesoContratacion,
+  IOficioProcesoContratacionBase,
+} from "@/schemas/procesos-contratacion/GetOficioProcesoContratacion";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { useEffect, useState, useContext } from "react";
 import { FaSearch } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import SolicitudService from "@/services/SolicitudService.js";
-import UserContext from "@/utils/UserContext.jsx";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function VerOficios() {
-  const { currentUser } = useContext(UserContext);
+  const { toast, mostrarToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const idProceso = location?.state.idProceso;
 
-  const datosSesion = sessionStorage.getItem("datosVerOficios");
-  const datosParsed = datosSesion ? JSON.parse(datosSesion) : null;
-
-  const idProceso = datosParsed?.idProceso || null;
-
-  const [oficios, setOficios] = useState([]);
-  const [oficiosFiltrados, setOficiosFiltrados] = useState([]);
+  const [oficios, setOficios] = useState<IOficioProcesoContratacionBase[]>([]);
+  const [oficiosFiltrados, setOficiosFiltrados] = useState<
+    IOficioProcesoContratacionBase[]
+  >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOficios = async () => {
       try {
-        const token =
-          sessionStorage.getItem("token") ||
-          localStorage.getItem("token") ||
-          usuario?.token;
+        const response: IResponseHTTP<IGetOficiosProcesoContratacion> =
+          await new ProcesoContratacionService().getOficio(idProceso);
 
-        if (!idProceso) {
-          console.error("❌ No se recibió idProceso");
-          setLoading(false);
-          return;
+        if (response.mensaje) {
+          const adaptados = response.mensaje.oficios.map((o, idx) => ({
+            id: o.idOficio ?? idx,
+            tipo: o.tipo || "Sin tipo",
+            dirigido: o.dirigido || "Sin destinatario",
+            fecha: o.fecha || "Sin fecha",
+            folio: o.folio || "",
+            machote: o.machote || "",
+            piePagina: o.piePagina || "",
+            puestoDirigido: o.puestoDirigido || "",
+          }));
+          setOficios(adaptados);
+          setOficiosFiltrados(adaptados);
         }
-
-        const servicio = new SolicitudService();
-        const data = await servicio.obtenerOficiosPorProceso(idProceso, token);
-
-        console.log("📩 JSON recibido del backend (oficios):", data);
-
-        const adaptados = data.map((o, idx) => ({
-          id: o.idOficio ?? idx,
-          tipo: o.tipo || "Sin tipo",
-          dirigido: o.dirigido || "Sin destinatario",
-          fecha: o.fecha || "Sin fecha",
-          folio: o.folio || "",
-          machote: o.machote || "",
-          piePagina: o.piePagina || "",
-          puestoDirigido: o.puestoDirigido || "",
-        }));
-
-        setOficios(adaptados);
-        setOficiosFiltrados(adaptados);
       } catch (err) {
         console.error("Error al obtener oficios:", err);
       } finally {
@@ -60,9 +51,9 @@ function VerOficios() {
     };
 
     fetchOficios();
-  }, [idProceso, usuario]);
+  }, [idProceso]);
 
-  // 🔎 Filtro
+  // Filtro
   useEffect(() => {
     const filtrados = oficios.filter((o) => {
       const texto = `${o.tipo} ${o.dirigido} ${o.fecha}`.toLowerCase();
@@ -71,16 +62,14 @@ function VerOficios() {
     setOficiosFiltrados(filtrados);
   }, [searchTerm, oficios]);
 
-  // 👉 **FUNCIÓN PARA VER DETALLES**
   const verDetalles = (oficio) => {
     sessionStorage.setItem("detallesOficio", JSON.stringify(oficio));
     navigate("/Ver-detalles-oficio");
   };
 
   return (
-    <div className="solicitudes-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
-
+    <>
+      <Toast texto={toast.texto} tipo={toast.tipo} />
       <main className="main-content">
         <div className="page-header2">
           <h1 className="page-title2">Oficios del Proceso</h1>
@@ -132,7 +121,7 @@ function VerOficios() {
           </table>
         )}
       </main>
-    </div>
+    </>
   );
 }
 

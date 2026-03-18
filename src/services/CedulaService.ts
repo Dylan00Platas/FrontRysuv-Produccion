@@ -8,9 +8,7 @@ import {
 } from "@/schemas/cedulas/GetCedula";
 import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompetencia";
 import { IGetCedulaExterna } from "@/schemas/cedulas-externas/GetCedulaExterna";
-import IPostCedula, {
-  IPostCedulaInternaForm,
-} from "@/schemas/cedulas/PostCedula";
+import IPostCedula from "@/schemas/cedulas/PostCedula";
 import IPutCedula, { IPutCedulaPartial } from "@/schemas/cedulas/PutCedula";
 import IPostResultadoCedula from "@/schemas/cedulas/PostResultadoCedula";
 
@@ -23,7 +21,7 @@ export default class CedulaService {
 
   // TODO-Desarrollo: Verificar body en backend
   async postCedulaInterna(
-    requestData: IPostCedulaInternaForm,
+    requestData: IPostCedula,
   ): Promise<IResponseHTTP<string | number>> {
     return await this.api.request({
       endpoint: "/",

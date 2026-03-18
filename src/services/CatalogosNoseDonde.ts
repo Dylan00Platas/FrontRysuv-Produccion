@@ -24,35 +24,6 @@ export function mapRolTipo(tipo: string) {
   }
 }
 
-export enum EstadoProceso {
-  Pendiente = 9,
-  EnProceso = 10,
-  Finalizado = 11,
-}
-
-export const mapColorEstado = (estado: EstadoProceso): string => {
-  switch (estado) {
-    case EstadoProceso.Pendiente:
-      return "#f1c40f";
-    case EstadoProceso.EnProceso:
-      return "#e67e22";
-    case EstadoProceso.Finalizado:
-      return "#23aa12";
-    default:
-      return "#d11a2a";
-  }
-};
-
-/**
- * Determina el color final del evento considerando si el candidato no asistió.
- */
-export default function resolverColor(
-  estado: number,
-  atendioCita: boolean,
-): string {
-  return atendioCita ? "#d11a2a" : mapColorEstado(estado);
-}
-
 // TODO-Desarrollo: Mapear roles dinámicamente desde servidor.
 const ESTADOS_PROCESO = {
   Citado: 1,

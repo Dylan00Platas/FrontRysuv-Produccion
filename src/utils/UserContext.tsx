@@ -1,9 +1,19 @@
 import { createContext, Dispatch, SetStateAction } from "react";
-import ICurrentUser from "@/interfaces/auth/CurrentUser";
 
+// TODO-Desarrollo: obtener usuario desde contexto/cookie
 export interface IUserContext {
-  currentUser: ICurrentUser | null;
-  setCurrentUser: Dispatch<SetStateAction<ICurrentUser | null>>;
+  FKIdTipoAcceso?: number;
+  id?: number;
+  nombre?: string;
+  email?: string;
+  setCurrentUser: Dispatch<
+    SetStateAction<{
+      FKIdTipoAcceso?: number;
+      id?: number;
+      nombre?: string;
+      email?: string;
+    } | null>
+  >;
 }
 
 const UserContext = createContext<IUserContext | undefined>(undefined);

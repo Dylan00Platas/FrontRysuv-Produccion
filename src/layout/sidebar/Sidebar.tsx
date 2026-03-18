@@ -28,7 +28,10 @@ interface NavItemProps {
 function NavItem({ icon, label, onClick, delay = "0s" }: NavItemProps) {
   return (
     <li
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
       style={{ animationDelay: delay }}
       className="
         group relative flex items-center gap-[0.7rem]

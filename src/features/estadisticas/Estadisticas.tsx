@@ -19,18 +19,17 @@ import {
 } from "recharts";
 
 import "./Estadisticas.css";
+import { Toast } from "@/components/Alert/Floating/Toast";
+import { useToast } from "@/hooks/useToast";
 import AccesoService from "@/services/AccesoService";
 import IResponseHTTP from "@/interfaces/http/Response";
+import ILabelValue from "@/interfaces/LabelValue";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import {
   IGetProcesosContratacion,
   IProcesoContratacionBase,
 } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import { IGetUsuarios, IUsuarioBase } from "@/schemas/acceso/GetUsuario";
-import { Toast } from "@/components/Alert/Floating/Toast";
-import { useToast } from "@/hooks/useToast";
-import ILabelValue from "@/interfaces/LabelValue";
-import { generarOpcionesMeses, mapEstado } from "@/utils/features/Estadisticas";
 
 // Interfaces de UI ------------------------------------------------------------
 interface ICedulaAdaptada {
@@ -47,10 +46,6 @@ interface IProcesoAdaptado {
   estado: string;
   region: string;
   dependencia: string;
-}
-interface ISelectOptionNum {
-  value: string | number;
-  label: string;
 }
 interface IFiltrosProcesos {
   estado: ILabelValue | null;
@@ -112,6 +107,50 @@ const OPCION_TODOS_ANALISTAS: ILabelValue = {
   value: "Todos",
   label: "Todos los analistas",
 };
+function mapEstado(fk: number): string {
+  switch (fk) {
+    case 1:
+      return "Citado";
+    case 2:
+      return "Evaluado";
+    case 4:
+      return "En revisión";
+    case 5:
+      return "En firma";
+    case 6:
+      return "Notificado";
+    case 7:
+      return "Cancelado";
+    case 8:
+      return "Terminado";
+    case 9:
+      return "Pendiente (cita)";
+    case 10:
+      return "Entregado (cita)";
+    case 11:
+      return "Citado";
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+      return "En procesamiento";
+    default:
+      return "En proceso";
+  }
+}
+function generarOpcionesMeses(n = 4): ILabelValue[] {
+  const hoy = new Date();
+  return Array.from({ length: n }, (_, i) => {
+    const fecha = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+    const label = fecha
+      .toLocaleString("es-ES", { month: "long", year: "numeric" })
+      .replace(/^\w/, (c) => c.toUpperCase());
+    return {
+      value: `${fecha.getFullYear()}-${fecha.getMonth() + 1}`,
+      label,
+    };
+  });
+}
 
 function Estadisticas() {
   const navigate = useNavigate();
@@ -132,7 +171,6 @@ function Estadisticas() {
       try {
         setLoadingProcesos(true);
 
-        // FIX: ambas llamadas en paralelo — no dependen una de la otra
         const [responseProcesos, responseAnalistas] = await Promise.all([
           new ProcesoContratacionService().getProcesosContratacion() as Promise<
             IResponseHTTP<IGetProcesosContratacion>
@@ -221,8 +259,8 @@ function Estadisticas() {
         nombre: p.nombreCandidato ?? "Sin candidato",
         analista: analistasMap[p.FKIdAcceso ?? ""] ?? "Sin analista",
         estado: mapEstado(p.FKIdEstadoProcesoContratacion),
-        region: p.region ?? "Sin región",
-        dependencia: p.nombre ?? "Sin dependencia",
+        region: p.dependencia.zona ?? "Sin región",
+        dependencia: p.dependencia.nombre ?? "Sin dependencia",
       }));
   }, [procesosRaw, analistas]);
 
@@ -395,14 +433,11 @@ function Estadisticas() {
     ];
   }, [procesosAdaptados, analistaFiltro]);
 
-  const totalAnalistaChart = useMemo(
-    () =>
-      analistaFiltro.value === "Todos"
-        ? procesosAdaptados.length
-        : procesosAdaptados.filter((p) => p.analista === analistaFiltro.value)
-            .length,
-    [procesosAdaptados, analistaFiltro],
-  );
+  const totalAnalistaChart =
+    analistaFiltro.value === "Todos"
+      ? procesosAdaptados.length
+      : procesosAdaptados.filter((p) => p.analista === analistaFiltro.value)
+          .length;
 
   // Datos para "resultados de evaluación"
   const dataEvaluacionChart = useMemo(() => {
@@ -493,11 +528,11 @@ function Estadisticas() {
               <h1 className="section-title">
                 📌 {totalSolicitudes} Solicitudes Activas
               </h1>
-              <label className="stats-label">
+              <p className="stats-label">
                 {contadores.pendientes} Pendientes (cita),{" "}
                 {contadores.entregadas} Entregadas (cita),{" "}
                 {contadores.notificadas} Citadas
-              </label>
+              </p>
               <div className="chart-container">
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
@@ -510,9 +545,9 @@ function Estadisticas() {
                       dataKey="value"
                       label
                     >
-                      {dataSolicitudesChart.map((_, index) => (
+                      {dataSolicitudesChart.map((entry, index) => (
                         <Cell
-                          key={`cell-sol-${index}`}
+                          key={entry.name}
                           fill={COLORS_PIE[index % COLORS_PIE.length]}
                         />
                       ))}
@@ -531,14 +566,14 @@ function Estadisticas() {
               <h1 className="section-title">
                 ⚙️ {totalProcesos} Procesos Activos
               </h1>
-              <label className="stats-label">
+              <p className="stats-label">
                 {contadores.citado} Citado, {contadores.evaluado} Evaluado,{" "}
                 {contadores.procesamiento} En procesamiento,{" "}
                 {contadores.revision} En revisión, {contadores.firma} En firma,{" "}
                 {contadores.notificadoProceso} Notificado,{" "}
                 {contadores.cancelado} Cancelado, {contadores.terminado}{" "}
                 Terminado
-              </label>
+              </p>
               <div className="chart-container">
                 <ResponsiveContainer width="100%" height={320}>
                   <PieChart>
@@ -551,9 +586,9 @@ function Estadisticas() {
                       dataKey="value"
                       label
                     >
-                      {dataProcesosChart.map((_, index) => (
+                      {dataProcesosChart.map((entry, index) => (
                         <Cell
-                          key={`cell-proc-${index}`}
+                          key={entry.name}
                           fill={COLORS_PIE2[index % COLORS_PIE2.length]}
                         />
                       ))}
@@ -617,12 +652,12 @@ function Estadisticas() {
                 </div>
               </div>
 
-              <label className="stats-label">
+              <p className="stats-label">
                 {totalAnalistaChart} Procesos —{" "}
                 {dataAnalistaChart
                   .map((d) => `${d.value} ${d.name}`)
                   .join(", ")}
-              </label>
+              </p>
               <div className="chart-container">
                 <ResponsiveContainer width="100%" height={320}>
                   <PieChart>
@@ -635,9 +670,9 @@ function Estadisticas() {
                       dataKey="value"
                       label
                     >
-                      {dataAnalistaChart.map((_, index) => (
+                      {dataAnalistaChart.map((entry, index) => (
                         <Cell
-                          key={`cell-an-${index}`}
+                          key={entry.name}
                           fill={COLORS_PIE2[index % COLORS_PIE2.length]}
                         />
                       ))}
@@ -686,7 +721,7 @@ function Estadisticas() {
                 </div>
               </div>
 
-              <label className="stats-label">
+              <p className="stats-label">
                 Mostrando {dataEvaluacionChart.total} procesos con resultado de
                 evaluación{" "}
                 {mesFiltroEval
@@ -695,7 +730,7 @@ function Estadisticas() {
                 {analistaFiltroEval.value === "Todos"
                   ? "de todos los analistas"
                   : `de ${analistaFiltroEval.label}`}
-              </label>
+              </p>
 
               <div className="chart-container">
                 <ResponsiveContainer width="100%" height={350}>
@@ -708,9 +743,9 @@ function Estadisticas() {
                     <YAxis allowDecimals={false} />
                     <Tooltip />
                     <Bar dataKey="value" barSize={45}>
-                      {dataEvaluacionChart.data.map((_, index) => (
+                      {dataEvaluacionChart.data.map((entry, index) => (
                         <Cell
-                          key={`cell-bar-${index}`}
+                          key={entry.name}
                           fill={COLORS_BAR[index % COLORS_BAR.length]}
                         />
                       ))}
@@ -722,7 +757,7 @@ function Estadisticas() {
               <div className="flex wrap-normal justify-center gap-4 mt-4">
                 {dataEvaluacionChart.data.map((entry, index) => (
                   <div
-                    key={`legend-eval-${index}`}
+                    key={entry.name}
                     className="flex items-center gap-2 text-[0.9rem]"
                   >
                     <div
@@ -744,7 +779,7 @@ function Estadisticas() {
 
             <div className="filtros-combobox">
               <div>
-                <label>Estado</label>
+                <p>Estado</p>
                 <Select<ILabelValue>
                   options={ESTADO_OPTIONS}
                   value={filtrosProcesos.estado}
@@ -755,7 +790,7 @@ function Estadisticas() {
                 />
               </div>
               <div>
-                <label>Analista</label>
+                <p>Analista</p>
                 <Select<ILabelValue>
                   options={analistaOptions}
                   value={filtrosProcesos.analista}
@@ -766,7 +801,7 @@ function Estadisticas() {
                 />
               </div>
               <div>
-                <label>Dependencia</label>
+                <p>Dependencia</p>
                 <Select<ILabelValue>
                   options={dependenciaOptions}
                   value={filtrosProcesos.dependencia}

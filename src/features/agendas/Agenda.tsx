@@ -12,12 +12,10 @@ import "./Agenda.css";
 import SolicitudService from "@/services/ProcesoContratacionService";
 import IResponseHTTP from "@/interfaces/http/Response";
 import ILabelValue from "@/interfaces/LabelValue";
-import resolverColor from "@/services/CatalogosNoseDonde";
 import { solicitudAEvento } from "@/utils/features/Agendas";
-import { IPutProcesoContratacionAgenda } from "@/schemas/procesos-contratacion/PutProcesoContratacion";
 import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 
-// Interfaces de UI ---------------------------------------------------------
+// Interfaces de UI -----------------------------------------------------------
 interface IEventoAgenda {
   id: string;
   title: string;
@@ -33,7 +31,6 @@ interface IEventoAgenda {
     atendioCita: boolean;
   };
 }
-
 interface IEventoSeleccionado {
   id: number;
   title: string;
@@ -43,6 +40,12 @@ interface IEventoSeleccionado {
   estado: number;
   atendioCita: boolean;
 }
+interface IPutProcesoContratacionAgenda {
+  fechaEntrevista: string;
+  FKIdEstadoProcesoContratacion: number;
+  atendioCita: boolean;
+  citaVirtual: boolean;
+}
 const ESTADOS_EDITABLES: number[] = [9, 10, 11];
 const OPCIONES_ESTADO: ILabelValue[] = [
   { value: "9", label: "Pendiente (cita)" },
@@ -50,11 +53,34 @@ const OPCIONES_ESTADO: ILabelValue[] = [
   { value: "11", label: "Citado" },
 ];
 
+enum EstadoProceso {
+  Pendiente = 9,
+  EnProceso = 10,
+  Finalizado = 11,
+}
+
+const mapColorEstado = (estado: EstadoProceso): string => {
+  switch (estado) {
+    case EstadoProceso.Pendiente:
+      return "#f1c40f";
+    case EstadoProceso.EnProceso:
+      return "#e67e22";
+    case EstadoProceso.Finalizado:
+      return "#23aa12";
+    default:
+      return "#d11a2a";
+  }
+};
+function resolverColor(estado: number, atendioCita: boolean): string {
+  return atendioCita ? "#d11a2a" : mapColorEstado(estado);
+}
+
 function Agenda() {
+  // Utils ------------------------------------------------------------------
   const fieldID = useId();
   const [eventos, setEventos] = useState<IEventoAgenda[]>([]);
-  // Interfaces de UI -------------------------------------------------------
   const [modalAbierto, setModalAbierto] = useState(false);
+  // Eventos de agenda ------------------------------------------------------
   const [eventoSeleccionado, setEventoSeleccionado] =
     useState<IEventoSeleccionado | null>(null);
   useEffect(() => {
@@ -78,7 +104,7 @@ function Agenda() {
     cargarEventos();
   }, []);
 
-  // Manejadores de eventos -------------------------------------------------
+  // Evento click eventos ---------------------------------------------------
   const handleEventClick = (info: EventClickArg): void => {
     const props = info.event.extendedProps as IEventoAgenda["extendedProps"];
 
@@ -238,20 +264,22 @@ function Agenda() {
       {/* ── Modal ───────────────────────────────────────────────────────── */}
       {modalAbierto && eventoSeleccionado && (
         <div
+          role="presentation"
           className="fixed inset-0 bg-black/50 flex justify-center items-center z-2000"
           onClick={() => setModalAbierto(false)}
+          onKeyDown={() => setModalAbierto(false)}
         >
           <div
+            role="presentation"
             className="bg-white p-6.25 rounded-xl w-87.5 shadow-[0_4px_12px_rgba(0,0,0,0.2)] animate-[fadeIn_0.3s_ease] font-[Kulim_Park,sans-serif]"
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
           >
             <h2 className="text-[2.5rem] font-bold text-[#18529d] mb-37.5 -mt-3.75 pb-3.75">
               Cita
             </h2>
 
-            <label className="mt-2.5 font-semibold text-[#18529d]">
-              Candidato:
-            </label>
+            <p className="mt-2.5 font-semibold text-[#18529d]">Candidato:</p>
             <p className="mt-1">{eventoSeleccionado.candidato}</p>
 
             <label
@@ -273,10 +301,14 @@ function Agenda() {
               className="w-full px-2 py-2 mt-1.5 rounded-md border border-[#ccc] h-6.25"
             />
 
-            <label className="mt-2.5 font-semibold text-[#18529d] block">
+            <label
+              htmlFor="agenda-estado"
+              className="mt-2.5 font-semibold text-[#18529d] block"
+            >
               Estado:
             </label>
             <Select<ILabelValue>
+              inputId="agenda-estado"
               className="modal-select" /* react-select necesita esta clase para overrides */
               classNamePrefix="react-select"
               isDisabled={

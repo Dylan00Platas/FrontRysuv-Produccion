@@ -5,5 +5,5 @@ export default interface IDatosOficio {
   titularPlaza: string;
   categoriaOrigen: string;
   categoriaAutorizada: string;
-  candidato: string;
+  nombreCandidato: string;
 }

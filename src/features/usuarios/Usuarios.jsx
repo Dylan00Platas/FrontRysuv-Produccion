@@ -58,7 +58,7 @@ function Usuarios() {
         {!cargando && !error && (
           <ul className="usuarios-list">
             {usuarios.map((user) => (
-              <li key={user.idAcceso} onClick={() => handleEditarUsuario(user)}>
+              <li key={user.idAcceso} role="button" tabIndex={0} onClick={() => handleEditarUsuario(user)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleEditarUsuario(user); }}>
                 <span>
                   {user.nombre} {user.primerApellido}{" "}
                   {user.segundoApellido ?? ""}

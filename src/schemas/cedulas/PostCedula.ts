@@ -1,5 +1,3 @@
-import { IDependenciaFormCedula } from "../catalogos/GetDependencia";
-
 export default interface IPostCedula {
   antecedentesFamiliaresUV: string;
   aprobadoDireccion: boolean;
@@ -38,7 +36,7 @@ export interface IPostCedulaInternaForm {
   revisa: string;
   elabora: string;
   avaladoPor: string;
-  adscripcion: IDependenciaFormCedula | null;
+  adscripcion: { idDependencia: number; nombre: string; zona: string } | null;
   //-----
   analista: string;
   antecedentesFamiliaresUV: string;

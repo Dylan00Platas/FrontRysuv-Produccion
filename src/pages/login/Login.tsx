@@ -76,10 +76,11 @@ export function Login() {
         >
           {/* Campo usuario */}
           <div className="flex flex-col gap-1">
-            <label className="text-white/50 text-xs tracking-wider uppercase pl-1">
+            <label htmlFor="login-usuario" className="text-white/50 text-xs tracking-wider uppercase pl-1">
               Usuario
             </label>
             <InputField
+              id="login-usuario"
               type="text"
               name="username"
               autoComplete="username"
@@ -92,11 +93,12 @@ export function Login() {
 
           {/* Campo contraseña */}
           <div className="flex flex-col gap-1">
-            <label className="text-white/50 text-xs tracking-wider uppercase pl-1">
+            <label htmlFor="login-contrasena" className="text-white/50 text-xs tracking-wider uppercase pl-1">
               Contraseña
             </label>
             <div className="relative">
               <InputField
+                id="login-contrasena"
                 type="password"
                 name="password"
                 autoComplete="current-password"

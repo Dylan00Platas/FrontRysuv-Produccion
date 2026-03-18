@@ -25,7 +25,7 @@ function SeguimientoHermes() {
   const [searchTerm, setSearchTerm] = useState("");
   const solicitudService = new SolicitudService();
 
-  const [filtros, setFiltros] = useState(
+  const [filtros, setFiltros] = useState(() =>
     columnas.reduce((acc, col) => {
       acc[col] = "Todos";
       return acc;

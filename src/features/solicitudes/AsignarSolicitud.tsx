@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { FormEvent, useEffect, useId, useState } from "react";
 import { useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Select from "react-select";
@@ -9,7 +9,12 @@ import { Toast } from "@/components/Alert/Floating/Toast";
 import ILabelValue from "@/interfaces/LabelValue";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import IResponseHTTP from "@/interfaces/http/Response";
-import IPutProcesoContratacion from "@/schemas/procesos-contratacion/PutProcesoContratacion";
+import AccesoService from "@/services/AccesoService";
+import {
+  IGetUsuario,
+  IGetUsuarios,
+  IUsuarioBase,
+} from "@/schemas/acceso/GetUsuario";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IFormData {
@@ -27,7 +32,7 @@ interface IFormData {
   nombreCandidato: string;
   numeroCarpeta: string;
   observaciones: string;
-  tipo: string;  
+  tipo: string;
 }
 const FAMILIA_KEYWORDS = {
   "N1. Académico Administrativo": "académico administrativo",
@@ -41,12 +46,24 @@ const FAMILIA_KEYWORDS = {
   "N9. Presupuestal-contable": "presupuestal contable",
   "N10. Comunicación y edición": "comunicación y edición",
   "N11. Operativo": "operativo",
+} as const;
+type FamiliaKeyword = keyof typeof FAMILIA_KEYWORDS;
+type CampoFamiliaKeyword = (typeof FAMILIA_KEYWORDS)[FamiliaKeyword];
+const getFamilaKeywordKey = (
+  nombre: string,
+): CampoFamiliaKeyword | undefined => {
+  if (nombre in FAMILIA_KEYWORDS) {
+    return FAMILIA_KEYWORDS[nombre as FamiliaKeyword];
+  }
+  return undefined;
 };
 
 function AsignarSolicitud() {
   // Utils ------------------------------------------------------------------
-  const { toast, mostrarToast } = useToast();
   const navigate = useNavigate();
+  const { toast, mostrarToast } = useToast();
+  const [showPopupConfirmationDeletion, setShowPopupConfirmationDeletion] =
+    useState(false);
   const fieldID = useId();
   const [formData, setFormData] = useState<IFormData>({
     analista: "",
@@ -66,12 +83,13 @@ function AsignarSolicitud() {
     tipo: "",
   });
   const location = useLocation();
-  const solicitudSeleccionada = location.state?.solicitud || {};  
-  const [analistas, setAnalistas] = useState([]);
+  const solicitudSeleccionada = location.state?.solicitud || {};
+  const [analistas, setAnalistas] = useState<IUsuarioBase[]>();
   const [permiteAsignarAnalista, setPermiteAsignarAnalista] = useState(true);
-  const [funcionesOptions, setFuncionesOptions] = useState([]);
-  const [funcionesFiltradas, setFuncionesFiltradas] = useState([]);
-  const [mostrarPopup, setMostrarPopup] = useState(false);
+  const [funcionesOptions, setFuncionesOptions] = useState<ILabelValue[]>([]);
+  const [funcionesFiltradas, setFuncionesFiltradas] = useState<
+    ILabelValue[] | undefined
+  >([]);
   const [avaladoPorSeleccionado, setAvaladoPorSeleccionado] = useState([]);
 
   let tipoInicial = "";
@@ -85,7 +103,7 @@ function AsignarSolicitud() {
     tipoDisabled = true;
   }
 
-  const toggleAvaladoPor = (valor) => {
+  const toggleAvaladoPor = (valor: string) => {
     setAvaladoPorSeleccionado((prev) => {
       if (prev.includes(valor)) {
         const nuevo = prev.filter((v) => v !== valor);
@@ -100,12 +118,12 @@ function AsignarSolicitud() {
   };
 
   useEffect(() => {
-    if (!formData.familia) {
+    if (!formData.familiaFuncional) {
       setFuncionesFiltradas([]);
       return;
     }
 
-    const keyword = FAMILIA_KEYWORDS[formData.familia];
+    const keyword = getFamilaKeywordKey(formData.familiaFuncional);
     if (!keyword) {
       setFuncionesFiltradas([]);
       return;
@@ -147,7 +165,7 @@ function AsignarSolicitud() {
     });
 
     setFuncionesFiltradas(filtradas);
-  }, [formData.familia, funcionesOptions]);
+  }, [formData.familiaFuncional, funcionesOptions]);
 
   useEffect(() => {
     if (solicitudSeleccionada && Object.keys(solicitudSeleccionada).length) {
@@ -162,7 +180,7 @@ function AsignarSolicitud() {
             : false,
         educacionFormal: solicitudSeleccionada.educacionFormal || "",
         estado: solicitudSeleccionada.FKIdEstadoProcesoContratacion || "",
-        familia: solicitudSeleccionada.familiaFuncional || "",
+        familiaFuncional: solicitudSeleccionada.familiaFuncional || "",
         fechaAsignacionAnalista: solicitudSeleccionada.fechaAsignacionAnalista,
         fechaEntrevista: solicitudSeleccionada.fechaEntrevista
           ? new Date(solicitudSeleccionada.fechaEntrevista)
@@ -198,8 +216,9 @@ function AsignarSolicitud() {
   useEffect(() => {
     const fetchAnalistas = async () => {
       try {
-        const data = await usuarioServicio.obtenerAnalistas(token);
-        setAnalistas(data);
+        const data: IResponseHTTP<IGetUsuarios> =
+          await new AccesoService().getAnalistas();
+        setAnalistas(data.mensaje.usuarios);
       } catch (err) {
         console.error("Error cargando analistas:", err);
       }
@@ -217,52 +236,72 @@ function AsignarSolicitud() {
         throw new Error("ID de proceso no encontrado para eliminar.");
       }
 
-      await SolicitudService.eliminarProcesoPorID(idProceso, token);
-      setMostrarPopup(false);
-      setMensaje({
-        texto: "🗑️ Solicitud eliminada correctamente",
-        tipo: "exito",
-      });
-      setTimeout(() => navigate("/solicitudes"), 1500);
+      const response: IResponseHTTP<string> =
+        await new ProcesoContratacionService().deleteProcesoContratacionById(
+          idProceso,
+        );
+      setShowPopupConfirmationDeletion(false);
+
+      if (response.estado == 204) {
+        mostrarToast("🗑️ Solicitud eliminada correctamente", "exito");
+        setTimeout(() => navigate("/solicitudes"), 1500);
+      } else {
+        console.error(
+          "AsignarSolicitud.tsx - No se logró eliminar proceso:\n" +
+            response.mensaje,
+        );
+        mostrarToast("No se logró eliminar.", "error");
+      }
     } catch (error) {
-      setMostrarPopup(false); // Ocultar el pop-up incluso si falla
-      console.error("Error al eliminar la solicitud:", error);
-
-      // Intentamos obtener el mensaje del objeto de error del servicio (si fue lanzado así)
-      const errorMsg =
-        error.mensaje || error.message || "Error desconocido al eliminar.";
-
-      setMensaje({ texto: `❌ Error al eliminar: ${errorMsg}`, tipo: "error" });
-      setTimeout(() => setMensaje({ texto: "", tipo: "" }), 3000);
+      setShowPopupConfirmationDeletion(false);
+      console.error(
+        "AsignarSlocitud.tsx - Error al eliminar la solicitud:\n",
+        error,
+      );
+      mostrarToast("❌ Error al eliminar, intente más tarde.", "error");
     }
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (
+    field: keyof IFormData,
+    value: string | boolean,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const { ...datosAEnviar } = formData;
 
     if (datosAEnviar.estado) {
-      datosAEnviar.estado = Number(datosAEnviar.estado);
+      datosAEnviar.estado = datosAEnviar.estado;
     }
 
     if (datosAEnviar.analista) {
-      datosAEnviar.analista = Number(datosAEnviar.analista);
+      datosAEnviar.analista = datosAEnviar.analista;
     }
 
     try {
       if (!formData.analista || formData.analista === "") {
-        const response: IResponseHTTP<string> = await new ProcesoContratacionService().putProcesoContratacion(solicitudSeleccionada.idProceso, formData);
-        
-        mostrarToast(" ✅ Solicitud actualizada correctamente", "exito"); 
-        navigate("/solicitudes");
+        const response: IResponseHTTP<string> =
+          await new ProcesoContratacionService().putProcesoContratacion(
+            solicitudSeleccionada.idProceso,
+            formData,
+          );
+
+        if (response.estado == 200) {
+          mostrarToast(" ✅ Solicitud actualizada correctamente.", "exito");
+          navigate("/solicitudes");
+        } else {
+          mostrarToast(
+            "No se logró actualizar correctmanete la solicitud.",
+            "error",
+          );
+        }
       } else {
         const fechaActual = new Date().toISOString().split("T")[0];
 
@@ -272,13 +311,17 @@ function AsignarSolicitud() {
           idAcceso: Number(formData.analista),
           fechaAsignacionAnalista: fechaActual,
         };
-        const response: IResponseHTTP<string> = await new ProcesoContratacionService().putProcesoContratacion(solicitudSeleccionada.idProceso, formData);
-        mostrarToast(" ✅ Solicitud actualizada correctamente", "exito"); 
+        const response: IResponseHTTP<string> =
+          await new ProcesoContratacionService().putProcesoContratacion(
+            solicitudSeleccionada.idProceso,
+            datosConAnalista,
+          );
+        mostrarToast(" ✅ Solicitud actualizada correctamente", "exito");
         navigate("/solicitudes");
       }
     } catch (error) {
       console.error("Error al guardar la solicitud:", error);
-      mostrarToast(" ❌ Error al modificar la solicitud.", "error"); 
+      mostrarToast(" ❌ Error al modificar la solicitud.", "error");
     }
   };
 
@@ -292,7 +335,12 @@ function AsignarSolicitud() {
         <div className="contenido-asignacion-inner">
           <form className="form-grid" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor={`${fieldID}-folio`} className="form-label-evaluacionl">Folio</label>
+              <label
+                htmlFor={`${fieldID}-folio`}
+                className="form-label-evaluacionl"
+              >
+                Folio
+              </label>
               <input
                 id={`${fieldID}-folio`}
                 type="text"
@@ -303,7 +351,12 @@ function AsignarSolicitud() {
             </div>
 
             <div className="form-group">
-              <label htmlFor={`${fieldID}-hermesNotificacion`} className="form-label-evaluacionl">Hermes</label>
+              <label
+                htmlFor={`${fieldID}-hermesNotificacion`}
+                className="form-label-evaluacionl"
+              >
+                Hermes
+              </label>
               <input
                 id={`${fieldID}-hermesNotificacion`}
                 type="text"
@@ -313,19 +366,29 @@ function AsignarSolicitud() {
               />
             </div>
 
-              <div className="form-group">
-                <label htmlFor={`${fieldID}-numCarpeta`} className="form-label-evaluacionl">Número de Carpeta</label>
+            <div className="form-group">
+              <label
+                htmlFor={`${fieldID}-numCarpeta`}
+                className="form-label-evaluacionl"
+              >
+                Número de Carpeta
+              </label>
               <input
                 id={`${fieldID}-numCarpeta`}
-                  type="text"
-                  className="form-input"
-                  value={formData.numeroCarpeta}
-                  onChange={(e) => handleInputChange("numeroCarpeta", e.target.value)}
-                />
-              </div>
+                type="text"
+                className="form-input"
+                value={formData.numeroCarpeta}
+                onChange={(e) =>
+                  handleInputChange("numeroCarpeta", e.target.value)
+                }
+              />
+            </div>
 
             <div className="form-group">
-              <label htmlFor={`${fieldID}-nombreCandidato`} className="form-label-evaluacionl">
+              <label
+                htmlFor={`${fieldID}-nombreCandidato`}
+                className="form-label-evaluacionl"
+              >
                 Nombre de Candidato
               </label>
               <input
@@ -333,19 +396,26 @@ function AsignarSolicitud() {
                 type="text"
                 className="form-input"
                 value={formData.nombreCandidato}
-                onChange={(e) => handleInputChange("candidato", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("nombreCandidato", e.target.value)
+                }
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor={`${fieldID}-familiaFuncional`} className="form-label-evaluacionl">
+              <label
+                htmlFor={`${fieldID}-familiaFuncional`}
+                className="form-label-evaluacionl"
+              >
                 Familia Funcional
               </label>
               <select
                 id={`${fieldID}-familiaFuncional`}
                 className="form-input"
                 value={formData.familiaFuncional}
-                onChange={(e) => handleInputChange("familia", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("familiaFuncional", e.target.value)
+                }
               >
                 <option value="" disabled hidden>
                   Seleccionar familia funcional
@@ -376,14 +446,17 @@ function AsignarSolicitud() {
 
             {/*  Función a desempeñar como combo box */}
             <div className="form-group">
-              <label htmlFor={`${fieldID}-funcion`} className="form-label-evaluacionl">
+              <label
+                htmlFor={`${fieldID}-funcion`}
+                className="form-label-evaluacionl"
+              >
                 Función a Desempeñar
               </label>
               <Select
                 id={`${fieldID}-funcion`}
                 options={funcionesFiltradas}
                 value={
-                  funcionesFiltradas.find(
+                  funcionesFiltradas?.find(
                     (opt) => opt.label === formData.funcion,
                   ) || null
                 }
@@ -391,20 +464,25 @@ function AsignarSolicitud() {
                   handleInputChange("funcion", selected ? selected.label : "")
                 }
                 placeholder={
-                  formData.familia
-                    ? funcionesFiltradas.length > 0
+                  formData.familiaFuncional
+                    ? funcionesFiltradas?.length
                       ? "Selecciona una función relacionada..."
                       : "No hay funciones disponibles para esta familia"
                     : "Primero selecciona una familia funcional"
                 }
-                isDisabled={!formData.familia}
+                isDisabled={!formData.familiaFuncional}
                 isClearable
                 isSearchable
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor={`${fieldID}-fechaEntrevista`} className="form-label-evaluacionl">Fecha entrevista</label>
+              <label
+                htmlFor={`${fieldID}-fechaEntrevista`}
+                className="form-label-evaluacionl"
+              >
+                Fecha entrevista
+              </label>
               <input
                 id={`${fieldID}-fechaEntrevista`}
                 type="date"
@@ -417,7 +495,12 @@ function AsignarSolicitud() {
             </div>
 
             <div className="form-group">
-              <label htmlFor={`${fieldID}-educacionFormal`} className="form-label-evaluacionl">Educación formal</label>
+              <label
+                htmlFor={`${fieldID}-educacionFormal`}
+                className="form-label-evaluacionl"
+              >
+                Educación formal
+              </label>
               <input
                 id={`${fieldID}-educacionFormal`}
                 type="text"
@@ -431,7 +514,12 @@ function AsignarSolicitud() {
 
             {/*  Avalado por - botones seleccionables */}
             <div className="form-group">
-              <label htmlFor={`${fieldID}-avaladoPor`} className="form-label-evaluacionl">Avalado por</label>
+              <label
+                htmlFor={`${fieldID}-avaladoPor`}
+                className="form-label-evaluacionl"
+              >
+                Avalado por
+              </label>
               <div className="avalado-buttons">
                 {[
                   "Título",
@@ -456,7 +544,12 @@ function AsignarSolicitud() {
             </div>
 
             <div className="form-group">
-              <label htmlFor={`${fieldID}-estado`} className="form-label-evaluacionl">Estado</label>
+              <label
+                htmlFor={`${fieldID}-estado`}
+                className="form-label-evaluacionl"
+              >
+                Estado
+              </label>
               <select
                 id={`${fieldID}-estado`}
                 className="form-input"
@@ -472,9 +565,7 @@ function AsignarSolicitud() {
               </select>
             </div>
 
-            <div
-              className="checkbox-group-solicitud pr-75 pb-5"
-            >
+            <div className="checkbox-group-solicitud pr-75 pb-5">
               <label
                 htmlFor={`${fieldID}-citaVirtual`}
                 className="form-label-evaluacionl whitespace-nowrap mb-2.5"
@@ -492,7 +583,10 @@ function AsignarSolicitud() {
             </div>
 
             <div className="form-group grid-cols-1">
-              <label htmlFor={`${fieldID}-observaciones`} className="form-label-evaluacionl">
+              <label
+                htmlFor={`${fieldID}-observaciones`}
+                className="form-label-evaluacionl"
+              >
                 Observaciones registro
               </label>
               <textarea
@@ -536,7 +630,12 @@ function AsignarSolicitud() {
             )}
 
             <div className="form-group tipo-combobox">
-              <label htmlFor={`${fieldID}-tipo`} className="form-label-evaluacionl">Tipo</label>
+              <label
+                htmlFor={`${fieldID}-tipo`}
+                className="form-label-evaluacionl"
+              >
+                Tipo
+              </label>
               <select
                 id={`${fieldID}-tipo`}
                 className="form-input"
@@ -557,7 +656,7 @@ function AsignarSolicitud() {
               <button
                 type="button"
                 className="btn-eliminar"
-                onClick={() => setMostrarPopup(true)}
+                onClick={() => setShowPopupConfirmationDeletion(true)}
               >
                 Eliminar
               </button>
@@ -566,7 +665,7 @@ function AsignarSolicitud() {
         </div>
 
         {/* 🧩 Pop-up de confirmación */}
-        {mostrarPopup && (
+        {showPopupConfirmationDeletion && (
           <div className="popup-overlay">
             <div className="popup">
               <h3>¿Estás seguro que deseas eliminar la solicitud?</h3>
@@ -576,7 +675,7 @@ function AsignarSolicitud() {
                 </button>
                 <button
                   className="btn-cancelar"
-                  onClick={() => setMostrarPopup(false)}
+                  onClick={() => setShowPopupConfirmationDeletion(false)}
                 >
                   Cancelar
                 </button>

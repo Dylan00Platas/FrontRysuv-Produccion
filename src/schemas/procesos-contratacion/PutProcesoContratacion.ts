@@ -52,14 +52,6 @@ export default interface IPutProcesoContratacion {
   titularPlaza: string;
 }
 
-export type IPutProcesoContratacionAgenda = Pick<
-  IPutProcesoContratacion,
-  | "fechaEntrevista"
-  | "FKIdEstadoProcesoContratacion"
-  | "atendioCita"
-  | "citaVirtual"
->;
-
 export type IPutProcesoContratacionCedula = Pick<
   IPutProcesoContratacion,
   | "FKIdDependencia"

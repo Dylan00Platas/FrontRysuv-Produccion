@@ -191,8 +191,9 @@ function Procesos() {
         <div className="main-content-inner">
           <div className="filtros-combobox">
             <div>
-              <label>Estado</label>
+              <label htmlFor="procesos-estado">Estado</label>
               <Select
+                inputId="procesos-estado"
                 options={estadoOptions}
                 value={estadoFiltro}
                 onChange={(value) => setEstadoFiltro(value)}
@@ -202,8 +203,9 @@ function Procesos() {
             </div>
 
             <div>
-              <label>Analista</label>
+              <label htmlFor="procesos-analista">Analista</label>
               <Select
+                inputId="procesos-analista"
                 options={analistaOptions}
                 value={analistaFiltro}
                 onChange={(value) => setAnalistaFiltro(value)}

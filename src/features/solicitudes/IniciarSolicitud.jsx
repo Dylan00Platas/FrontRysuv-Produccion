@@ -280,8 +280,9 @@ function IniciarSolicitud() {
             <h3 className="section-title">Datos generales de la vacante</h3>
 
             <div className="form-group">
-              <label className="form-label-solicitud">Folio </label>
+              <label htmlFor="folio" className="form-label-solicitud">Folio </label>
               <input
+                id="folio"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.folio}
@@ -304,10 +305,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-solicitud">
+              <label htmlFor="hermes" className="form-label-solicitud">
                 Hermes de Notificación
               </label>
               <input
+                id="hermes"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.hermes}
@@ -319,8 +321,9 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Fecha de recibido</label>
+              <label htmlFor="fecha-recibido" className="form-label-solicitud">Fecha de recibido</label>
               <input
+                id="fecha-recibido"
                 type="date"
                 className="form-input-solicitud"
                 value={formData.fechaRecibido}
@@ -334,11 +337,12 @@ function IniciarSolicitud() {
               className="form-group-solicitud"
               style={{ position: "relative" }}
             >
-              <label className="form-label-solicitud">
+              <label htmlFor="num-dependencia" className="form-label-solicitud">
                 Número de Entidad académica o Dependencia
               </label>
               <div className="input-with-icon">
                 <input
+                  id="num-dependencia"
                   type="text"
                   className="form-input-solicitud"
                   value={formData.numDependencia}
@@ -360,10 +364,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
+              <label htmlFor="dependencia" className="form-label-solicitud">
                 Entidad académica o Dependencia
               </label>
               <input
+                id="dependencia"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.dependencia}
@@ -374,10 +379,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
+              <label htmlFor="area" className="form-label-solicitud">
                 Área Organizacional
               </label>
               <input
+                id="area"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.area}
@@ -386,8 +392,9 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Región</label>
+              <label htmlFor="region" className="form-label-solicitud">Región</label>
               <input
+                id="region"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.region}
@@ -396,8 +403,9 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-solicitud">Tipo de Personal</label>
+              <label htmlFor="tipo-personal" className="form-label-solicitud">Tipo de Personal</label>
               <select
+                id="tipo-personal"
                 className="form-input-solicitud"
                 value={formData.tipoPersonal}
                 onChange={(e) =>
@@ -413,8 +421,9 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Número de Plaza</label>
+              <label htmlFor="num-plaza" className="form-label-solicitud">Número de Plaza</label>
               <input
+                id="num-plaza"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.numPlaza}
@@ -423,10 +432,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
+              <label htmlFor="categoria-origen" className="form-label-solicitud">
                 Categoría/Puesto (origen)
               </label>
               <input
+                id="categoria-origen"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.categoriaOrigen}
@@ -437,10 +447,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
+              <label htmlFor="titular-plaza" className="form-label-solicitud">
                 Titular de la Plaza
               </label>
               <input
+                id="titular-plaza"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.titularPlaza}
@@ -452,10 +463,11 @@ function IniciarSolicitud() {
 
             {/* Lineamiento que aplica */}
             <div className="form-group">
-              <label className="form-label-evaluacion">
+              <label htmlFor="lineamiento-solicitud" className="form-label-evaluacion">
                 Lineamiento que aplica
               </label>
               <select
+                id="lineamiento-solicitud"
                 className="form-input-evaluacion"
                 value={formData.lineamiento}
                 onChange={(e) =>
@@ -471,8 +483,9 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Motivo</label>
+              <label htmlFor="motivo" className="form-label-solicitud">Motivo</label>
               <input
+                id="motivo"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.motivo}
@@ -481,10 +494,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
+              <label htmlFor="fecha-propuesta" className="form-label-solicitud">
                 Fecha de Elaboración Propuesta
               </label>
               <input
+                id="fecha-propuesta"
                 type="date"
                 className="form-input-solicitud"
                 value={formData.fechaPropuesta}
@@ -495,10 +509,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
+              <label htmlFor="fecha-oficio" className="form-label-solicitud">
                 Fecha de liberación de oficio
               </label>
               <input
+                id="fecha-oficio"
                 type="date"
                 className="form-input-solicitud"
                 value={formData.fechaOficio}
@@ -509,10 +524,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
+              <label htmlFor="periodo-inicio" className="form-label-solicitud">
                 Periodo Autorizado en oficio (inicio)
               </label>
               <input
+                id="periodo-inicio"
                 type="date"
                 className="form-input-solicitud"
                 value={formData.periodoInicio}
@@ -523,10 +539,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
+              <label htmlFor="periodo-termino" className="form-label-solicitud">
                 Periodo Autorizado en oficio (término)
               </label>
               <input
+                id="periodo-termino"
                 type="date"
                 className="form-input-solicitud"
                 value={formData.periodoTermino}
@@ -537,10 +554,11 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
+              <label htmlFor="categoria-autorizada" className="form-label-solicitud">
                 Categoría autorizada en oficio
               </label>
               <input
+                id="categoria-autorizada"
                 type="text"
                 className="form-input-solicitud"
                 value={formData.categoriaAutorizada}
@@ -551,8 +569,9 @@ function IniciarSolicitud() {
             </div>
 
             <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Tipo</label>
+              <label htmlFor="tipo-solicitud" className="form-label-solicitud">Tipo</label>
               <select
+                id="tipo-solicitud"
                 className="form-input-solicitud"
                 value={formData.tipo}
                 onChange={(e) => handleInputChange("tipo", e.target.value)}
@@ -567,23 +586,25 @@ function IniciarSolicitud() {
 
             <div className="form-group-solicitud checkbox-group-solicitud">
               <input
+                id="autorizacion"
                 type="checkbox"
                 checked={formData.autorizacion}
                 onChange={(e) =>
                   handleInputChange("autorizacion", e.target.checked)
                 }
               />
-              <label>Autorización</label>
+              <label htmlFor="autorizacion">Autorización</label>
             </div>
 
             <div
               className="form-group-solicitud"
               style={{ gridColumn: "span 3" }}
             >
-              <label className="form-label-solicitud">
+              <label htmlFor="observaciones" className="form-label-solicitud">
                 Observaciones Registro
               </label>
               <textarea
+                id="observaciones"
                 className="large-textarea-solicitud"
                 value={formData.observaciones}
                 onChange={(e) =>
@@ -597,10 +618,11 @@ function IniciarSolicitud() {
               <>
                 <h3 className="section-title">Datos del proceso</h3>
                 <div className="form-group">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="numero-carpeta" className="form-label-solicitud">
                     Número Carpeta{" "}
                   </label>
                   <input
+                    id="numero-carpeta"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.numeroCarpeta}
@@ -611,10 +633,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="candidato-bolsa" className="form-label-solicitud">
                     Nombre de Candidato
                   </label>
                   <input
+                    id="candidato-bolsa"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.candidato}
@@ -625,10 +648,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="funcion" className="form-label-solicitud">
                     Función a desempeñar
                   </label>
                   <input
+                    id="funcion"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.funcion}
@@ -639,10 +663,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="familia" className="form-label-solicitud">
                     Familia Funcional
                   </label>
                   <input
+                    id="familia"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.familia}
@@ -653,10 +678,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="fecha-entrevista" className="form-label-solicitud">
                     Fecha Entrevista
                   </label>
                   <input
+                    id="fecha-entrevista"
                     type="date"
                     className="form-input-solicitud"
                     value={formData.fechaEntrevista}
@@ -667,10 +693,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="fecha-competencias" className="form-label-solicitud">
                     Fecha Evaluación competencias
                   </label>
                   <input
+                    id="fecha-competencias"
                     type="date"
                     className="form-input-solicitud"
                     value={formData.fechaCompetencias}
@@ -681,10 +708,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="fecha-procesamiento" className="form-label-solicitud">
                     Fecha Se inicia procesamiento
                   </label>
                   <input
+                    id="fecha-procesamiento"
                     type="date"
                     className="form-input-solicitud"
                     value={formData.fechaProcesamiento}
@@ -695,10 +723,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="resultado-conocimiento" className="form-label-solicitud">
                     Resultado Evaluación conocimiento
                   </label>
                   <input
+                    id="resultado-conocimiento"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.resultadoConocimiento}
@@ -709,10 +738,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="experiencia" className="form-label-solicitud">
                     Experiencia laboral solicitada
                   </label>
                   <input
+                    id="experiencia"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.experiencia}
@@ -723,8 +753,9 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">Referencias</label>
+                  <label htmlFor="referencias" className="form-label-solicitud">Referencias</label>
                   <input
+                    id="referencias"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.referencias}
@@ -735,10 +766,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="fecha-envio-des" className="form-label-solicitud">
                     Fecha Envío a DEyDP
                   </label>
                   <input
+                    id="fecha-envio-des"
                     type="date"
                     className="form-input-solicitud"
                     value={formData.fechaEnvioDes}
@@ -750,8 +782,9 @@ function IniciarSolicitud() {
 
                 {/* Otros campos de resultados y seguimiento */}
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">Beneficiado</label>
+                  <label htmlFor="beneficiado-solicitud" className="form-label-solicitud">Beneficiado</label>
                   <select
+                    id="beneficiado-solicitud"
                     className="form-input-solicitud"
                     value={formData.beneficiado}
                     onChange={(e) =>
@@ -767,10 +800,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="fecha-ofi-eval" className="form-label-solicitud">
                     Fecha Revisión OfiEval
                   </label>
                   <input
+                    id="fecha-ofi-eval"
                     type="date"
                     className="form-input-solicitud"
                     value={formData.fechaOfiEval}
@@ -781,10 +815,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="fecha-notificacion" className="form-label-solicitud">
                     Fecha Notificación
                   </label>
                   <input
+                    id="fecha-notificacion"
                     type="date"
                     className="form-input-solicitud"
                     value={formData.fechaNotificacion}
@@ -795,10 +830,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="tiempo-proceso-solicitud" className="form-label-solicitud">
                     Tiempo del proceso
                   </label>
                   <input
+                    id="tiempo-proceso-solicitud"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.tiempoProceso}
@@ -809,10 +845,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="fecha-eval-desempeno" className="form-label-solicitud">
                     Fecha de evaluación de desempeño
                   </label>
                   <input
+                    id="fecha-eval-desempeno"
                     type="date"
                     className="form-input-solicitud"
                     value={formData.fechaEvaluacionDesempenio}
@@ -826,10 +863,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group" style={{ gridColumn: "span 3" }}>
-                  <label className="form-label-solicitud">
+                  <label htmlFor="observaciones-analista" className="form-label-solicitud">
                     Observaciones Analista
                   </label>
                   <textarea
+                    id="observaciones-analista"
                     className="large-textarea"
                     value={formData.observacionesAnalista}
                     onChange={(e) =>
@@ -839,10 +877,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="consecutivo-expediente" className="form-label-solicitud">
                     Consecutivo Expediente Físico
                   </label>
                   <input
+                    id="consecutivo-expediente"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.consecutivoExpediente}
@@ -853,10 +892,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="seguimiento-desempeno" className="form-label-solicitud">
                     Seguimiento Evaluación Desempeño
                   </label>
                   <select
+                    id="seguimiento-desempeno"
                     className="form-input-solicitud"
                     value={formData.seguimientoDesempeno}
                     onChange={(e) =>
@@ -872,10 +912,11 @@ function IniciarSolicitud() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="resultado-seguimiento" className="form-label-solicitud">
                     Resultado Seguimiento Evaluación Desempeño
                   </label>
                   <input
+                    id="resultado-seguimiento"
                     type="text"
                     className="form-input-solicitud"
                     value={formData.resultadoSeguimiento}
@@ -891,10 +932,11 @@ function IniciarSolicitud() {
             {tipoSolicitud !== "bolsa" && (
               <>
                 <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
+                  <label htmlFor="cantidad-candidatos" className="form-label-solicitud">
                     Cantidad de candidatos
                   </label>
                   <input
+                    id="cantidad-candidatos"
                     type="number"
                     min="1"
                     className="form-input-solicitud"
@@ -917,14 +959,15 @@ function IniciarSolicitud() {
 
                 <div style={{ gridColumn: "1 / -1" }}>
                   {formData.candidatos.map((candidato, index) => (
-                    <div key={index} className="candidato-section">
+                    <div key={candidato.nombre ? `${candidato.nombre}-${index}` : index} className="candidato-section">
                       <h3 className="section-title">Candidato {index + 1}</h3>
 
                       <div className="form-group-solicitud">
-                        <label className="form-label-solicitud">
+                        <label htmlFor={`nombre-candidato-${index}`} className="form-label-solicitud">
                           Nombre del Candidato
                         </label>
                         <input
+                          id={`nombre-candidato-${index}`}
                           type="text"
                           className="form-input-solicitud candidato-input"
                           value={candidato.nombre}
@@ -937,10 +980,11 @@ function IniciarSolicitud() {
                       </div>
 
                       <div className="form-group-solicitud">
-                        <label className="form-label-solicitud">
+                        <label htmlFor={`fecha-cita-${index}`} className="form-label-solicitud">
                           Fecha de cita
                         </label>
                         <input
+                          id={`fecha-cita-${index}`}
                           type="date"
                           className="form-input-solicitud candidato-input"
                           value={candidato.fechaCita}

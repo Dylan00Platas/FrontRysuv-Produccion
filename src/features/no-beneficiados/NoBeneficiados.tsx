@@ -5,6 +5,7 @@ import Select, { SingleValue } from "react-select";
 import "./NoBeneficiados.css";
 import { useDependencias } from "@/hooks/useDependencias";
 import { useProcesosNoBeneficiados } from "@/hooks/useProcesosNoBeneficiados";
+import ILabelValue from "@/interfaces/LabelValue";
 
 // Interfaces de UI ---------------------------------------------------------
 interface ICargaDatos {
@@ -21,10 +22,6 @@ interface IFiltro {
   profesion: string;
   resultado: string;
 }
-interface ISelectOption {
-  value: string;
-  label: string;
-}
 const FILTRO_INICIAL: IFiltro = { region: "", profesion: "", resultado: "" };
 
 function NoBeneficiados() {
@@ -40,7 +37,7 @@ function NoBeneficiados() {
   const [filtros, setFiltros] = useState<IFiltro>(FILTRO_INICIAL);
 
   const handleFiltro =
-    (campo: keyof IFiltro) => (opcion: SingleValue<ISelectOption>) => {
+    (campo: keyof IFiltro) => (opcion: SingleValue<ILabelValue>) => {
       setFiltros((prev) => ({ ...prev, [campo]: opcion?.value ?? "" }));
     };
 
@@ -69,7 +66,7 @@ function NoBeneficiados() {
   }, [dataProcesosNoBeneficiados, dataDependencias]);
 
   // Opciones de filtros ---------------------------------------------------------
-  const regionOptions = useMemo<ISelectOption[]>(
+  const regionOptions = useMemo<ILabelValue[]>(
     () =>
       [...new Set(candidatos.map((c) => c.region))].map((r) => ({
         value: r,
@@ -78,7 +75,7 @@ function NoBeneficiados() {
     [candidatos],
   );
 
-  const profesionOptions = useMemo<ISelectOption[]>(
+  const profesionOptions = useMemo<ILabelValue[]>(
     () =>
       [...new Set(candidatos.map((c) => c.profesion))].map((p) => ({
         value: p,
@@ -87,7 +84,7 @@ function NoBeneficiados() {
     [candidatos],
   );
 
-  const resultadoOptions = useMemo<ISelectOption[]>(
+  const resultadoOptions = useMemo<ILabelValue[]>(
     () =>
       [...new Set(candidatos.map((c) => c.resultado))].map((r) => ({
         value: r,
@@ -140,8 +137,9 @@ function NoBeneficiados() {
         {/* Filtros */}
         <div className="filtros-combobox">
           <div>
-            <label>Región</label>
-            <Select<ISelectOption>
+            <label htmlFor="nb-region">Región</label>
+            <Select<ILabelValue>
+              inputId="nb-region"
               options={regionOptions}
               value={
                 regionOptions.find((o) => o.value === filtros.region) ?? null
@@ -153,8 +151,9 @@ function NoBeneficiados() {
           </div>
 
           <div>
-            <label>Profesión</label>
-            <Select<ISelectOption>
+            <label htmlFor="nb-profesion">Profesión</label>
+            <Select<ILabelValue>
+              inputId="nb-profesion"
               options={profesionOptions}
               value={
                 profesionOptions.find((o) => o.value === filtros.profesion) ??
@@ -168,8 +167,9 @@ function NoBeneficiados() {
           </div>
 
           <div>
-            <label>Resultado</label>
-            <Select<ISelectOption>
+            <label htmlFor="nb-resultado">Resultado</label>
+            <Select<ILabelValue>
+              inputId="nb-resultado"
               options={resultadoOptions}
               value={
                 resultadoOptions.find((o) => o.value === filtros.resultado) ??

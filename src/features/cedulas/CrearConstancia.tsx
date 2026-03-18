@@ -8,7 +8,13 @@ import {
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { saveAs } from "file-saver";
-import { PDFTextField, PDFCheckBox, PDFDropdown, PDFRadioGroup } from "pdf-lib";
+import {
+  PDFTextField,
+  PDFCheckBox,
+  PDFDropdown,
+  PDFRadioGroup,
+  PDFDocument,
+} from "pdf-lib";
 import { FaSearch } from "react-icons/fa";
 import { FiHelpCircle } from "react-icons/fi";
 import Select from "react-select";
@@ -25,46 +31,42 @@ import { useDependencias } from "@/hooks/useDependencias";
 import { useProcesoTipos } from "@/hooks/useProcesoTipos";
 import IResponseHTTP from "@/interfaces/http/Response";
 import { IGetCedulaExterna } from "@/schemas/cedulas-externas/GetCedulaExterna";
-import { IGetCedula } from "@/schemas/cedulas/GetCedula";
+import { ICedulaBase, IGetCedula } from "@/schemas/cedulas/GetCedula";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompetencia";
-import UserProvider from "@/utils/UserProvider";
 import UserContext from "@/utils/UserContext";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IDependenciaOption {
-  value: number;
-  label: string;
+  idDependencia: number;
+  nombre: string;
   zona: string;
 }
 interface IFormData {
-  idProceso: string | number;
-  hermesNotificacion: string;
   adscripcion: IDependenciaOption | null;
-  region: string;
-  plaza: string;
-  puesto: string;
-  titular: string;
-  oficio: string;
-  temporalidad: "1" | "2" | "";
-  nombre: string;
-  edad: string;
-  educacion: string;
-  experiencia: string;
-  sobresaliente: string;
-  reforzar: string;
-  desarrollar: string;
-  habilidades: string;
-  evaluacion: string;
-  resultadoFinal: string;
-  efectos: string;
-  cualitativoReforzar: string;
-  cualitativoDesarrollar: string;
-  valida: string;
-  revisa: string;
   aprueba: string;
+  cualitativoDesarrollar: string;
+  cualitativoReforzar: string;
+  desarrollar: string;
+  edad: string;
+  efectos: string;
+  educacion: string;
+  evaluacion: string;
+  experiencia: string;
   FKIdProceso: number | string;
-  idDependencia: number | string;
+  habilidades: string;
+  hermesNotificacion: string;
+  nombreCandidato: string;
+  numPlaza: string;
+  oficio: string;
+  puesto: string;
+  reforzar: string;
+  resultadoFinal: string;
+  revisa: string;
+  sobresaliente: string;
+  temporalidad: "1" | "2" | "";
+  titular: string;
+  valida: string;
 }
 
 const hoy = new Date();
@@ -133,40 +135,42 @@ function buildHabilidades(proc: {
 }
 
 const FORM_INICIAL: IFormData = {
-  idProceso: "",
-  hermesNotificacion: "",
   adscripcion: null,
-  region: "",
-  plaza: "",
-  puesto: "",
-  titular: "",
-  oficio: "",
-  temporalidad: "",
-  nombre: "",
-  edad: "",
-  educacion: "",
-  experiencia: "",
-  sobresaliente: "",
-  reforzar: "",
+  aprueba: "",
+  cualitativoDesarrollar: "",
+  cualitativoReforzar: "",
   desarrollar: "",
-  habilidades: "",
-  evaluacion: "",
-  resultadoFinal: "",
+  edad: "",
   efectos:
     "En caso de la contratación, y en cumplimiento a los Lineamientos específicos para el ejercicio del gasto AAAA, la persona titular de la Dependencia deberá realizar el movimiento de alta con fecha DD de MM de AAAA, o, en caso de que sea festivo o inhábil, a partir del día siguiente, en el Subsistema de Recursos Humanos, tal como se establece en la Guía para la captura de movimientos de alta de personal en el SsRH.",
-  cualitativoReforzar: "",
-  cualitativoDesarrollar: "",
-  valida: "",
-  revisa: "",
-  aprueba: "",
+  educacion: "",
+  evaluacion: "",
+  experiencia: "",
   FKIdProceso: "",
-  idDependencia: "",
+  habilidades: "",
+  hermesNotificacion: "",
+  nombreCandidato: "",
+  numPlaza: "",
+  oficio: "",
+  puesto: "",
+  reforzar: "",
+  resultadoFinal: "",
+  revisa: "",
+  sobresaliente: "",
+  temporalidad: "",
+  titular: "",
+  valida: "",
 };
+
+async function cargarPdfDesdeUrl(url: string): Promise<string> {
+  const bytes = await fetch(url).then((r) => r.arrayBuffer());
+  return btoa(String.fromCharCode(...new Uint8Array(bytes)));
+}
 
 function CrearConstancia() {
   const navigate = useNavigate();
   const { toast, mostrarToast } = useToast();
-  const usuario = useContext(UserContext);
+  const currentUser = useContext(UserContext);
 
   const [showHelp, setShowHelp] = useState(false);
   const [formData, setFormData] = useState<IFormData>(FORM_INICIAL);
@@ -192,8 +196,8 @@ function CrearConstancia() {
   const dependenciasOptions = useMemo<IDependenciaOption[]>(
     () =>
       dataDependencias?.dependencias.map((dep) => ({
-        value: dep.idDependencia,
-        label: dep.nombre,
+        idDependencia: dep.idDependencia,
+        nombre: dep.nombre,
         zona: dep.zona,
       })) ?? [],
     [dataDependencias],
@@ -226,37 +230,35 @@ function CrearConstancia() {
 
     setFormData((prev) => ({
       ...prev,
-      idProceso: cedulaFromNav.idProceso ?? "",
-      hermesNotificacion: cedulaFromNav.hermesNotificacion ?? "",
-      titular: cedulaFromNav.titularPlaza ?? "",
-      edad: cedulaFromNav.edad ?? "",
-      oficio: cedulaFromNav.oficioAutorizacionDeOcupacion ?? "",
-      educacion: cedulaFromNav.educacionFormal ?? "",
-      experiencia: cedulaFromNav.experienciaRelacionada ?? "",
-      evaluacion: cedulaFromNav.evaluacionConocimientos ?? "",
-      idDependencia: cedulaFromNav.IdDependencia ?? "",
-      sobresaliente: cedulaFromNav.competenciasSobresaliente ?? "",
-      reforzar: cedulaFromNav.competenciaReforzar ?? "",
-      desarrollar: cedulaFromNav.competenciaDesarrollar ?? "",
-      efectos: cedulaFromNav.efectoContratacion ?? prev.efectos,
+      adscripcion: dep
+        ? {
+            idDependencia: dep.idDependencia,
+            nombre: dep.nombre,
+            zona: dep.zona,
+          }
+        : null,
+      // TODO-Desarrollo: Falta aprueba
       cualitativoDesarrollar: cedulaFromNav.descripcionDesarrollar ?? "",
       cualitativoReforzar: cedulaFromNav.descripcionReforzar ?? "",
-      habilidades: buildHabilidades(cedulaFromNav),
+      desarrollar: cedulaFromNav.competenciaDesarrollar ?? "",
+      edad: cedulaFromNav.edad ?? "",
+      efectos: cedulaFromNav.efectoContratacion ?? prev.efectos,
+      educacion: cedulaFromNav.educacionFormal ?? "",
+      evaluacion: cedulaFromNav.evaluacionConocimientos ?? "",
+      experiencia: cedulaFromNav.experienciaRelacionada ?? "",
       FKIdProceso: cedulaFromNav.idProceso ?? "",
-      temporalidad:
-        cedulaFromNav.FKIdTemporalDefinitiva === 1
-          ? "1"
-          : cedulaFromNav.FKIdTemporalDefinitiva === 2
-            ? "2"
-            : "",
+      habilidades: buildHabilidades(cedulaFromNav),
+      hermesNotificacion: cedulaFromNav.hermesNotificacion ?? "",
+      nombreCandidato: cedulaFromNav.candidato ?? "",
+      numPlaza: cedulaFromNav.plaza ?? "",
+      oficio: cedulaFromNav.oficioAutorizacionDeOcupacion ?? "",
       puesto: cedulaFromNav.puesto ?? "",
-      plaza: cedulaFromNav.plaza ?? "",
-      nombre: cedulaFromNav.candidato ?? "",
+      reforzar: cedulaFromNav.competenciaReforzar ?? "",
       resultadoFinal: cedulaFromNav.resultadoProcesoEvaluacion ?? "",
-      adscripcion: dep
-        ? { value: dep.idDependencia, label: dep.nombre, zona: dep.zona }
-        : null,
-      region: dep?.zona ?? "",
+      // TODO-Desarrollo: Falta revisa
+      sobresaliente: cedulaFromNav.competenciasSobresaliente ?? "",
+      temporalidad: cedulaFromNav.temporalidad,
+      titular: cedulaFromNav.titularPlaza ?? "",
     }));
   }, [cedulaFromNav, dataDependencias]);
 
@@ -302,14 +304,16 @@ function CrearConstancia() {
   // Mostrar PDF desde navegación ---------------------------------------------
   useEffect(() => {
     if (!mostrarPDF || !archivoUrl) return;
-    const cargar = async () => {
-      const bytes = await fetch(archivoUrl).then((r) => r.arrayBuffer());
-      const b64 = btoa(String.fromCharCode(...new Uint8Array(bytes)));
+    let cancelado = false;
+    cargarPdfDesdeUrl(archivoUrl).then((b64) => {
+      if (cancelado) return;
       setArchivoBase64(b64);
       setNombreArchivo(archivoNombre ?? "Documento.pdf");
       setPdfVisible(true);
+    });
+    return () => {
+      cancelado = true;
     };
-    cargar();
   }, [mostrarPDF, archivoUrl, archivoNombre]);
 
   // Drag & Drop --------------------------------------------------------------
@@ -479,7 +483,7 @@ function CrearConstancia() {
   );
 
   const handleBuscarCedula = async () => {
-    if (!formData.idProceso) {
+    if (!formData.FKIdProceso) {
       mostrarToast(
         "⚠️ Por favor ingresa el identificador y presiona la lupa.",
         "advertencia",
@@ -489,7 +493,9 @@ function CrearConstancia() {
 
     try {
       const response: IResponseHTTP<IGetCedula> =
-        await new CedulaService().getCedulaInternaIdProceso(formData.idProceso);
+        await new CedulaService().getCedulaInternaIdProceso(
+          Number(formData.FKIdProceso),
+        );
 
       if (!response?.mensaje) {
         mostrarToast(
@@ -499,41 +505,45 @@ function CrearConstancia() {
         return;
       }
 
-      const cedulaData = response.mensaje.cedula;
+      const cedulaData: ICedulaBase = response.mensaje?.cedula[0];
 
       const dep =
         dataDependencias?.dependencias.find(
-          (d) => d.idDependencia === cedulaData.FKIdDependencia,
+          (d) => d.idDependencia === cedulaData.idDependencia,
         ) ?? null;
 
       setFormData((prev) => ({
         ...prev,
-        edad: cedulaData.edad ?? "",
-        experiencia: cedulaData.experienciaRelacionada ?? "",
-        puesto: cedulaData.puesto ?? "",
-        cualitativoReforzar: cedulaData.descripcionReforzar ?? "",
-        cualitativoDesarrollar: cedulaData.descripcionDesarrollar ?? "",
-        sobresaliente: cedulaData.competenciaSobresaliente ?? "",
-        reforzar: cedulaData.competenciaReforzar ?? "",
-        desarrollar: cedulaData.competenciaDesarrollar ?? "",
-        efectos: cedulaData.efectoContratacion ?? prev.efectos,
-        resultadoFinal: cedulaData.resultadoProcesoEvaluacion ?? "",
-        educacion: cedulaData.educacionFormal ?? "",
-        FKIdProceso: cedulaData.idProceso ?? prev.FKIdProceso,
-        hermesNotificacion: cedulaData.hermesNotificacion ?? "",
-        nombre: cedulaData.nombreCandidato ?? "",
-        titular: cedulaData.titularPlaza ?? "",
-        habilidades: buildHabilidades(cedulaData),
-        temporalidad:
-          cedulaData.FKIdTemporalDefinitiva === 1
-            ? "1"
-            : cedulaData.FKIdTemporalDefinitiva === 2
-              ? "2"
-              : "",
         adscripcion: dep
-          ? { value: dep.idDependencia, label: dep.nombre, zona: dep.zona }
+          ? {
+              idDependencia: dep.idDependencia,
+              nombre: dep.nombre,
+              zona: dep.zona,
+            }
           : null,
-        region: dep?.zona ?? "",
+        aprueba: cedulaData.aprueba || "",
+        cualitativoDesarrollar: cedulaData.descripcionDesarrollar ?? "",
+        cualitativoReforzar: cedulaData.descripcionReforzar ?? "",
+        desarrollar: cedulaData.competenciaDesarrollar ?? "",
+        edad: cedulaData.edad ?? "",
+        efectos: cedulaData.efectoContratacion ?? prev.efectos,
+        educacion: cedulaData.educacionFormal ?? "",
+        evaluacion: cedulaData.evaluacion ?? "",
+        experiencia: cedulaData.experienciaRelacionada ?? "",
+        FKIdProceso: cedulaData.FKIdProceso ?? prev.FKIdProceso,
+        habilidades: buildHabilidades(cedulaData),
+        hermesNotificacion: cedulaData.hermesNotificacion ?? "",
+        nombreCandidato: cedulaData.nombreCandidato ?? "",
+        numPlaza: cedulaData.numPlaza ?? "",
+        oficio: cedulaData.oficio ?? "",
+        puesto: cedulaData.puesto ?? "",
+        reforzar: cedulaData.competenciaReforzar ?? "",
+        resultadoFinal: cedulaData.resultadoProcesoEvaluacion ?? "",
+        revisa: cedulaData.revisa ?? "",
+        sobresaliente: cedulaData.competenciasSobresaliente ?? "",
+        temporalidad: cedulaData.temporalidad ?? "",
+        titular: cedulaData.titularPlaza ?? "",
+        valida: cedulaData.valida ?? "",
       }));
 
       setTipoProceso(cedulaData.FKIdTipoProceso ?? 0);
@@ -554,7 +564,9 @@ function CrearConstancia() {
 
     try {
       const response: IResponseHTTP<IGetCompetenciasClasificacionCedula> =
-        await new CedulaService().getResultadosIdProceso(formData.FKIdProceso);
+        await new CedulaService().getResultadosIdProceso(
+          Number(formData.FKIdProceso),
+        );
 
       if (
         !response ||
@@ -664,37 +676,38 @@ function CrearConstancia() {
       });
 
       const setField = (name: string, value: string) => {
-        try {
-          form.getTextField(name).setText(value ?? "");
-        } catch {}
+        form.getTextField(name).setText(value ?? "");
       };
 
-      setField("hermes", formData.hermesNotificacion);
-      setField("adscripcion", formData.adscripcion?.label ?? "");
-      setField("region", formData.region);
-      setField("plaza", formData.plaza);
-      setField("puesto", formData.puesto);
-      setField("titular", formData.titular);
+      setField("nombreDependencia", formData.adscripcion?.nombre ?? "");
+      setField("regionDependencia", formData.adscripcion?.zona || "");
+      // TODO-Desarrollar: Falta aprueba
+      setField("cualitativoDesarrollar", formData.cualitativoDesarrollar);
+      setField("cualitativoReforzar", formData.cualitativoReforzar);
+      setField("desarrollar", formData.desarrollar);
+      setField("edad", formData.edad ? `${formData.edad} años` : "");
+      setField("efectos", formData.efectos);
+      setField("educacion", formData.educacion);
+      setField("evaluacion", formData.evaluacion);
+      setField("experiencia", formData.experiencia);
+      // TODO-Desarrollar: Falta FKIdProceso
+      setField("fecha1", fechaFormateada);
+      setField("fecha2", fechaFormateada);
+      setField("habilidades", formData.habilidades);
+      setField("hermesNotificacion", formData.hermesNotificacion);
+      setField("nombreCandidato", formData.nombreCandidato);
+      setField("numPlaza", formData.numPlaza);
       setField("oficio", formData.oficio);
+      setField("puesto", formData.puesto);
+      setField("reforzar", formData.reforzar);
+      setField("resultadoFinal", formData.resultadoFinal);
+      // TODO-Desarrollar: Falta revisa
+      setField("sobresaliente", formData.sobresaliente);
       setField(
         "temporalidad",
         formData.temporalidad === "1" ? "Temporal" : "Definitiva",
       );
-      setField("nombre", formData.nombre);
-      setField("edad", formData.edad ? `${formData.edad} años` : "");
-      setField("educacion", formData.educacion);
-      setField("experiencia", formData.experiencia);
-      setField("sobresaliente", formData.sobresaliente);
-      setField("reforzar", formData.reforzar);
-      setField("desarrollar", formData.desarrollar);
-      setField("habilidades", formData.habilidades);
-      setField("conocimientos", formData.evaluacion);
-      setField("contratacion", formData.efectos);
-      setField("fecha1", fechaFormateada);
-      setField("fecha2", fechaFormateada);
-      setField("resultado", formData.resultadoFinal);
-      setField("cualitativoReforzar", formData.cualitativoReforzar);
-      setField("cualitativoDesarrollar", formData.cualitativoDesarrollar);
+      setField("titular", formData.titular);
 
       const fontBytes = await fetch("/gill.TTF").then((r) => r.arrayBuffer());
       const gillSansFont = await pdfDoc.embedFont(fontBytes);
@@ -766,9 +779,10 @@ function CrearConstancia() {
         }
       }
 
-      // Firma (solo para ciertos tipos de acceso)
-      // TODO: obtener usuario desde contexto/cookie, no hardcodeado
-      if (usuario?.FKidTipoAcceso === 1 || usuario?.FKidTipoAcceso === 4) {
+      if (
+        currentUser?.FKIdTipoAcceso === 1 ||
+        currentUser?.FKIdTipoAcceso === 4
+      ) {
         try {
           const firmaBytes = await fetch("/Firma_AVC.png").then((r) =>
             r.arrayBuffer(),
@@ -788,12 +802,11 @@ function CrearConstancia() {
       }
 
       const pdfBytes = await pdfDoc.save();
-      const buffer = pdfBytes.buffer.slice(
-        pdfBytes.byteOffset,
-        pdfBytes.byteOffset + pdfBytes.byteLength,
-      ) as ArrayBuffer;
+      const blob = new Blob([ManageFiles.toArrayBuffer(pdfBytes)], {
+        type: "application/pdf",
+      });
       saveAs(
-        new Blob([buffer], { type: "application/pdf" }),
+        new Blob([blob], { type: "application/pdf" }),
         `CedulaResultados_${formData.hermesNotificacion || "SinHermes"}.pdf`,
       );
     } catch (err) {
@@ -864,13 +877,31 @@ function CrearConstancia() {
       <Toast texto={toast.texto} tipo={toast.tipo} />
 
       <main className="main-content">
-        <div className="help-icon" onClick={() => setShowHelp(true)}>
+        <div
+          role="button"
+          tabIndex={0}
+          className="help-icon"
+          onClick={() => setShowHelp(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") setShowHelp(true);
+          }}
+        >
           <FiHelpCircle />
         </div>
 
         {showHelp && (
-          <div className="modal-overlay" onClick={() => setShowHelp(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            role="presentation"
+            className="modal-overlay"
+            onClick={() => setShowHelp(false)}
+            onKeyDown={() => setShowHelp(false)}
+          >
+            <div
+              role="presentation"
+              className="modal-content"
+              onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => e.stopPropagation()}
+            >
               <h2>Ayuda</h2>
               <p>
                 Esta es la ventana de generar cédula de resultados. En el campo
@@ -930,10 +961,13 @@ function CrearConstancia() {
               }[]
             ).map(({ label, key, withButton }) => (
               <div key={key} className="form-group">
-                <label className="form-label-evaluacion">{label}</label>
+                <label htmlFor={key} className="form-label-evaluacion">
+                  {label}
+                </label>
                 {withButton ? (
                   <div className="input-with-button">
                     <input
+                      id={key}
                       type="text"
                       className="form-input"
                       value={String(formData[key] ?? "")}
@@ -954,6 +988,7 @@ function CrearConstancia() {
                   </div>
                 ) : (
                   <input
+                    id={key}
                     type="text"
                     className="form-input"
                     value={String(formData[key] ?? "")}
@@ -969,8 +1004,14 @@ function CrearConstancia() {
             ))}
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Temporalidad</label>
+              <label
+                htmlFor="constancia-temporalidad"
+                className="form-label-evaluacion"
+              >
+                Temporalidad
+              </label>
               <select
+                id="constancia-temporalidad"
                 className="form-input"
                 value={formData.temporalidad}
                 onChange={(e) =>
@@ -989,13 +1030,19 @@ function CrearConstancia() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Adscripción</label>
+              <label
+                htmlFor="constancia-adscripcion"
+                className="form-label-evaluacion"
+              >
+                Adscripción
+              </label>
               <Select<IDependenciaOption>
+                inputId="constancia-adscripcion"
                 options={dependenciasOptions}
                 value={formData.adscripcion}
                 onChange={(selected) => {
-                  handleInputChange("adscripcion", selected ?? null);
-                  handleInputChange("region", selected?.zona ?? "");
+                  handleInputChange("adscripcion.nombre", selected ?? null);
+                  handleInputChange("adscripcion.zona", selected?.zona ?? "");
                 }}
                 placeholder="Escribe o selecciona una adscripción"
                 isClearable
@@ -1004,11 +1051,17 @@ function CrearConstancia() {
             </div>
 
             <div className="form-group">
-              <label className="form-label-evaluacion">Región</label>
+              <label
+                htmlFor="region-constancia"
+                className="form-label-evaluacion"
+              >
+                Región
+              </label>
               <input
+                id="region-constancia"
                 type="text"
                 className="form-input"
-                value={formData.region}
+                value={formData.adscripcion?.zona}
                 readOnly
               />
             </div>
@@ -1155,7 +1208,7 @@ function CrearConstancia() {
                     type="button"
                     className={`btn-aprobacion ${aprobadoJefeOficina ? "activo" : ""}`}
                     onClick={() => setAprobadoJefeOficina((v) => !v)}
-                    disabled={usuario?.FKidTipoAcceso !== 1}
+                    disabled={currentUser?.FKIdTipoAcceso !== 1}
                   >
                     🧾 Jefe de Oficina
                   </button>
@@ -1163,7 +1216,7 @@ function CrearConstancia() {
                     type="button"
                     className={`btn-aprobacion ${aprobadoDireccion ? "activo" : ""}`}
                     onClick={() => setAprobadoDireccion((v) => !v)}
-                    disabled={usuario?.FKidTipoAcceso !== 4}
+                    disabled={currentUser?.FKIdTipoAcceso !== 4}
                   >
                     🗂️ Jefe de Departamento
                   </button>

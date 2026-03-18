@@ -95,8 +95,9 @@ function CrearUsuario() {
         <form className="form-grid" onSubmit={handleSubmit}>
           {/* Fila 1 */}
           <div className="form-group">
-            <label className="form-label">Nombre(s)</label>
+            <label htmlFor="crear-nombres" className="form-label">Nombre(s)</label>
             <input
+              id="crear-nombres"
               type="text"
               className="form-input"
               value={formData.nombres}
@@ -112,8 +113,9 @@ function CrearUsuario() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Primer Apellido</label>
+            <label htmlFor="crear-primer-apellido" className="form-label">Primer Apellido</label>
             <input
+              id="crear-primer-apellido"
               type="text"
               className="form-input"
               value={formData.primerApellido}
@@ -129,8 +131,9 @@ function CrearUsuario() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Segundo Apellido</label>
+            <label htmlFor="crear-segundo-apellido" className="form-label">Segundo Apellido</label>
             <input
+              id="crear-segundo-apellido"
               type="text"
               className="form-input"
               value={formData.segundoApellido}
@@ -142,8 +145,9 @@ function CrearUsuario() {
 
           {/* Fila 2 */}
           <div className="form-group">
-            <label className="form-label">Usuario</label>
+            <label htmlFor="crear-usuario" className="form-label">Usuario</label>
             <input
+              id="crear-usuario"
               type="text"
               className="form-input"
               value={formData.usuario}
@@ -163,9 +167,10 @@ function CrearUsuario() {
           {/* actualizar estilos a password-input-usuario*/}
 
           <div className="form-group password-group">
-            <label className="form-label">Contraseña</label>
+            <label htmlFor="crear-contrasena" className="form-label">Contraseña</label>
             <div className="password-input-container-usuario">
               <input
+                id="crear-contrasena"
                 type={showPassword ? "text" : "password"}
                 className="form-input password-input-usuario"
                 value={formData.contrasena}
@@ -206,8 +211,9 @@ function CrearUsuario() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Rol</label>
+            <label htmlFor="crear-rol" className="form-label">Rol</label>
             <select
+              id="crear-rol"
               className="form-input rol-select"
               value={formData.rol}
               onChange={(e) => {
