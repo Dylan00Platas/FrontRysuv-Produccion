@@ -85,11 +85,23 @@ function AppRoutes() {
           path="/candidato-no-beneficiado"
           element={<CandidatoNoBeneficiado />}
         />
-        <Route path="/evaluacion" element={<Evaluacion />} />
+        <Route 
+          path="/evaluacion" 
+          element={
+            <MainLayout>
+              <Evaluacion />
+            </MainLayout>
+        } />
         <Route path="/crear-cedula-interna" element={<CrearCedulaInterna />} />
         <Route path="/estadisticas" element={<Estadisticas />} />
         <Route path="/asignar-solicitud" element={<AsignarSolicitud />} />
-        <Route path="/procesos" element={<Procesos />} />
+        <Route 
+          path="/procesos" 
+          element={
+            <MainLayout>
+              <Procesos />
+            </MainLayout>
+        } />
         <Route path="/solicitudes" element={<Solicitudes />} />
         <Route 
           path="/editar-usuario" 

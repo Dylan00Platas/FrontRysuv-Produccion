@@ -2,30 +2,44 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaBell, FaExclamationTriangle } from "react-icons/fa";
 import Select from "react-select";
-
+import AccesoService from "@/services/AccesoService";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import "./Procesos.css";
-import UsuarioService from "@/services/UsuarioService.js";
-import SolicitudService from "@/services/SolicitudService.js";
+
+
+interface IAnalista {
+  idAcceso: number;
+  nombre: string;
+  primerApellido: string;
+  segundoApellido: string;
+}
+
+interface IProcesosAdaptados {
+  id: number,
+  folio: string,
+  candidato: string,
+  analista: string,
+  estado: string,
+  estadoId: number,
+  fechaNotificacion: string,
+  hermesNotificacion: string
+}
 
 function Procesos() {
 
-  interface IAnalista {
-    idAcceso: number;
-    nombre: string;
-    primerApellido: string;
-    segundoApellido: string;
-  }
-
   const navigate = useNavigate();
-  const [procesos, setProcesos] = useState([]);
-  const [procesosRaw, setProcesosRaw] = useState([]);
-  const [analistas, setAnalistas] = useState([]);
+  const [procesos, setProcesos] = useState<IProcesosAdaptados[]>([]);
+  const [procesosRaw, setProcesosRaw] = useState<IProcesoContratacionBase[]>([]);
+  const [analistas, setAnalistas] = useState<IAnalista[]>([]);
   const [loading, setLoading] = useState(true);
+
+  type OptionType = {value: string; label: string}
 
   const [analistaOptions, setAnalistaOptions] = useState([
     { value: "Todos", label: "Todos" },
   ]);
-  const [analistaFiltro, setAnalistaFiltro] = useState({
+  const [analistaFiltro, setAnalistaFiltro] = useState<OptionType | null>({
     value: "Todos",
     label: "Todos",
   });
@@ -33,7 +47,7 @@ function Procesos() {
   const [estadoOptions, setEstadoOptions] = useState([
     { value: "Todos", label: "Todos" },
   ]);
-  const [estadoFiltro, setEstadoFiltro] = useState({
+  const [estadoFiltro, setEstadoFiltro] = useState<OptionType | null>({
     value: "Todos",
     label: "Todos",
   });
@@ -43,25 +57,32 @@ function Procesos() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const solicitudService = new SolicitudService();
-        const usuarioServicio = new UsuarioService();
+        const solicitudService = new ProcesoContratacionService();
+        const usuarioServicio = new AccesoService();
 
-        const data = await solicitudService.obtenerSolicitudes(token);
-        setProcesosRaw(data);
+        const data = await solicitudService.getProcesosContratacion();
+        setProcesosRaw(data.mensaje.procesos);
 
-        const analistasData = await usuarioServicio.obtenerAnalistas(token);
-        setAnalistas(analistasData);
+        const analistasData = await usuarioServicio.getAnalistas();
+        const Analistas: IAnalista[] = analistasData.mensaje.usuarios.map(analista => {
+          return {
+            idAcceso: analista.idAcceso,
+            nombre: analista.nombre,
+            primerApellido: analista.primerApellido,
+            segundoApellido: analista.segundoApellido
+          }
+        })
+        setAnalistas(Analistas);
 
-        const analistasMap = {};
-        analistasData.forEach((a: IAnalista) => {
-          analistasMap[a.idAcceso] =
-            `${a.nombre} ${a.primerApellido} ${a.segundoApellido || ""}`.trim();
+        const analistasMap: Record<number, string> = {};
+        analistas.forEach((analista: IAnalista) => {
+          analistasMap[analista.idAcceso] =
+            `${analista.nombre} ${analista.primerApellido} ${analista.segundoApellido || ""}`.trim();
         });
 
-        const dataConAnalista = data.filter((s) => s.FKIdAcceso !== null);
+        const dataConAnalista = data.mensaje.procesos.filter((s) => s.FKIdAcceso !== null);
 
-        const procesosAdaptados = dataConAnalista.map((s, idx) => ({
+        const procesosAdaptados: IProcesosAdaptados[] = dataConAnalista.map((s, idx) => ({
           id: s.idProceso || idx,
           folio: s.folio || "",
 
@@ -107,7 +128,7 @@ function Procesos() {
     fetchData();
   }, []);
 
-  function mapEstado(fk) {
+  function mapEstado(fk: number) {
     switch (fk) {
       case 1:
         return "Citado";
@@ -134,16 +155,14 @@ function Procesos() {
     }
   }
 
-  function getStatusByFecha(fechaNotificacion) {
+  function getStatusByFecha(fechaNotificacion: string) {
     if (!fechaNotificacion) return { color: "inherit", icon: null };
 
     const fechaNotif = new Date(fechaNotificacion);
     const fechaLimite = new Date(fechaNotif);
     fechaLimite.setMonth(fechaLimite.getMonth() + 3);
-
     const hoy = new Date();
-    const diffDias = (fechaLimite - hoy) / (1000 * 60 * 60 * 24);
-
+    const diffDias = (fechaLimite.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24);
     if (diffDias <= 15)
       return {
         color: "red",
@@ -168,12 +187,12 @@ function Procesos() {
   //  Filtro general
   const procesosFiltrados = procesos.filter((p) => {
     const estadoPermitido =
-      estadoFiltro.value === "Todos"
+      estadoFiltro?.value === "Todos"
         ? p.estado !== "Terminado" && p.estado !== "Cancelado"
-        : p.estado === estadoFiltro.value;
+        : p.estado === estadoFiltro?.value;
 
     const coincideAnalista =
-      analistaFiltro.value === "Todos" || p.analista === analistaFiltro.value;
+      analistaFiltro?.value === "Todos" || p.analista === analistaFiltro?.value;
 
     const coincideBusqueda =
       p.folio.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -186,7 +205,6 @@ function Procesos() {
 
   return (
     <div className="procesos-page">
-      <Sidebar tipoAcceso={currentUser.FKidTipoAcceso} />
 
       <main className="main-content">
         <div className="page-header2">

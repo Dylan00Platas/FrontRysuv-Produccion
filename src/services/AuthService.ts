@@ -3,6 +3,7 @@ import APIClient from "./connection/APIClient";
 import IResponseHTTP from "@/interfaces/http/Response";
 import ILogin from "@/schemas/acceso/PostLogin";
 import IPostUsuario from "@/schemas/acceso/PostUser";
+import IGetSesion from "@/schemas/acceso/GetSesion";
 import ICurrentUser from "@/interfaces/auth/CurrentUser";
 
 export default class AuthService {
@@ -30,6 +31,13 @@ export default class AuthService {
       endpoint: "/me",
       method: "GET",
     });
+  }
+
+  async session(): Promise<IResponseHTTP<IGetSesion>>{
+    return await this.api.request({
+      endpoint: "/sesion",
+      method: "GET"
+    })
   }
 
   saveToken(token: string) {

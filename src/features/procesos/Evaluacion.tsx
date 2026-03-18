@@ -8,6 +8,8 @@ import CatalogoService from "@/services/CatalogosService";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import "./Evaluacion.css";
+import IGetSesion from "@/schemas/acceso/GetSesion";
+import AuthService from "@/services/AuthService";
 import IPostControlVersion from "@/schemas/control-versiones/PostControlVersion";
 import { Toast } from "@/components/Alert/Floating/Toast";
 
@@ -102,21 +104,52 @@ interface ICalculoEstado {
 
 function Evaluacion() {
   const location = useLocation();
-  const soloLectura = true //currentUser.FKidTipoAcceso === 2;
   const procesoSeleccionado = location.state || {};
   const [step, setStep] = useState(1);
   const ProcesoServicio = new ProcesoContratacionService();
+  const [soloLectura, setSoloLectura] = useState<boolean>(true);
   const [showPopup, setShowPopup] = useState(false);
   const [versiones, setVersiones] = useState<any>([]);
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
   const [tarjetasAbiertas, setTarjetasAbiertas] = useState<boolean[]>([]);
   const {toast,mostrarToast} = useToast();
+  const [datosSesion, setDatosSesion] = useState<IGetSesion|null>();
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
     return new Date(dateString).toISOString().split("T")[0];
   };
+
+  useEffect(() => {
+      async function ObtenerSesion() {
+        if(datosSesion === null){
+          const AuthServicio = new AuthService();
+          const respuesta = await AuthServicio.session();
+          if(respuesta.mensaje.usuario){
+            const DatosSesion : IGetSesion = {
+              tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
+              usuario: respuesta.mensaje.usuario,
+              idAcceso: respuesta.mensaje.idAcceso,
+              nombre: respuesta.mensaje.nombre,
+              primerApellido: respuesta.mensaje.primerApellido,
+              segundoApellido: respuesta.mensaje.segundoApellido
+            }
+            setDatosSesion(DatosSesion)
+          }
+        }
+      }
+  
+      ObtenerSesion();
+    }, [])
+
+  useEffect(() => {
+    if(datosSesion?.tipoDeAcceso === 2){
+      setSoloLectura(true)
+    }else{
+      setSoloLectura(false)
+    }
+  },[datosSesion])
 
   const calcularEstado = (data: ICalculoEstado) => {
     if (
@@ -254,6 +287,10 @@ function Evaluacion() {
     }
     cargarDependencias();
   }, [dependenciasCargadas]);
+
+  useEffect(() => {
+    
+  })
 
   const mapFormDataToDto = (form: IPutProceso): IPutProcesoContratacion => {
   const findKey = <T extends object>(map: T, value: string): number =>
@@ -669,34 +706,32 @@ function Evaluacion() {
                 Guardar
               </button>
 
-              {/* Checar como obtener el id tipo de acceso
-                {currentUser.FKidTipoAcceso !== 2 && (
-                  <button
-                    type="button"
-                    className="btn-crear-oficio"
-                    onClick={() => {
-                      const data = {
-                        idProcesoContratacion: formData.idProcesoContratacion,
-                        folio: formData.folio,
-                        plaza: formData.numPlaza,
-                        motivo: formData.motivo,
-                        titularPlaza: formData.titular,
-                        categoriaOrigen: formData.categoria,
-                        categoriaAutorizada: formData.categoriaAutorizada,
-                        candidato: formData.candidato,
-                      };
+              {datosSesion?.tipoDeAcceso !== 2 && (
+                <button
+                  type="button"
+                  className="btn-crear-oficio"
+                  onClick={() => {
+                    const data = {
+                      idProcesoContratacion: formData.idProcesoContratacion,
+                      folio: formData.folio,
+                      plaza: formData.numPlaza,
+                      motivo: formData.motivo,
+                      titularPlaza: formData.titular,
+                      categoriaOrigen: formData.categoria,
+                      categoriaAutorizada: formData.categoriaAutorizada,
+                      candidato: formData.candidato,
+                    };
 
-                      const token = localStorage.getItem("token");
-                      sessionStorage.setItem("token", token || "");
-                      sessionStorage.setItem("datosOficio", JSON.stringify(data));
+                    const token = localStorage.getItem("token");
+                    sessionStorage.setItem("token", token || "");
+                    sessionStorage.setItem("datosOficio", JSON.stringify(data));
 
-                      window.open("/generar-oficio", "_blank");
-                    }}
-                  >
-                    Crear Oficio
-                  </button>
-                )}
-                */}
+                    window.open("/generar-oficio", "_blank");
+                  }}
+                >
+                  Crear Oficio
+                </button>
+              )}
               
 
               <button
@@ -1037,8 +1072,7 @@ function Evaluacion() {
                 Guardar
               </button>
 
-              {/* 
-              {currentUser.FKidTipoAcceso !== 2 && (
+              {datosSesion?.tipoDeAcceso !== 2 && (
                 <button
                   type="button"
                   className="btn-crear-oficio"
@@ -1063,7 +1097,7 @@ function Evaluacion() {
                 >
                   Crear Oficio
                 </button>
-              )} */}
+              )} 
 
               <button
                 type="button"

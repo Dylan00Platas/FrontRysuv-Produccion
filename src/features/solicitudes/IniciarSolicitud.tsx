@@ -6,6 +6,8 @@ import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
 import "./IniciarSolicitud.css";
+import IGetSesion from "@/schemas/acceso/GetSesion";
+import AuthService from "@/services/AuthService";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import IPostProcesoContratacion from "@/schemas/procesos-contratacion/PostProcesoContratacion";
 
@@ -74,6 +76,7 @@ function IniciarSolicitud() {
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
   const {toast, mostrarToast} = useToast();
   const ServicioCatalogo = new CatalogoService();
+  const [datosSesion, setDatosSesion] = useState<IGetSesion|null>();
 
   const [formData, setFormData] = useState<IProcesoContratacion>({
     folio: "",
@@ -129,6 +132,27 @@ function IniciarSolicitud() {
   });
 
   useEffect(() => {
+    async function ObtenerSesion() {
+      if(datosSesion === null){
+        const AuthServicio = new AuthService();
+        const respuesta = await AuthServicio.session();
+        if(respuesta.mensaje.usuario){
+          const DatosSesion : IGetSesion = {
+            tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
+            usuario: respuesta.mensaje.usuario,
+            idAcceso: respuesta.mensaje.idAcceso,
+            nombre: respuesta.mensaje.nombre,
+            primerApellido: respuesta.mensaje.primerApellido,
+            segundoApellido: respuesta.mensaje.segundoApellido
+          }
+          setDatosSesion(DatosSesion)
+        }
+      }
+    }
+    ObtenerSesion();
+  }, [])
+
+  useEffect(() => {
     async function cargarDependencias() {
       if (dependencias.length === 0 && dependenciasCargadas !== true) {
         try {
@@ -180,7 +204,7 @@ function IniciarSolicitud() {
           consecutivoExpediente: dataConCandidato.consecutivoExpediente, diasProceso: dataConCandidato.tiempoProceso, experienciaLaboralSolicitada: dataConCandidato.experiencia, familiaFuncional: dataConCandidato.familia,
           fechaElaboracionPropuesta: dataConCandidato.fechaPropuesta, fechaEntrevista: dataConCandidato.fechaEntrevista, fechaEnvioDEyDP: dataConCandidato.fechaEnvioDEyDP, fechaEnvioEvaluacionDesempenio: dataConCandidato.fechaEvaluacionDesempenio,
           fechaEvaluacionCompetencias: dataConCandidato.fechaCompetencias, fechaInicioProcesamiento: dataConCandidato.fechaProcesamiento, fechaLiberacionOficio: dataConCandidato.fechaOficio, fechaNotificacion: dataConCandidato.fechaNotificacion,
-          fechaRecibido: dataConCandidato.fechaRecibido, fechaRevisionOfiEval: dataConCandidato.fechaOfiEval, folio: dataConCandidato.folio, FKIdAcceso: 1, FKIdDependencia: dataConCandidato.idDependencia, FKIdEstadoProcesoContratacion: dataConCandidato.estado, FKIdTemporalDefinitiva: dataConCandidato.tipo === "temporal" ? 1 : 2,
+          fechaRecibido: dataConCandidato.fechaRecibido, fechaRevisionOfiEval: dataConCandidato.fechaOfiEval, folio: dataConCandidato.folio, FKIdAcceso: datosSesion!.idAcceso, FKIdDependencia: dataConCandidato.idDependencia, FKIdEstadoProcesoContratacion: dataConCandidato.estado, FKIdTemporalDefinitiva: dataConCandidato.tipo === "temporal" ? 1 : 2,
           FKIdTipoPersonal: dataConCandidato.tipoPersonal === "eventual" ? 1 : 2, FKIdTipoProceso: 0, funcionDesempeniar: dataConCandidato.funcion, hermesNotificacion: dataConCandidato.hermes, lineamientoOficioContinuidad: dataConCandidato.lineamiento, motivo: dataConCandidato.motivo,
           nombreCandidato: formData.candidatos[i].nombre, numCarpeta: dataConCandidato.numeroCarpeta, numPlaza: dataConCandidato.numPlaza, observaciones: dataConCandidato.observaciones, observacionesAnalista: dataConCandidato.observacionesAnalista, periodoAutorizadoOficioFin: dataConCandidato.periodoInicio,
           periodoAutorizadoOficioInicio: dataConCandidato.periodoTermino, resultadoEvaluacionCompetencias: dataConCandidato.resultadoEvaluacion, resultadoEvaluacionConocimiento: dataConCandidato.resultadoConocimiento, resultadoHabilidadesExcel: dataConCandidato.resultadoExcel, resultadoHabilidadesWord: dataConCandidato.resultadoWord,
