@@ -3,6 +3,7 @@ import {
   IGetUsuarios,
   IUsuarioBase,
 } from "@/schemas/acceso/GetUsuario";
+import type IPutUsuario from "@/schemas/acceso/PutUser";
 import APIClient from "./connection/APIClient";
 import IResponseHTTP from "@/interfaces/http/Response";
 import { IGetTiposAccesoUsuario } from "@/schemas/acceso/GetTipoAccesoUsuario";
@@ -60,7 +61,7 @@ export default class AccesoService {
 
   async putUsuario(
     idAcceso: number,
-    data: IUsuarioBase,
+    data: IPutUsuario,
   ): Promise<IResponseHTTP<string>> {
     return await this.api.request({
       endpoint: `/usuario/${idAcceso}`,

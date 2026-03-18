@@ -14,6 +14,7 @@ import IPostOficioProcesoContratacion from "@/schemas/procesos-contratacion/Post
 import { IGetOficiosProcesoContratacion } from "@/schemas/procesos-contratacion/GetOficioProcesoContratacion";
 import { IPostSeguimientoHermes } from "@/schemas/procesos-contratacion/PostSeguimientoHermes";
 import IPostControlVersion from "@/schemas/control-versiones/PostControlVersion";
+import { IGetSeguimientoHermes } from "@/schemas/procesos-contratacion/GetSeguimientoHermes";
 
 export default class ProcesoContratacionService {
   private api: APIClient = new APIClient(
@@ -157,7 +158,7 @@ export default class ProcesoContratacionService {
   }
 
   async getSeguimientoHermes(): Promise<
-    IResponseHTTP<IGetOficiosProcesoContratacion>
+    IResponseHTTP<IGetSeguimientoHermes>
   > {
     return await this.api.request({
       endpoint: `/obtencion-seguimiento-hermes`,
