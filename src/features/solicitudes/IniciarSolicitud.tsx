@@ -66,6 +66,8 @@ export interface IProcesoContratacion {
   idDependencia: number;
   fechaEvaluacionDesempenio: string;
   cantidadCandidatos: string;
+  idAcceso: number;
+  tipoDeProceso: number;
   candidatos: ICandidato[];
 }
 
@@ -76,9 +78,10 @@ function IniciarSolicitud() {
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
   const {toast, mostrarToast} = useToast();
   const ServicioCatalogo = new CatalogoService();
-  const [datosSesion, setDatosSesion] = useState<IGetSesion|null>();
+  const [datosSesion, setDatosSesion] = useState<IGetSesion|null>(null);
 
   const [formData, setFormData] = useState<IProcesoContratacion>({
+    idAcceso: 0,
     folio: "",
     hermes: "",
     fechaRecibido: "",
@@ -98,7 +101,7 @@ function IniciarSolicitud() {
     periodoTermino: "",
     categoriaAutorizada: "",
     tipo: "",
-    estado: 0,
+    estado: 1,
     autorizacion: false,
     observaciones: "",
     numeroCarpeta: "",
@@ -126,6 +129,7 @@ function IniciarSolicitud() {
     seguimientoDesempeno: "",
     resultadoSeguimiento: "",
     idDependencia: 0,
+    tipoDeProceso: 0,
     fechaEvaluacionDesempenio: "",
     cantidadCandidatos: "1",
     candidatos: [{ nombre: "", fechaCita: "" }],
@@ -205,7 +209,7 @@ function IniciarSolicitud() {
           fechaElaboracionPropuesta: dataConCandidato.fechaPropuesta, fechaEntrevista: dataConCandidato.fechaEntrevista, fechaEnvioDEyDP: dataConCandidato.fechaEnvioDEyDP, fechaEnvioEvaluacionDesempenio: dataConCandidato.fechaEvaluacionDesempenio,
           fechaEvaluacionCompetencias: dataConCandidato.fechaCompetencias, fechaInicioProcesamiento: dataConCandidato.fechaProcesamiento, fechaLiberacionOficio: dataConCandidato.fechaOficio, fechaNotificacion: dataConCandidato.fechaNotificacion,
           fechaRecibido: dataConCandidato.fechaRecibido, fechaRevisionOfiEval: dataConCandidato.fechaOfiEval, folio: dataConCandidato.folio, FKIdAcceso: datosSesion!.idAcceso, FKIdDependencia: dataConCandidato.idDependencia, FKIdEstadoProcesoContratacion: dataConCandidato.estado, FKIdTemporalDefinitiva: dataConCandidato.tipo === "temporal" ? 1 : 2,
-          FKIdTipoPersonal: dataConCandidato.tipoPersonal === "eventual" ? 1 : 2, FKIdTipoProceso: 0, funcionDesempeniar: dataConCandidato.funcion, hermesNotificacion: dataConCandidato.hermes, lineamientoOficioContinuidad: dataConCandidato.lineamiento, motivo: dataConCandidato.motivo,
+          FKIdTipoPersonal: dataConCandidato.tipoPersonal === "eventual" ? 1 : 2, FKIdTipoProceso: tipoSolicitud === "Asignación" ? 1 : (tipoSolicitud === "Requisición" ? 2 : 3), funcionDesempeniar: dataConCandidato.funcion, hermesNotificacion: dataConCandidato.hermes, lineamientoOficioContinuidad: dataConCandidato.lineamiento, motivo: dataConCandidato.motivo,
           nombreCandidato: formData.candidatos[i].nombre, numCarpeta: dataConCandidato.numeroCarpeta, numPlaza: dataConCandidato.numPlaza, observaciones: dataConCandidato.observaciones, observacionesAnalista: dataConCandidato.observacionesAnalista, periodoAutorizadoOficioFin: dataConCandidato.periodoInicio,
           periodoAutorizadoOficioInicio: dataConCandidato.periodoTermino, resultadoEvaluacionCompetencias: dataConCandidato.resultadoEvaluacion, resultadoEvaluacionConocimiento: dataConCandidato.resultadoConocimiento, resultadoHabilidadesExcel: dataConCandidato.resultadoExcel, resultadoHabilidadesWord: dataConCandidato.resultadoWord,
           resultadoOrtografia: dataConCandidato.resultadoOrtografia, resultadoProcesoEvaluacion: dataConCandidato.resultadoEvaluacion, resultadoReferenciasLaborales: dataConCandidato.referencias, resultadoSeguimientoEvaluacionDesempenio: dataConCandidato.resultadoSeguimiento, titularPlaza: dataConCandidato.titularPlaza
@@ -242,7 +246,7 @@ function IniciarSolicitud() {
         periodoTermino: "",
         categoriaAutorizada: "",
         tipo: "",
-        estado: 0,
+        estado: 1,
         idDependencia: 0,
         autorizacion: false,
         beneficiado: false,
@@ -273,6 +277,8 @@ function IniciarSolicitud() {
         fechaEvaluacionDesempenio: "",
         cantidadCandidatos: "1",
         candidatos: [{ nombre: "", fechaCita: "" }],
+        tipoDeProceso: 0,
+        idAcceso: 0
       });
     } catch (error) {
       console.error("IniciarSolicitud.tsx - Error al iniciar solicitud:" + error);
@@ -324,9 +330,9 @@ function IniciarSolicitud() {
               {" "}
               Seleccionar tipo de solicitud
             </option>
-            <option value="asignacion">Asignación</option>
-            <option value="requisicion">Requisición</option>
-            <option value="bolsa">Bolsa de Trabajo</option>
+            <option value="Asignación">Asignación</option>
+            <option value="Requisición">Requisición</option>
+            <option value="Bolsa">Bolsa de Trabajo</option>
           </select>
         </div>
 
@@ -354,14 +360,14 @@ function IniciarSolicitud() {
                   handleInputChange("folio", e.target.value);
                   e.target.setCustomValidity("");
                 }}
-                disabled={tipoSolicitud === "asignacion"}
+                disabled={tipoSolicitud === "Asignación"}
                 style={{
                   backgroundColor:
-                    tipoSolicitud === "asignacion" ? "#e0e0e0" : "white",
+                    tipoSolicitud === "Asignación" ? "#e0e0e0" : "white",
                   color: "black",
                 }}
                 placeholder={
-                  tipoSolicitud === "asignacion"
+                  tipoSolicitud === "Asignación"
                     ? "Este campo está bloqueado para asignación"
                     : ""
                 }
@@ -658,7 +664,7 @@ function IniciarSolicitud() {
             </div>
 
             {/* Campos específicos Bolsa de Trabajo */}
-            {tipoSolicitud === "bolsa" && (
+            {tipoSolicitud === "Bolsa" && (
               <>
                 <h3 className="section-title">Datos del proceso</h3>
                 <div className="form-group">
@@ -953,7 +959,7 @@ function IniciarSolicitud() {
             )}
 
             {/*  Asignación/Requisición */}
-            {tipoSolicitud !== "bolsa" && (
+            {tipoSolicitud !== "Bolsa" && (
               <>
                 <div className="form-group-solicitud">
                   <label className="form-label-solicitud">
