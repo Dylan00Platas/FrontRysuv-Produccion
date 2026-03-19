@@ -1,6 +1,8 @@
 import { RouteObject } from "react-router-dom";
-import Agenda from "@/features/agendas/Agenda";
+import { lazy } from "react";
 import MainLayout from "@/layout/main-layout/main-layout";
+
+const Agenda = lazy(() => import("@/features/agendas/Agenda"));
 
 const agendaRoutes: RouteObject[] = [
   {

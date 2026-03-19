@@ -7,7 +7,6 @@ import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import "./Procesos.css";
 
-
 interface IAnalista {
   idAcceso: number;
   nombre: string;
@@ -16,25 +15,26 @@ interface IAnalista {
 }
 
 interface IProcesosAdaptados {
-  id: number,
-  folio: string,
-  candidato: string,
-  analista: string,
-  estado: string,
-  estadoId: number,
-  fechaNotificacion: string,
-  hermesNotificacion: string
+  id: number;
+  folio: string;
+  candidato: string;
+  analista: string;
+  estado: string;
+  estadoId: number;
+  fechaNotificacion: string;
+  hermesNotificacion: string;
 }
 
 function Procesos() {
-
   const navigate = useNavigate();
   const [procesos, setProcesos] = useState<IProcesosAdaptados[]>([]);
-  const [procesosRaw, setProcesosRaw] = useState<IProcesoContratacionBase[]>([]);
+  const [procesosRaw, setProcesosRaw] = useState<IProcesoContratacionBase[]>(
+    [],
+  );
   const [analistas, setAnalistas] = useState<IAnalista[]>([]);
   const [loading, setLoading] = useState(true);
 
-  type OptionType = {value: string; label: string}
+  type OptionType = { value: string; label: string };
 
   const [analistaOptions, setAnalistaOptions] = useState([
     { value: "Todos", label: "Todos" },
@@ -64,14 +64,16 @@ function Procesos() {
         setProcesosRaw(data.mensaje.procesos);
 
         const analistasData = await usuarioServicio.getAnalistas();
-        const Analistas: IAnalista[] = analistasData.mensaje.usuarios.map(analista => {
-          return {
-            idAcceso: analista.idAcceso,
-            nombre: analista.nombre,
-            primerApellido: analista.primerApellido,
-            segundoApellido: analista.segundoApellido
-          }
-        })
+        const Analistas: IAnalista[] = analistasData.mensaje.usuarios.map(
+          (analista) => {
+            return {
+              idAcceso: analista.idAcceso,
+              nombre: analista.nombre,
+              primerApellido: analista.primerApellido,
+              segundoApellido: analista.segundoApellido,
+            };
+          },
+        );
         setAnalistas(Analistas);
 
         const analistasMap: Record<number, string> = {};
@@ -80,19 +82,23 @@ function Procesos() {
             `${analista.nombre} ${analista.primerApellido} ${analista.segundoApellido || ""}`.trim();
         });
 
-        const dataConAnalista = data.mensaje.procesos.filter((s) => s.FKIdAcceso !== null);
+        const dataConAnalista = data.mensaje.procesos.filter(
+          (s) => s.FKIdAcceso !== null,
+        );
 
-        const procesosAdaptados: IProcesosAdaptados[] = dataConAnalista.map((s, idx) => ({
-          id: s.idProceso || idx,
-          folio: s.folio || "",
+        const procesosAdaptados: IProcesosAdaptados[] = dataConAnalista.map(
+          (s, idx) => ({
+            id: s.idProceso || idx,
+            folio: s.folio || "",
 
-          candidato: s.nombreCandidato || "Sin candidato",
-          analista: analistasMap[s.FKIdAcceso] || "Sin analista",
-          estado: mapEstado(s.FKIdEstadoProcesoContratacion),
-          estadoId: s.FKIdEstadoProcesoContratacion,
-          fechaNotificacion: s.fechaNotificacion,
-          hermesNotificacion: s.hermesNotificacion || "",
-        }));
+            candidato: s.nombreCandidato || "Sin candidato",
+            analista: analistasMap[s.FKIdAcceso] || "Sin analista",
+            estado: mapEstado(s.FKIdEstadoProcesoContratacion),
+            estadoId: s.FKIdEstadoProcesoContratacion,
+            fechaNotificacion: s.fechaNotificacion,
+            hermesNotificacion: s.hermesNotificacion || "",
+          }),
+        );
 
         setProcesos(procesosAdaptados);
 
@@ -162,7 +168,8 @@ function Procesos() {
     const fechaLimite = new Date(fechaNotif);
     fechaLimite.setMonth(fechaLimite.getMonth() + 3);
     const hoy = new Date();
-    const diffDias = (fechaLimite.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24);
+    const diffDias =
+      (fechaLimite.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24);
     if (diffDias <= 15)
       return {
         color: "red",
@@ -204,8 +211,7 @@ function Procesos() {
   });
 
   return (
-    <div className="procesos-page">
-
+    <>
       <main className="main-content">
         <div className="page-header2">
           <h1 className="page-title2">Evaluaciones</h1>
@@ -304,7 +310,7 @@ function Procesos() {
           )}
         </div>
       </main>
-    </div>
+    </>
   );
 }
 

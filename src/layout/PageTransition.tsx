@@ -1,5 +1,6 @@
 import { motion, Variants } from "framer-motion";
 import uvBlanco from "@/assets/uvBlanco.png";
+import { useCookie } from "@/hooks/useCookie";
 
 // Interfaces de UI ------------------------------------------------------------
 interface PageTransitionProps {

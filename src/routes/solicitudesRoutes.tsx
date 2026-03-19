@@ -1,8 +1,14 @@
 import { RouteObject } from "react-router-dom";
-import AsignarSolicitud from "@/features/solicitudes/AsignarSolicitud";
-import IniciarSolicitud from "@/features/solicitudes/IniciarSolicitud";
-import Solicitudes from "@/features/solicitudes/Solicitudes";
+import { lazy } from "react";
 import MainLayout from "@/layout/main-layout/main-layout";
+
+const AsignarSolicitud = lazy(
+  () => import("@/features/solicitudes/AsignarSolicitud"),
+);
+const IniciarSolicitud = lazy(
+  () => import("@/features/solicitudes/IniciarSolicitud"),
+);
+const Solicitudes = lazy(() => import("@/features/solicitudes/Solicitudes"));
 
 const solicitudesRoutes: RouteObject[] = [
   {

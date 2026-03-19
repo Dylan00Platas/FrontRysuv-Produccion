@@ -3,7 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
-import {IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
+import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import "./Solicitudes.css";
 
 interface ISolicitudTabla {
@@ -18,13 +18,15 @@ interface ISolicitudTabla {
 function Solicitudes() {
   const navigate = useNavigate();
   const [solicitudes, setSolicitudes] = useState<ISolicitudTabla[]>([]);
-  const [solicitudesRaw, setSolicitudesRaw] = useState<IProcesoContratacionBase[]>([]);
+  const [solicitudesRaw, setSolicitudesRaw] = useState<
+    IProcesoContratacionBase[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   const handleEditarSolicitud = (solicitudAdaptada: ISolicitudTabla) => {
     // Buscamos la solicitud completa por id
     const solicitudCompleta = solicitudesRaw?.find(
-      (s) => s.idProceso === solicitudAdaptada.id
+      (s) => s.idProceso === solicitudAdaptada.id,
     );
     console.log(solicitudCompleta);
     navigate("/asignar-solicitud", { state: { solicitud: solicitudCompleta } });
@@ -46,11 +48,13 @@ function Solicitudes() {
       try {
         const token = localStorage.getItem("token");
         const ProcesoServicio = new ProcesoContratacionService();
-        const data = await ProcesoServicio.getProcesosContratacion()
+        const data = await ProcesoServicio.getProcesosContratacion();
         setSolicitudesRaw(data.mensaje.procesos);
 
         //  Filtramos solo solicitudes sin analista asignado
-        const dataSinBolsa = data.mensaje.procesos.filter((s) => s.FKIdTipoProceso !== 3);
+        const dataSinBolsa = data.mensaje.procesos.filter(
+          (s) => s.FKIdTipoProceso !== 3,
+        );
         const dataSinAnalista = dataSinBolsa.filter(
           (s) => s.FKIdAcceso === null,
         );
@@ -101,8 +105,7 @@ function Solicitudes() {
   });
 
   return (
-    <div className="solicitudes-page">
-
+    <>
       <main className="main-content">
         <div className="page-header2">
           <h1 className="page-title2">Solicitudes</h1>
@@ -113,7 +116,9 @@ function Solicitudes() {
             <Select
               options={estadoOptions}
               value={estadoFiltro}
-              onChange={(value) => {if (value) setEstadoFiltro(value);}}
+              onChange={(value) => {
+                if (value) setEstadoFiltro(value);
+              }}
               isClearable={false}
             />
           </div>
@@ -163,7 +168,7 @@ function Solicitudes() {
           </table>
         )}
       </main>
-    </div>
+    </>
   );
 }
 

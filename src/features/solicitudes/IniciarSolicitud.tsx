@@ -76,10 +76,9 @@ function IniciarSolicitud() {
   const [tipoSolicitud, setTipoSolicitud] = useState("");
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
-  const {toast, mostrarToast} = useToast();
+  const { toast, mostrarToast } = useToast();
   const ServicioCatalogo = new CatalogoService();
   const [datosSesion, setDatosSesion] = useState<IGetSesion|null>(null);
-
   const [formData, setFormData] = useState<IProcesoContratacion>({
     idAcceso: 0,
     folio: "",
@@ -137,37 +136,40 @@ function IniciarSolicitud() {
 
   useEffect(() => {
     async function ObtenerSesion() {
-      if(datosSesion === null){
+      if (datosSesion === null) {
         const AuthServicio = new AuthService();
         const respuesta = await AuthServicio.session();
-        if(respuesta.mensaje.usuario){
-          const DatosSesion : IGetSesion = {
+        if (respuesta.mensaje.usuario) {
+          const DatosSesion: IGetSesion = {
             tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
             usuario: respuesta.mensaje.usuario,
             idAcceso: respuesta.mensaje.idAcceso,
             nombre: respuesta.mensaje.nombre,
             primerApellido: respuesta.mensaje.primerApellido,
-            segundoApellido: respuesta.mensaje.segundoApellido
-          }
-          setDatosSesion(DatosSesion)
+            segundoApellido: respuesta.mensaje.segundoApellido,
+          };
+          setDatosSesion(DatosSesion);
         }
       }
     }
     ObtenerSesion();
-  }, [])
+  }, []);
 
   useEffect(() => {
     async function cargarDependencias() {
       if (dependencias.length === 0 && dependenciasCargadas !== true) {
         try {
           const response = await ServicioCatalogo.getDependencias();
-          setDependencias(response.mensaje.dependencias)
+          setDependencias(response.mensaje.dependencias);
           setDependenciasCargadas(true);
         } catch (err) {
-          console.error("IniciarSolicitud.tsx - Error cargando dependencias: ", err);
-          mostrarToast("Error al cargar dependencias", "error")
+          console.error(
+            "IniciarSolicitud.tsx - Error cargando dependencias: ",
+            err,
+          );
+          mostrarToast("Error al cargar dependencias", "error");
         }
-      }else{
+      } else {
         setDependenciasCargadas(true);
       }
     }
@@ -183,14 +185,20 @@ function IniciarSolicitud() {
     );
   }
 
-  const handleInputChange = (field: keyof IProcesoContratacion, value: string | number | boolean | ICandidato[]) => {
+  const handleInputChange = (
+    field: keyof IProcesoContratacion,
+    value: string | number | boolean | ICandidato[],
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.folio.trim() && !formData.hermes.trim()) {
-      mostrarToast("Debes ingresar al menos un Folio o Hermes de notificación", "error")
+      mostrarToast(
+        "Debes ingresar al menos un Folio o Hermes de notificación",
+        "error",
+      );
       return;
     }
     try {
@@ -215,13 +223,19 @@ function IniciarSolicitud() {
           resultadoOrtografia: dataConCandidato.resultadoOrtografia, resultadoProcesoEvaluacion: dataConCandidato.resultadoEvaluacion, resultadoReferenciasLaborales: dataConCandidato.referencias, resultadoSeguimientoEvaluacionDesempenio: dataConCandidato.resultadoSeguimiento, titularPlaza: dataConCandidato.titularPlaza
         } 
         if (tipoSolicitud === "bolsa") {
-          response = await ProcesoContratacionServicio.postProcesoContratacion(DatosCandidato)
+          response =
+            await ProcesoContratacionServicio.postProcesoContratacion(
+              DatosCandidato,
+            );
         } else {
-          response = await ProcesoContratacionServicio.postProcesoContratacion(DatosCandidato)
+          response =
+            await ProcesoContratacionServicio.postProcesoContratacion(
+              DatosCandidato,
+            );
         }
         console.log(`Solicitud ${i + 1} creada:`, response);
       }
-      mostrarToast( `${cantidad} solicitude(s) creadas correctamente`, "error")
+      mostrarToast(`${cantidad} solicitude(s) creadas correctamente`, "error");
       setTimeout(() => {
         navigate("/solicitudes");
       }, 2000);
@@ -281,22 +295,28 @@ function IniciarSolicitud() {
         idAcceso: 0
       });
     } catch (error) {
-      console.error("IniciarSolicitud.tsx - Error al iniciar solicitud:" + error);
-      mostrarToast("Error al crear solicitud","error")
+      console.error(
+        "IniciarSolicitud.tsx - Error al iniciar solicitud:" + error,
+      );
+      mostrarToast("Error al crear solicitud", "error");
     }
   };
 
-  const handleBuscarDependencia = (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent) => {
+  const handleBuscarDependencia = (
+    e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent,
+  ) => {
     e.preventDefault();
     const numDep = formData.numDependencia.trim();
-    const dep = dependencias.find(dependecia => dependecia.numDependencia = numDep)
+    const dep = dependencias.find(
+      (dependecia) => (dependecia.numDependencia = numDep),
+    );
     if (dep) {
       handleInputChange("dependencia", dep.nombre);
       handleInputChange("area", dep.areaOrganizacional);
       handleInputChange("region", dep.zona);
       formData.idDependencia = dep.idDependencia;
     } else {
-      mostrarToast("No se encontró la dependencia ingresada", "error")
+      mostrarToast("No se encontró la dependencia ingresada", "error");
     }
   };
 
@@ -316,9 +336,9 @@ function IniciarSolicitud() {
   }, [formData.lineamiento]);
 
   return (
-    <div className="iniciar-solicitud-page">
+    <>
+      <Toast texto={toast.texto} tipo={toast.tipo} />
       <main className="main-content-solicitud">
-        <Toast texto={toast.texto} tipo={toast.tipo}/>
         <div className="page-header-solicitud">
           <h1 className="page-title-solicitud">Iniciar Solicitud</h1>
           <select
@@ -1039,7 +1059,7 @@ function IniciarSolicitud() {
           </form>
         </div>
       </main>
-    </div>
+    </>
   );
 }
 

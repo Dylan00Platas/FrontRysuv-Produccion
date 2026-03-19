@@ -10,12 +10,12 @@ import { useToast } from "@/hooks/useToast";
 function EditarUsuario() {
   const navigate = useNavigate();
   const location = useLocation();
-  const {toast, mostrarToast} = useToast();
+  const { toast, mostrarToast } = useToast();
   const usuarioAEditar = location.state?.usuario || null;
   const [showPassword, setShowPassword] = useState(false);
   const usuarioServicio = new AccesoService();
 
-  const [formData, setFormData] = useState<IPutUsuario >({
+  const [formData, setFormData] = useState<IPutUsuario>({
     usuario: usuarioAEditar?.usuario || "",
     nombre: usuarioAEditar?.nombre || "",
     primerApellido: usuarioAEditar?.primerApellido || "",
@@ -54,38 +54,44 @@ function EditarUsuario() {
     const regexContrasena =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     if (formData.contrasenia && !regexContrasena.test(formData.contrasenia)) {
-      mostrarToast("La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial", "error")
+      mostrarToast(
+        "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial",
+        "error",
+      );
       return;
     }
     try {
-      const response = await usuarioServicio.putUsuario(formData.idAcceso, formData)
-      if(response.estado === 200){
-        mostrarToast("Usuario modificado correctamente", "exito")
+      const response = await usuarioServicio.putUsuario(
+        formData.idAcceso,
+        formData,
+      );
+      if (response.estado === 200) {
+        mostrarToast("Usuario modificado correctamente", "exito");
         setTimeout(() => {
           navigate("/usuarios");
         }, 1500);
       }
     } catch (error) {
-      console.error("EditarUsuario.tsx - Error al editar usuario: "+error);
-      mostrarToast("Error al editar el usuario", "error")
+      console.error("EditarUsuario.tsx - Error al editar usuario: " + error);
+      mostrarToast("Error al editar el usuario", "error");
     }
   };
 
   const handleDesactivarUsuario = async () => {
     try {
-      const response = await usuarioServicio.putBanUsuario(formData.idAcceso)
-      mostrarToast("Usuario desactivado de manera éxitosa", "exito")
+      const response = await usuarioServicio.putBanUsuario(formData.idAcceso);
+      mostrarToast("Usuario desactivado de manera éxitosa", "exito");
       setTimeout(() => navigate("/usuarios"), 1500);
     } catch (error) {
       console.error("EditarUsuario.tsx - Error al desactivar usuario:", error);
-      mostrarToast("Error al desactivar el usuario", "error")
+      mostrarToast("Error al desactivar el usuario", "error");
     }
   };
 
   return (
-    <div className="crear-usuario-page">
+    <>
+      <Toast texto={toast.texto} tipo={toast.tipo} />
       <main className="main-content-evaluacion">
-        <Toast texto={toast.texto} tipo={toast.tipo}/>
         <h1 className="page-title3">Editar Usuario</h1>
 
         <form className="form-grid" onSubmit={handleSubmit}>
@@ -117,7 +123,9 @@ function EditarUsuario() {
                 e.target.setCustomValidity("");
               }}
               onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
-                e.currentTarget.setCustomValidity("El primer apellido es obligatorio");
+                e.currentTarget.setCustomValidity(
+                  "El primer apellido es obligatorio",
+                );
               }}
               required
             />
@@ -226,7 +234,7 @@ function EditarUsuario() {
           </div>
         </form>
       </main>
-    </div>
+    </>
   );
 }
 

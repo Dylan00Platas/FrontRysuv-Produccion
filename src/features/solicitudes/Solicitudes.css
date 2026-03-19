@@ -1,12 +1,3 @@
-.solicitudes-page {
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-  font-family: "Kulim Park", sans-serif;
-  background: #fff;
-  overflow: hidden;
-}
-
 .page-header2 {
   display: flex;
   flex-direction: column;

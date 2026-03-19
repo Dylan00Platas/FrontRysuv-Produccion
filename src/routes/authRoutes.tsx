@@ -1,11 +1,10 @@
 import { RouteObject } from "react-router-dom";
-import { Login } from "@/pages/login/Login";
-import { MainMenu } from "@/layout/main-menu/MainMenu";
+import { lazy } from "react";
 import MainLayout from "@/layout/main-layout/main-layout";
 
+const MainMenu = lazy(() => import("@/layout/main-menu/MainMenu"));
+
 const authRoutes: RouteObject[] = [
-  { path: "/", element: <Login /> },
-  { path: "", element: <Login /> },
   {
     path: "/menu",
     element: (

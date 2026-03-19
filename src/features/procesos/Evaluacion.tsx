@@ -24,7 +24,6 @@ const mapTemporalDefinitiva = {
   2: "Definitiva",
 } as const;
 
-
 const mapEstadoProceso = {
   1: "Citado",
   2: "Evaluado",
@@ -39,67 +38,67 @@ const mapEstadoProceso = {
 } as const;
 
 interface IPutProceso {
-  idProcesoContratacion: number,
-  folio: string,
-  hermes: string,
-  fechaRecibido: string,
-  numDependencia: string,
-  entidad: string,
-  area: string,
-  region: string,
-  tipoPersonal: string,
-  numPlaza: string,
-  categoria: string,
-  titular: string,
-  lineamiento: string,
-  motivo: string,
-  fechaPropuesta: string,
-  fechaLiberacion: string,
-  pInicio: string
-  pTermino: string,
-  categoriaAutorizada: string,
-  tipo: typeof mapTemporalDefinitiva[keyof typeof mapTemporalDefinitiva];
-  observacionesRegistro: string,
-  analista: string,
-  estado: typeof mapEstadoProceso[keyof typeof mapEstadoProceso]
-  tipoAsignacion: typeof mapTipoProceso[keyof typeof mapTipoProceso]
-  nCarpeta: string,
-  candidato: string,
-  funcion: string,
-  familia: string,
-  fechaEntrevista: string,
-  fechaCompetencias: string,
-  fechaProcesamiento: string,
-  experienciaLaboral: string,
-  resultadoConocimiento: string,
-  fechaEnvioEval: string,
-  resultadoReferencias: string,
-  resultadoOrtografia: string,
-  resultadoWord: string,
-  resultadoExcel: string,
-  resultadoEvaluacion: string,
-  beneficiado: string,
-  fechaRevision: string,
-  fechaEnvio: string,
-  fechaNotificacion: string,
-  tiempoProceso: string,
-  observacionesAnalista: string,
-  consecutivo: string,
-  seguimientoDesempeno: string,
-  resultadoSeguimiento: string,
-  estadoFinal: string,
-  terminado: boolean,
-  FKIdDependencia: number | null,
-  fechaEvaluacionDesempeno: string
+  idProcesoContratacion: number;
+  folio: string;
+  hermes: string;
+  fechaRecibido: string;
+  numDependencia: string;
+  entidad: string;
+  area: string;
+  region: string;
+  tipoPersonal: string;
+  numPlaza: string;
+  categoria: string;
+  titular: string;
+  lineamiento: string;
+  motivo: string;
+  fechaPropuesta: string;
+  fechaLiberacion: string;
+  pInicio: string;
+  pTermino: string;
+  categoriaAutorizada: string;
+  tipo: (typeof mapTemporalDefinitiva)[keyof typeof mapTemporalDefinitiva];
+  observacionesRegistro: string;
+  analista: string;
+  estado: (typeof mapEstadoProceso)[keyof typeof mapEstadoProceso];
+  tipoAsignacion: (typeof mapTipoProceso)[keyof typeof mapTipoProceso];
+  nCarpeta: string;
+  candidato: string;
+  funcion: string;
+  familia: string;
+  fechaEntrevista: string;
+  fechaCompetencias: string;
+  fechaProcesamiento: string;
+  experienciaLaboral: string;
+  resultadoConocimiento: string;
+  fechaEnvioEval: string;
+  resultadoReferencias: string;
+  resultadoOrtografia: string;
+  resultadoWord: string;
+  resultadoExcel: string;
+  resultadoEvaluacion: string;
+  beneficiado: string;
+  fechaRevision: string;
+  fechaEnvio: string;
+  fechaNotificacion: string;
+  tiempoProceso: string;
+  observacionesAnalista: string;
+  consecutivo: string;
+  seguimientoDesempeno: string;
+  resultadoSeguimiento: string;
+  estadoFinal: string;
+  terminado: boolean;
+  FKIdDependencia: number | null;
+  fechaEvaluacionDesempeno: string;
 }
 
 interface ICalculoEstado {
-  fechaEntrevista: string,
-  fechaCompetencias: string,
-  fechaProcesamiento: string,
-  fechaRevision: string,
-  fechaEnvio: string,
-  fechaNotificacion: string
+  fechaEntrevista: string;
+  fechaCompetencias: string;
+  fechaProcesamiento: string;
+  fechaRevision: string;
+  fechaEnvio: string;
+  fechaNotificacion: string;
 }
 
 function Evaluacion() {
@@ -113,8 +112,8 @@ function Evaluacion() {
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
   const [tarjetasAbiertas, setTarjetasAbiertas] = useState<boolean[]>([]);
-  const {toast,mostrarToast} = useToast();
-  const [datosSesion, setDatosSesion] = useState<IGetSesion|null>();
+  const { toast, mostrarToast } = useToast();
+  const [datosSesion, setDatosSesion] = useState<IGetSesion | null>();
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
@@ -122,34 +121,34 @@ function Evaluacion() {
   };
 
   useEffect(() => {
-      async function ObtenerSesion() {
-        if(datosSesion === null){
-          const AuthServicio = new AuthService();
-          const respuesta = await AuthServicio.session();
-          if(respuesta.mensaje.usuario){
-            const DatosSesion : IGetSesion = {
-              tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
-              usuario: respuesta.mensaje.usuario,
-              idAcceso: respuesta.mensaje.idAcceso,
-              nombre: respuesta.mensaje.nombre,
-              primerApellido: respuesta.mensaje.primerApellido,
-              segundoApellido: respuesta.mensaje.segundoApellido
-            }
-            setDatosSesion(DatosSesion)
-          }
+    async function ObtenerSesion() {
+      if (datosSesion === null) {
+        const AuthServicio = new AuthService();
+        const respuesta = await AuthServicio.session();
+        if (respuesta.mensaje.usuario) {
+          const DatosSesion: IGetSesion = {
+            tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
+            usuario: respuesta.mensaje.usuario,
+            idAcceso: respuesta.mensaje.idAcceso,
+            nombre: respuesta.mensaje.nombre,
+            primerApellido: respuesta.mensaje.primerApellido,
+            segundoApellido: respuesta.mensaje.segundoApellido,
+          };
+          setDatosSesion(DatosSesion);
         }
       }
-  
-      ObtenerSesion();
-    }, [])
+    }
+
+    ObtenerSesion();
+  }, []);
 
   useEffect(() => {
-    if(datosSesion?.tipoDeAcceso === 2){
-      setSoloLectura(true)
-    }else{
-      setSoloLectura(false)
+    if (datosSesion?.tipoDeAcceso === 2) {
+      setSoloLectura(true);
+    } else {
+      setSoloLectura(false);
     }
-  },[datosSesion])
+  }, [datosSesion]);
 
   const calcularEstado = (data: ICalculoEstado) => {
     if (
@@ -193,12 +192,19 @@ function Evaluacion() {
     pTermino: formatDate(procesoSeleccionado.periodoAutorizadoOficioFin),
     categoriaAutorizada: procesoSeleccionado.categoriaAutorizadaOficio || "",
     tipo:
-      mapTemporalDefinitiva[procesoSeleccionado.FKIdTemporalDefinitiva as keyof typeof mapTemporalDefinitiva] || "",
+      mapTemporalDefinitiva[
+        procesoSeleccionado.FKIdTemporalDefinitiva as keyof typeof mapTemporalDefinitiva
+      ] || "",
     observacionesRegistro: procesoSeleccionado.observaciones || "",
     analista: procesoSeleccionado.analista || "",
     estado:
-      mapEstadoProceso[procesoSeleccionado.FKIdEstadoProcesoContratacion as keyof typeof mapEstadoProceso] || "",
-    tipoAsignacion: mapTipoProceso[procesoSeleccionado.FKIdTipoProceso as keyof typeof mapTipoProceso] || "",
+      mapEstadoProceso[
+        procesoSeleccionado.FKIdEstadoProcesoContratacion as keyof typeof mapEstadoProceso
+      ] || "",
+    tipoAsignacion:
+      mapTipoProceso[
+        procesoSeleccionado.FKIdTipoProceso as keyof typeof mapTipoProceso
+      ] || "",
 
     // Grid 2
     nCarpeta: procesoSeleccionado.numCarpeta || "",
@@ -262,7 +268,10 @@ function Evaluacion() {
     }));
   };
 
-  const handleInputChange = (field: keyof IPutProceso, value: string | number) => {
+  const handleInputChange = (
+    field: keyof IPutProceso,
+    value: string | number,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -275,26 +284,27 @@ function Evaluacion() {
         try {
           const ServicioCatalogo = new CatalogoService();
           const response = await ServicioCatalogo.getDependencias();
-          setDependencias(response.mensaje.dependencias)
+          setDependencias(response.mensaje.dependencias);
           setDependenciasCargadas(true);
         } catch (err) {
-          console.error("IniciarSolicitud.tsx - Error cargando dependencias: ", err);
-          mostrarToast("Error al cargar dependencias", "error")
+          console.error(
+            "IniciarSolicitud.tsx - Error cargando dependencias: ",
+            err,
+          );
+          mostrarToast("Error al cargar dependencias", "error");
         }
-      }else{
+      } else {
         setDependenciasCargadas(true);
       }
     }
     cargarDependencias();
   }, [dependenciasCargadas]);
 
-  useEffect(() => {
-    
-  })
+  useEffect(() => {});
 
   const mapFormDataToDto = (form: IPutProceso): IPutProcesoContratacion => {
-  const findKey = <T extends object>(map: T, value: string): number =>
-    Number(Object.entries(map).find(([, v]) => v === value)?.[0] ?? 0);
+    const findKey = <T extends object>(map: T, value: string): number =>
+      Number(Object.entries(map).find(([, v]) => v === value)?.[0] ?? 0);
     return {
       folio: form.folio,
       hermesNotificacion: form.hermes,
@@ -360,42 +370,57 @@ function Evaluacion() {
     try {
       const token = localStorage.getItem("token");
       const idProceso = procesoSeleccionado.idProceso;
-      const dto = mapFormDataToDto(formData)
-      const respuesta = await ProcesoServicio.putProcesoContratacion(idProceso,dto)
+      const dto = mapFormDataToDto(formData);
+      const respuesta = await ProcesoServicio.putProcesoContratacion(
+        idProceso,
+        dto,
+      );
 
       if (respuesta && respuesta.error === false) {
         try {
-          const nombreCompleto = "Usuario" //usuario.nombre;
-          const ControlPost:IPostControlVersion = {
+          const nombreCompleto = "Usuario"; //usuario.nombre;
+          const ControlPost: IPostControlVersion = {
             nombreCompleto: nombreCompleto,
             jsonDatos: JSON.stringify(dto),
-            FKIdProceso: idProceso
-          }
+            FKIdProceso: idProceso,
+          };
           await ProcesoServicio.postControlVersion(ControlPost);
-          mostrarToast("Evaluación registrada", "exito")
+          mostrarToast("Evaluación registrada", "exito");
         } catch (versionError) {
-          console.error("Evaluacion.tsx - Error al registrar control de versión: "+versionError);
-          mostrarToast("Evaluación guardada, pero NO se pudo registrar el control de cambios.", "error")
+          console.error(
+            "Evaluacion.tsx - Error al registrar control de versión: " +
+              versionError,
+          );
+          mostrarToast(
+            "Evaluación guardada, pero NO se pudo registrar el control de cambios.",
+            "error",
+          );
         }
       } else {
-        if (
-          respuesta &&
-          respuesta.estado === 400
-        ) {
-          mostrarToast("El formato de los datos es inválido.", "error")
+        if (respuesta && respuesta.estado === 400) {
+          mostrarToast("El formato de los datos es inválido.", "error");
         } else {
-          mostrarToast("Ocurrió un error al guardar la evaluación.", "error")
+          mostrarToast("Ocurrió un error al guardar la evaluación.", "error");
         }
         console.log("Evaluacion.tsx - Respuesta del servidor:", respuesta);
       }
     } catch (error) {
       console.error("Evaluacion.tsx - Error al guardar evaluación:", error);
-      mostrarToast("Ocurrió un error al guardar los cambios de la evaluación.", "error")
+      mostrarToast(
+        "Ocurrió un error al guardar los cambios de la evaluación.",
+        "error",
+      );
     }
   };
 
   useEffect(() => {
-    type FechasClave = "fechaEntrevista" | "fechaCompetencias" | "fechaProcesamiento" | "fechaRevision" | "fechaEnvio" | "fechaNotificacion";
+    type FechasClave =
+      | "fechaEntrevista"
+      | "fechaCompetencias"
+      | "fechaProcesamiento"
+      | "fechaRevision"
+      | "fechaEnvio"
+      | "fechaNotificacion";
     const fechasActuales: Record<FechasClave, string> = {
       fechaEntrevista: formData.fechaEntrevista,
       fechaCompetencias: formData.fechaCompetencias,
@@ -453,7 +478,9 @@ function Evaluacion() {
 
   const handleBuscarDependencia = () => {
     const numDep = formData.numDependencia.trim();
-    const dep = dependencias.find(dependencia => dependencia.numDependencia === numDep)
+    const dep = dependencias.find(
+      (dependencia) => dependencia.numDependencia === numDep,
+    );
     if (dep) {
       handleInputChange("entidad", dep.nombre);
       handleInputChange("area", dep.areaOrganizacional);
@@ -478,9 +505,9 @@ function Evaluacion() {
   }, [formData.lineamiento]);
 
   return (
-    <div className="evaluacion-page">
+    <>
+      <Toast texto={toast.texto} tipo={toast.tipo} />
       <main className="main-content-evaluacion">
-        <Toast texto={toast.texto} tipo={toast.tipo} />
         <div className="page-header-evaluacion">
           <h1 className="page-title-evaluacion">Evaluación</h1>
           <div className="combobox-header-evaluacion">
@@ -529,11 +556,31 @@ function Evaluacion() {
             {/* Fechas */}
             {(
               [
-                { label: "Fecha de recibido", field: "fechaRecibido", type: "date" },
-                { label: "Fecha de Elaboración Propuesta", field: "fechaPropuesta", type: "date" },
-                { label: "Fecha de liberación de oficio", field: "fechaLiberacion", type: "date" },
-                { label: "Periodo Autorizado en oficio (inicio)", field: "pInicio", type: "date" },
-                { label: "Periodo Autorizado en oficio (Termino)", field: "pTermino", type: "date" },
+                {
+                  label: "Fecha de recibido",
+                  field: "fechaRecibido",
+                  type: "date",
+                },
+                {
+                  label: "Fecha de Elaboración Propuesta",
+                  field: "fechaPropuesta",
+                  type: "date",
+                },
+                {
+                  label: "Fecha de liberación de oficio",
+                  field: "fechaLiberacion",
+                  type: "date",
+                },
+                {
+                  label: "Periodo Autorizado en oficio (inicio)",
+                  field: "pInicio",
+                  type: "date",
+                },
+                {
+                  label: "Periodo Autorizado en oficio (Termino)",
+                  field: "pTermino",
+                  type: "date",
+                },
               ] as { label: string; field: keyof IPutProceso; type: string }[]
             ).map((f, i) => (
               <div key={i} className="form-group">
@@ -582,12 +629,19 @@ function Evaluacion() {
                 { label: "Entidad académica o Dependencia", field: "entidad" },
                 { label: "Área Organizacional", field: "area" },
                 { label: "Región", field: "region" },
-                { label: "Tipo de Personal", field: "tipoPersonal", type: "select" },
+                {
+                  label: "Tipo de Personal",
+                  field: "tipoPersonal",
+                  type: "select",
+                },
                 { label: "Número de Plaza", field: "numPlaza" },
                 { label: "Categoría/Puesto (origen)", field: "categoria" },
                 { label: "Titular de la Plaza", field: "titular" },
                 { label: "Motivo", field: "motivo" },
-                { label: "Categoría por autorizar", field: "categoriaAutorizada" },
+                {
+                  label: "Categoría por autorizar",
+                  field: "categoriaAutorizada",
+                },
               ] as { label: string; field: keyof IPutProceso; type?: string }[]
             ).map(({ label, field, type = "text" }, i) => (
               <div key={i} className="form-group">
@@ -732,7 +786,6 @@ function Evaluacion() {
                   Crear Oficio
                 </button>
               )}
-              
 
               <button
                 type="button"
@@ -802,9 +855,18 @@ function Evaluacion() {
             {(
               [
                 { label: "Fecha de entrevista", field: "fechaEntrevista" },
-                { label: "Fecha de evaluación competencias", field: "fechaCompetencias" },
-                { label: "Fecha de inicio procesamiento", field: "fechaProcesamiento" },
-                { label: "Fecha de envio de evaluación de desempeño", field: "fechaEnvioEval" },
+                {
+                  label: "Fecha de evaluación competencias",
+                  field: "fechaCompetencias",
+                },
+                {
+                  label: "Fecha de inicio procesamiento",
+                  field: "fechaProcesamiento",
+                },
+                {
+                  label: "Fecha de envio de evaluación de desempeño",
+                  field: "fechaEnvioEval",
+                },
               ] as { label: string; field: keyof IPutProceso }[]
             ).map((f, i) => (
               <div key={i} className="form-group">
@@ -839,10 +901,22 @@ function Evaluacion() {
 
             {(
               [
-                { label: "Resultado de evaluación conocimiento", field: "resultadoConocimiento" },
-                { label: "Resultado de ortografía y redacción", field: "resultadoOrtografia" },
-                { label: "Resultado de habilidades Word", field: "resultadoWord" },
-                { label: "Resultado de habilidades Excel", field: "resultadoExcel" },
+                {
+                  label: "Resultado de evaluación conocimiento",
+                  field: "resultadoConocimiento",
+                },
+                {
+                  label: "Resultado de ortografía y redacción",
+                  field: "resultadoOrtografia",
+                },
+                {
+                  label: "Resultado de habilidades Word",
+                  field: "resultadoWord",
+                },
+                {
+                  label: "Resultado de habilidades Excel",
+                  field: "resultadoExcel",
+                },
               ] as { label: string; field: keyof IPutProceso; type?: string }[]
             ).map((f, i) => (
               <div key={i} className="form-group">
@@ -927,7 +1001,10 @@ function Evaluacion() {
             {/* Fechas */}
             {(
               [
-                { label: "Fecha de revisión Oficina Eval", field: "fechaRevision" },
+                {
+                  label: "Fecha de revisión Oficina Eval",
+                  field: "fechaRevision",
+                },
                 { label: "Fecha de envio a DEyDP", field: "fechaEnvio" },
                 { label: "Fecha de Notificación", field: "fechaNotificacion" },
               ] as { label: string; field: keyof IPutProceso }[]
@@ -988,8 +1065,14 @@ function Evaluacion() {
             {/* Otros campos */}
             {(
               [
-                { label: "Consecutivo Expediente (Fisico)", field: "consecutivo" },
-                { label: "Resultado a seguimiento de evaluación de desempeño", field: "resultadoSeguimiento" },
+                {
+                  label: "Consecutivo Expediente (Fisico)",
+                  field: "consecutivo",
+                },
+                {
+                  label: "Resultado a seguimiento de evaluación de desempeño",
+                  field: "resultadoSeguimiento",
+                },
               ] as { label: string; field: keyof IPutProceso }[]
             ).map((f, i) => (
               <div key={i} className="form-group">
@@ -1097,7 +1180,7 @@ function Evaluacion() {
                 >
                   Crear Oficio
                 </button>
-              )} 
+              )}
 
               <button
                 type="button"
@@ -1132,43 +1215,52 @@ function Evaluacion() {
 
               console.log("ID del proceso:", idProceso);
               console.log("Token:", token);
-              const listaJson = await servicio.getControlesVersionByProcesoId(
-                idProceso,
-              );
+              const listaJson =
+                await servicio.getControlesVersionByProcesoId(idProceso);
               console.log("Respuesta cruda del backend:", listaJson);
-              if (!listaJson || listaJson.mensaje.controlesVersiones.length === 0) {
-                mostrarToast("No se recibieron versiones desde el backend", "error");
+              if (
+                !listaJson ||
+                listaJson.mensaje.controlesVersiones.length === 0
+              ) {
+                mostrarToast(
+                  "No se recibieron versiones desde el backend",
+                  "error",
+                );
               }
 
-              const versionesFormateadas = listaJson.mensaje.controlesVersiones.map((item) => {
-                console.log("Item original:", item);
+              const versionesFormateadas =
+                listaJson.mensaje.controlesVersiones.map((item) => {
+                  console.log("Item original:", item);
 
-                let datosJson = item.jsonDatos;
-                if (typeof datosJson === "string") {
-                  try {
-                    datosJson = JSON.parse(datosJson);
-                  } catch (parseError) {
-                    console.error(
-                      "Error parseando jsonDatos:",
-                      parseError,
-                      "jsonDatos:",
-                      item.jsonDatos,
-                    );
-                    datosJson = "";
+                  let datosJson = item.jsonDatos;
+                  if (typeof datosJson === "string") {
+                    try {
+                      datosJson = JSON.parse(datosJson);
+                    } catch (parseError) {
+                      console.error(
+                        "Error parseando jsonDatos:",
+                        parseError,
+                        "jsonDatos:",
+                        item.jsonDatos,
+                      );
+                      datosJson = "";
+                    }
                   }
-                }
 
-                return {
-                  NombreCompleto: item.nombreCompleto,
-                  jsonDatos: datosJson,
-                };
-              });
+                  return {
+                    NombreCompleto: item.nombreCompleto,
+                    jsonDatos: datosJson,
+                  };
+                });
               console.log("Versiones formateadas:", versionesFormateadas);
               setVersiones(versionesFormateadas);
               setShowPopup(true);
             } catch (error) {
-              console.error("Evaluacion.tsx - Error al cargar versiones: ", error);
-              mostrarToast("Error al cargar versiones", "error")
+              console.error(
+                "Evaluacion.tsx - Error al cargar versiones: ",
+                error,
+              );
+              mostrarToast("Error al cargar versiones", "error");
             }
           }}
         >
@@ -1217,7 +1309,7 @@ function Evaluacion() {
           </div>
         )}
       </main>
-    </div>
+    </>
   );
 }
 
