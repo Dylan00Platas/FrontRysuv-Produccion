@@ -5,13 +5,11 @@ export interface IUserContext {
   FKIdTipoAcceso?: number;
   id?: number;
   nombre?: string;
-  email?: string;
   setCurrentUser: Dispatch<
     SetStateAction<{
       FKIdTipoAcceso?: number;
       id?: number;
       nombre?: string;
-      email?: string;
     } | null>
   >;
 }

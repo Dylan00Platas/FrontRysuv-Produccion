@@ -1,31 +1,8 @@
-import ICurrentUser from "@/interfaces/auth/CurrentUser";
-import ILogin from "@/interfaces/auth/Login";
 import IResponseHTTP from "@/interfaces/http/Response";
+import IGetSesion from "@/schemas/acceso/GetSesion";
 import AuthService from "@/services/AuthService";
 import { useCallback, useEffect, useState } from "react";
 
-export interface UseCookieReturn {
-  /** Datos del usuario obtenidos del backend (null si no hay sesión). */
-  user: ICurrentUser | null;
-  isLoading: boolean;
-  error: string | null;
-  /**
-   * Llama al endpoint de login.
-   * El backend establece la cookie httpOnly.
-   * No necesitas manejar el token manualmente.
-   */
-  login: (data: ILogin) => Promise<void>;
-  /**
-   * Llama al endpoint de logout.
-   * El backend elimina la cookie httpOnly.
-   */
-  logout: () => Promise<void>;
-  /**
-   * Verifica con el backend si existe una sesión activa.
-   * Útil para restaurar el estado al recargar la página.
-   */
-  checkSession: () => Promise<void>;
-}
 /**
  * useCookie
  *
@@ -38,14 +15,21 @@ export interface UseCookieReturn {
  * El backend implementa:
  *   POST /auth/login    → establece la cookie
  *   POST /auth/logout   → elimina la cookie
- *   GET  /auth/me       → devuelve CookieUser si el token es válido
+ *   GET  /auth/session       → devuelve CookieUser si el token es válido
  */
-export function useCookie(): UseCookieReturn {
-  const [user, setUser] = useState<ICurrentUser | null>(null);
+
+interface ILogin {
+  usuario: string;
+  contrasenia: string;
+}
+type ICurrentUser = IGetSesion;
+const authService = new AuthService();
+export function useCookie() {
+  const [currentUser, setCurrentUser] = useState<ICurrentUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ── Verificar sesión activa (al montar o recargar) ─────────────────────────
+  // Verificar sesión activa (al montar o recargar) -------------------------------
 
   const checkSession = useCallback(async () => {
     setIsLoading(true);
@@ -54,18 +38,17 @@ export function useCookie(): UseCookieReturn {
     const API_URL = import.meta.env.VITE_API_ACCESO_URL;
     try {
       const response: IResponseHTTP<ICurrentUser> =
-        await new AuthService().me();
+        await new AuthService().session();
 
       if (response.error == false) {
-        const data: ICurrentUser = await response.mensaje;
-        setUser(data);
+        setCurrentUser(response.mensaje);
       } else {
         // 401 / 403
-        setUser(null);
+        setCurrentUser(null);
       }
     } catch {
       setError("Error de conexión al verificar la sesión.");
-      setUser(null);
+      setCurrentUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -95,22 +78,22 @@ export function useCookie(): UseCookieReturn {
       }
 
       const responseData: IResponseHTTP<ICurrentUser> =
-        await new AuthService().me();
+        await new AuthService().session();
       if (responseData.mensaje) {
-        setUser(responseData.mensaje);
+        setCurrentUser(responseData.mensaje);
       }
     } catch (err) {
       console.error(
-        `useCookie.ts - Error al obtener cookie de usuario \n ${error}`,
+        `useCookie.ts - Error al obtener cookie de usuario \n ${err}`,
       );
       setError(err instanceof Error ? err.message : "Error al iniciar sesión.");
-      setUser(null);
+      setCurrentUser(null);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // ── Logout ─────────────────────────────────────────────────────────────────
+  // Logout --------------------------------------------------------------------
 
   const logout = useCallback(async () => {
     setIsLoading(true);
@@ -122,10 +105,10 @@ export function useCookie(): UseCookieReturn {
     } catch {
       // Aunque falle la red, se limpia estado local
     } finally {
-      setUser(null);
+      setCurrentUser(null);
       setIsLoading(false);
     }
   }, []);
 
-  return { user, isLoading, error, login, logout, checkSession };
+  return { currentUser, isLoading, error, login, logout, checkSession };
 }

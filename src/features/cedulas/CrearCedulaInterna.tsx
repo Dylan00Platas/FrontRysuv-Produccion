@@ -77,6 +77,32 @@ interface IPostCedulaInternaForm {
   resultadoHabilidadesWord: string;
   resultadoOrtografia: string;
 }
+type InputCompatibleKeys = {
+  [K in keyof IPostCedulaInternaForm]: IPostCedulaInternaForm[K] extends
+    | string
+    | number
+    ? K
+    : never;
+}[keyof IPostCedulaInternaForm];
+
+const inputKeys: InputCompatibleKeys[] = [
+  "psicometriaAnalisisProblemas",
+  "psicometriaComunicacion",
+  "psicometriaControlActividades",
+  "psicometriaDinamismo",
+  "psicometriaEnfoqueCalidad",
+  "psicometriaEnfoqueResultados",
+  "psicometriaInnovacion",
+  "psicometriaLiderazgo",
+  "psicometriaNegociacion",
+  "psicometriaOrientacionAlServicio",
+  "psicometriaPensamientoEstrategico",
+  "psicometriaPlaneacionOrganizacion",
+  "psicometriaRelacionesInterpersonales",
+  "psicometriaSensibilidadALineamientos",
+  "psicometriaTomaDecisiones",
+  "psicometriaTrabajoEnEquipo",
+];
 
 /**
  * interface IFormData {
@@ -421,31 +447,49 @@ function CrearCedulaInterna() {
     try {
       const responseCedula: IResponseHTTP<string | number> =
         await new CedulaService().postCedulaInterna({
-          revisa: formData.revisa,
-          elabora: formData.elabora,
-          avaladoPor: formData.avaladoPor,
           adscripcion: formData.adscripcion,
           analista: formData.analista,
           antecedentesFamiliaresUV: formData.antecedentesFamiliaresUV,
+          aprobadoDireccion: false,
+          aprobadoJefeOficina: false,
+          archivoAdjunto: false,
+          avaladoPor: formData.avaladoPor,
+          competenciaDesarrollar: "",
+          competenciaReforzar: "",
+          competenciasSobresaliente: "",
           conclusiones: formData.conclusiones,
+          descripcionDesarrollar: "",
+          descripcionReforzar: "",
           edad: formData.edad,
           educacionFormal: formData.educacionFormal,
+          efectoContratacion: "",
+          elabora: formData.elabora,
           evaluacionConocimientos: formData.evaluacionConocimientos,
           expectativaLaboral: formData.expectativaLaboral,
           experiencia: formData.experiencia,
           experienciaRelacionada: formData.experienciaRelacionada,
+          fechaCedulaInterna: "",
+          fechaCedulaResultados: "",
           fechaElaboracionPropuesta: formData.fechaElaboracionPropuesta,
-          FKIdProceso: Number(formData.FKIdProceso),
+          FKIdClasificacionCedula: 0,
+          FKIdProceso: 0,
+          FKIdResultado: 0,
+          FKIdTipoCedula: 0,
           hermesNotificacion: formData.hermesNotificacion,
           idCedula: formData.idCedula,
+          motivoCedulaInterna: "",
+          motivoCedulaResultados: "",
           nombreCandidato: formData.nombreCandidato,
           numPlaza: formData.numPlaza,
+          oficioAutorizacionDeOcupacion: "",
+          plaza: "",
           puesto: formData.puesto,
           referidoPor: formData.referidoPor,
-          resultados: formData.resultados,
           resultadoHabilidadesExcel: formData.resultadoHabilidadesExcel,
           resultadoHabilidadesWord: formData.resultadoHabilidadesWord,
           resultadoOrtografia: formData.resultadoOrtografia,
+          resultados: formData.resultados,
+          revisa: formData.revisa,
         });
 
       if (responseCedula.error) {
@@ -460,7 +504,42 @@ function CrearCedulaInterna() {
       if (!idCedula)
         throw new Error("No se recibió el ID de la cédula registrada");
 
-      await new CedulaService().postResultadoCedulaInterna(formData);
+      await new CedulaService().postResultadoCedulaInterna({
+        FKIdCedula: formData.idCedula,
+        psicometriaAnalisisProblemas: Number(
+          formData.psicometriaAnalisisProblemas,
+        ),
+        psicometriaComunicacion: Number(formData.psicometriaComunicacion),
+        psicometriaControlActividades: Number(
+          formData.psicometriaControlActividades,
+        ),
+        psicometriaDinamismo: Number(formData.psicometriaDinamismo),
+        psicometriaEnfoqueCalidad: Number(formData.psicometriaEnfoqueCalidad),
+        psicometriaEnfoqueResultados: Number(
+          formData.psicometriaEnfoqueResultados,
+        ),
+        psicometriaInnovacion: Number(formData.psicometriaInnovacion),
+        psicometriaLiderazgo: Number(formData.psicometriaLiderazgo),
+        psicometriaNegociacion: Number(formData.psicometriaNegociacion),
+        psicometriaOrientacionAlServicio: Number(
+          formData.psicometriaOrientacionAlServicio,
+        ),
+        psicometriaPensamientoEstrategico: Number(
+          formData.psicometriaPensamientoEstrategico,
+        ),
+        psicometriaPlaneacionOrganizacion: Number(
+          formData.psicometriaPlaneacionOrganizacion,
+        ),
+        psicometriaRelacionesInterpersonales: Number(
+          formData.psicometriaRelacionesInterpersonales,
+        ),
+        psicometriaSensibilidadALineamientos: Number(
+          formData.psicometriaSensibilidadALineamientos,
+        ),
+        psicometriaTomaDecisiones: Number(formData.psicometriaTomaDecisiones),
+        psicometriaTrabajoEnEquipo: Number(formData.psicometriaTrabajoEnEquipo),
+        resultadoPorcentaje: Number(formData.resultados),
+      });
 
       const solicitudData = {
         FKIdDependencia: formData.adscripcion?.idDependencia ?? null,
@@ -991,19 +1070,22 @@ function CrearCedulaInterna() {
                           <td>{item.nombreCompetencia}</td>
                           <td>{item.idCompetencia}</td>
                           <td>
-                            <input
-                              type="number"
-                              className="form-input"
-                              value={(formData[key] as string) ?? ""}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  key,
-                                  e.target
-                                    .value as IPostCedulaInternaForm[typeof key],
-                                )
-                              }
-                              placeholder="Ingresa valor"
-                            />
+                            {inputKeys.map((key) => (
+                              <input
+                                type="text"
+                                className="form-input"
+                                value={formData[key] ?? ""}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    key,
+                                    (typeof formData[key] === "number"
+                                      ? Number(e.target.value)
+                                      : e.target
+                                          .value) as IPostCedulaInternaForm[typeof key],
+                                  )
+                                }
+                              />
+                            ))}
                           </td>
                         </tr>
                       );

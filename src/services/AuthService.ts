@@ -4,10 +4,9 @@ import IResponseHTTP from "@/interfaces/http/Response";
 import ILogin from "@/schemas/acceso/PostLogin";
 import IPostUsuario from "@/schemas/acceso/PostUser";
 import IGetSesion from "@/schemas/acceso/GetSesion";
-import ICurrentUser from "@/interfaces/auth/CurrentUser";
 
 export default class AuthService {
-  private api: APIClient = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
+  private api: APIClient;
 
   constructor() {
     this.api = new APIClient(import.meta.env.VITE_API_ACCESO_URL);
@@ -26,26 +25,11 @@ export default class AuthService {
     return response;
   }
 
-  async me(): Promise<IResponseHTTP<ICurrentUser>> {
-    return await this.api.request({
-      endpoint: "/me",
-      method: "GET",
-    });
-  }
-
-  async session(): Promise<IResponseHTTP<IGetSesion>>{
+  async session(): Promise<IResponseHTTP<IGetSesion>> {
     return await this.api.request({
       endpoint: "/sesion",
-      method: "GET"
-    })
-  }
-
-  saveToken(token: string) {
-    // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
-  }
-
-  getToken() {
-    // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
+      method: "GET",
+    });
   }
 
   async logout(): Promise<IResponseHTTP<string>> {
@@ -55,14 +39,11 @@ export default class AuthService {
     });
   }
 
-  isAuthenticated() {
-    // TODO-Desarrollo: Agregar endpoint que elimine cookie en el backend
-  }
-
   async register(data: IPostUsuario): Promise<IResponseHTTP<string>> {
     return await this.api.request({
       endpoint: "/",
       method: "POST",
+      body: data,
     });
   }
 }

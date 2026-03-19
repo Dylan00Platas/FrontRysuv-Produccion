@@ -1,8 +1,11 @@
 export default interface IPostCedula {
+  adscripcion: { idDependencia: number; nombre: string; zona: string } | null;
+  analista: string;
   antecedentesFamiliaresUV: string;
   aprobadoDireccion: boolean;
   aprobadoJefeOficina: boolean;
   archivoAdjunto: boolean;
+  avaladoPor: string;
   competenciaDesarrollar: string;
   competenciaReforzar: string;
   competenciasSobresaliente: string;
@@ -12,23 +15,33 @@ export default interface IPostCedula {
   edad: string;
   educacionFormal: string;
   efectoContratacion: string;
+  elabora: string;
   evaluacionConocimientos: string;
   expectativaLaboral: string;
   experiencia: string;
   experienciaRelacionada: string;
+  fechaElaboracionPropuesta: string;
   FKIdClasificacionCedula: number;
   FKIdProceso: number;
   FKIdResultado: number;
   FKIdTipoCedula: number;
   fechaCedulaInterna: string;
   fechaCedulaResultados: string;
+  hermesNotificacion: string;
+  idCedula: number;
+  nombreCandidato: string;
+  numPlaza: string;
   motivoCedulaInterna: string;
   motivoCedulaResultados: string;
   oficioAutorizacionDeOcupacion: string;
   plaza: string;
   puesto: string;
   referidoPor: string;
-  resultado: string;
+  resultadoHabilidadesExcel: string;
+  resultadoHabilidadesWord: string;
+  resultadoOrtografia: string;
+  resultados: string;
+  revisa: string;
 }
 
 export interface IPostCedulaInternaForm {

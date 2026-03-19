@@ -10,7 +10,9 @@ import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompet
 import { IGetCedulaExterna } from "@/schemas/cedulas-externas/GetCedulaExterna";
 import IPostCedula from "@/schemas/cedulas/PostCedula";
 import IPutCedula, { IPutCedulaPartial } from "@/schemas/cedulas/PutCedula";
-import IPostResultadoCedula from "@/schemas/cedulas/PostResultadoCedula";
+import IPostResultadoCedula, {
+  ICedulaResultados,
+} from "@/schemas/cedulas/PostResultadoCedula";
 
 export default class CedulaService {
   private api: APIClient = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
@@ -85,7 +87,7 @@ export default class CedulaService {
   }
 
   async postResultadoCedulaInterna(
-    data: IPostResultadoCedula,
+    data: IPostResultadoCedula | ICedulaResultados,
   ): Promise<IResponseHTTP<string>> {
     return await this.api.request({
       endpoint: `/resultado`,

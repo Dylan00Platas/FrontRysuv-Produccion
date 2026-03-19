@@ -33,8 +33,12 @@ import IResponseHTTP from "@/interfaces/http/Response";
 import { IGetCedulaExterna } from "@/schemas/cedulas-externas/GetCedulaExterna";
 import { ICedulaBase, IGetCedula } from "@/schemas/cedulas/GetCedula";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
-import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompetencia";
+import {
+  ICompetenciaClasificacionCedulaBase,
+  IGetCompetenciasClasificacionCedula,
+} from "@/schemas/cedulas/GetCompetencia";
 import UserContext from "@/utils/UserContext";
+import { ICedulaResultados } from "@/schemas/cedulas/PostResultadoCedula";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IDependenciaOption {
@@ -53,6 +57,7 @@ interface IFormData {
   educacion: string;
   evaluacion: string;
   experiencia: string;
+  fechaCedulaResultados: string;
   FKIdProceso: number | string;
   habilidades: string;
   hermesNotificacion: string;
@@ -79,27 +84,32 @@ function mapFormDataToCedula(
   aprobadoJefeOficina: boolean,
   aprobadoDireccion: boolean,
 ) {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
   return {
-    hermesNotificacion: formData.hermesNotificacion,
+    aprobadoDireccion,
+    aprobadoJefeOficina,
+    competenciaDesarrollar: formData.desarrollar,
+    competenciaReforzar: formData.reforzar,
+    competenciasSobresaliente: formData.sobresaliente,
+    descripcionDesarrollar: formData.cualitativoDesarrollar,
+    descripcionReforzar: formData.cualitativoReforzar,
+    efectoContratacion: formData.efectos,
     edad: formData.edad,
     educacionFormal: formData.educacion,
-    experiencia: formData.experiencia,
-    puesto: formData.puesto,
-    plaza: formData.plaza,
-    oficio: formData.oficio,
     evaluacionConocimientos: formData.evaluacion,
-    competenciasSobresaliente: formData.sobresaliente,
-    competenciaReforzar: formData.reforzar,
-    competenciaDesarrollar: formData.desarrollar,
-    descripcionReforzar: formData.cualitativoReforzar,
-    descripcionDesarrollar: formData.cualitativoDesarrollar,
-    resultadoProcesoEvaluacion: formData.resultadoFinal,
-    efectoContratacion: formData.efectos,
-    habilidades: formData.habilidades,
+    experiencia: formData.experiencia,
+    fechaCedulaResultados: `${yyyy}-${mm}-${dd}`,
     FKIdProceso: formData.FKIdProceso || null,
+    habilidades: formData.habilidades,
+    hermesNotificacion: formData.hermesNotificacion,
+    numPlaza: formData.numPlaza,
+    oficio: formData.oficio,
+    puesto: formData.puesto,
+    resultadoProcesoEvaluacion: formData.resultadoFinal,
     titularPlaza: formData.titular,
-    aprobadoJefeOficina,
-    aprobadoDireccion,
   };
 }
 
@@ -110,13 +120,8 @@ function mapFormDataToSolicitud(formData: IFormData) {
     educacionFormal: formData.educacion,
     resultadoEvaluacion: formData.resultadoFinal,
     edad: formData.edad,
-    idDependencia: formData.adscripcion?.value ?? null,
-    tipo:
-      formData.temporalidad === "1"
-        ? 1
-        : formData.temporalidad === "2"
-          ? 2
-          : null,
+    idDependencia: formData.adscripcion?.idDependencia ?? null,
+    tipo: Number(formData.temporalidad),
     puesto: formData.puesto,
     resultadoFinal: formData.resultadoFinal,
   };
@@ -146,6 +151,7 @@ const FORM_INICIAL: IFormData = {
   educacion: "",
   evaluacion: "",
   experiencia: "",
+  fechaCedulaResultados: "",
   FKIdProceso: "",
   habilidades: "",
   hermesNotificacion: "",
@@ -475,12 +481,22 @@ function CrearConstancia() {
   }, []);
 
   // Manejadores de eventos -------------------------------------------------
-  const handleInputChange = useCallback(
-    <K extends keyof IFormData>(field: K, value: IFormData[K]) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    },
-    [],
-  );
+  const handleInputChange = (field: string, value: any) => {
+    setFormData((prev) => {
+      const newData = { ...prev };
+      const parts = field.split(".");
+      if (parts.length === 2) {
+        const [parent, child] = parts;
+        (newData as any)[parent] = {
+          ...(prev as any)[parent],
+          [child]: value,
+        };
+      } else {
+        (newData as any)[field] = value;
+      }
+      return newData;
+    });
+  };
 
   const handleBuscarCedula = async () => {
     if (!formData.FKIdProceso) {
@@ -509,7 +525,7 @@ function CrearConstancia() {
 
       const dep =
         dataDependencias?.dependencias.find(
-          (d) => d.idDependencia === cedulaData.idDependencia,
+          (d) => d.idDependencia === cedulaData.adscripcion?.idDepndencia,
         ) ?? null;
 
       setFormData((prev) => ({
@@ -528,7 +544,7 @@ function CrearConstancia() {
         edad: cedulaData.edad ?? "",
         efectos: cedulaData.efectoContratacion ?? prev.efectos,
         educacion: cedulaData.educacionFormal ?? "",
-        evaluacion: cedulaData.evaluacion ?? "",
+        evaluacionConocimientos: cedulaData.evaluacionConocimientos ?? "",
         experiencia: cedulaData.experienciaRelacionada ?? "",
         FKIdProceso: cedulaData.FKIdProceso ?? prev.FKIdProceso,
         habilidades: buildHabilidades(cedulaData),
@@ -541,12 +557,12 @@ function CrearConstancia() {
         resultadoFinal: cedulaData.resultadoProcesoEvaluacion ?? "",
         revisa: cedulaData.revisa ?? "",
         sobresaliente: cedulaData.competenciasSobresaliente ?? "",
-        temporalidad: cedulaData.temporalidad ?? "",
+        temporalidad: cedulaData.temporalidad,
         titular: cedulaData.titularPlaza ?? "",
         valida: cedulaData.valida ?? "",
       }));
 
-      setTipoProceso(cedulaData.FKIdTipoProceso ?? 0);
+      setTipoProceso(cedulaData.FKIdTipoCedula ?? 0);
     } catch (err) {
       console.error("CrearConstancia.tsx - Error al buscar cédula:\n", err);
       mostrarToast("❌ Ocurrió un error al buscar la cédula.", "error");
@@ -577,7 +593,8 @@ function CrearConstancia() {
         return;
       }
 
-      const resultado = response.mensaje.competencias[0];
+      const resultado: ICompetenciaClasificacionCedulaBase =
+        response.mensaje.competencias[0];
 
       if (resultado.resultadoPorcentaje != null) {
         setPorcentajeHabilidades(resultado.resultadoPorcentaje);
@@ -828,14 +845,29 @@ function CrearConstancia() {
     }
 
     try {
-      const cedulaData = mapFormDataToCedula(
-        formData,
-        aprobadoJefeOficina,
-        aprobadoDireccion,
-      );
-
+      const cedulaResultados: ICedulaResultados = {
+        aprobadoDireccion: aprobadoDireccion,
+        aprobadoJefeOficina: aprobadoJefeOficina,
+        competenciaDesarrollar: formData.cualitativoDesarrollar,
+        competenciaReforzar: formData.cualitativoReforzar,
+        competenciasSobresaliente: formData.sobresaliente,
+        descripcionDesarrollar: formData.cualitativoDesarrollar,
+        descripcionReforzar: formData.reforzar,
+        edad: formData.edad,
+        efectoContratacion: formData.efectos,
+        educacionFormal: formData.educacion,
+        evaluacionConocimientos: formData.evaluacion,
+        experienciaRelacionada: formData.experiencia,
+        FKIdProceso: formData.FKIdProceso,
+        FKIdTipoCedula: Number(formData.FKIdProceso),
+        fechaCedulaResultados: formData.fechaCedulaResultados,
+        oficioAutorizacionDeOcupacion: formData.oficio,
+        plaza: formData.numPlaza,
+        puesto: formData.puesto,
+        resultadoProcesoEvaluacion: formData.resultadoFinal,
+      };
       const response: IResponseHTTP<string> =
-        await new CedulaService().postResultadoCedulaInterna(cedulaData);
+        await new CedulaService().postResultadoCedulaInterna(cedulaResultados);
 
       if (!response.error) {
         const solicitudData = mapFormDataToSolicitud(formData);

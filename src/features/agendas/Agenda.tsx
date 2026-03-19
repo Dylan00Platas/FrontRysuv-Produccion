@@ -12,7 +12,6 @@ import "./Agenda.css";
 import SolicitudService from "@/services/ProcesoContratacionService";
 import IResponseHTTP from "@/interfaces/http/Response";
 import ILabelValue from "@/interfaces/LabelValue";
-import { solicitudAEvento } from "@/utils/features/Agendas";
 import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 
 // Interfaces de UI -----------------------------------------------------------
@@ -73,6 +72,30 @@ const mapColorEstado = (estado: EstadoProceso): string => {
 };
 function resolverColor(estado: number, atendioCita: boolean): string {
   return atendioCita ? "#d11a2a" : mapColorEstado(estado);
+}
+function solicitudAEvento(s): IEventoAgenda {
+  const colorBase = resolverColor(
+    s.FKIdEstadoProcesoContratacion,
+    s.atendioCita,
+  );
+
+  return {
+    id: String(s.idProceso),
+    title: s.citaVirtual
+      ? `🛜 ${s.nombreCandidato || "Sin nombre"} `
+      : s.nombreCandidato || "Sin nombre",
+    start: s.fechaEntrevista!.split("T")[0],
+    allDay: true,
+    backgroundColor: colorBase,
+    borderColor: s.citaVirtual ? "#3498db" : colorBase,
+    display: "block",
+    extendedProps: {
+      candidato: s.nombreCandidato,
+      citaVirtual: s.citaVirtual,
+      estado: s.FKIdEstadoProcesoContratacion,
+      atendioCita: s.atendioCita,
+    },
+  };
 }
 
 function Agenda() {

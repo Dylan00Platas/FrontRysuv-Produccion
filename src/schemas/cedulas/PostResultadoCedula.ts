@@ -18,3 +18,25 @@ export default interface IPostResultadoCedula {
   psicometriaTrabajoEnEquipo: number;
   resultadoPorcentaje: number;
 }
+
+export interface ICedulaResultados {
+  aprobadoDireccion: boolean;
+  aprobadoJefeOficina: boolean;
+  competenciaDesarrollar: string;
+  competenciaReforzar: string;
+  competenciasSobresaliente: string;
+  descripcionDesarrollar: string;
+  descripcionReforzar: string;
+  edad: string;
+  efectoContratacion: string;
+  educacionFormal: string;
+  evaluacionConocimientos: string;
+  experienciaRelacionada: string;
+  FKIdProceso: number | string;
+  FKIdTipoCedula: number;
+  fechaCedulaResultados: string;
+  oficioAutorizacionDeOcupacion: string;
+  plaza: string;
+  puesto: string;
+  resultadoProcesoEvaluacion: string;
+}

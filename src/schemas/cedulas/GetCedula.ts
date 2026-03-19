@@ -1,9 +1,11 @@
 export interface ICedulaBase {
   idCedula: number;
+  adscripcion: { idDepndencia: number; nombre: string; zona: string } | null;
   analista: string;
   antecedentesFamiliaresUV: string;
   aprobadoDireccion: boolean;
   aprobadoJefeOficina: boolean;
+  aprueba: string;
   archivoAdjunto: boolean;
   categoriaPuestoOrigen: string;
   competenciaDesarrollar: string;
@@ -54,6 +56,7 @@ export interface ICedulaBase {
   numPlaza: string;
   observaciones: string;
   observacionesAnalista: string;
+  oficio: string;
   oficioAutorizacionDeOcupacion: string;
   periodoAutorizadoOficioFin: string;
   periodoAutorizadoOficioInicio: string;
@@ -86,8 +89,11 @@ export interface ICedulaBase {
   resultadoProcesoEvaluacion: string;
   resultadoReferenciasLaborales: string;
   resultadoSeguimientoEvaluacionDesempenio: string;
+  revisa: string;
   seguimientoEvaluacionDesempenio: string;
+  temporalidad: "1" | "2" | "";
   titularPlaza: string;
+  valida: string;
 }
 
 export type ICedulaBasePartial = Partial<ICedulaBase>;
@@ -103,6 +109,7 @@ export interface IGetCedulas {
 export interface ICedulaActivaBase {
   idCedula: number;
   antecedentesFamiliaresUV: string;
+  capacitado: boolean;
   competenciaDesarrollar: string;
   competenciaReforzar: string;
   competenciasSobresaliente: string;

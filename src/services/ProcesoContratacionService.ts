@@ -37,7 +37,10 @@ export default class ProcesoContratacionService {
 
   async putProcesoContratacion(
     idProceso: number,
-    data: IPutProcesoContratacion | IPutProcesoContratacionAgenda,
+    data:
+      | IPutProcesoContratacion
+      | IPutProcesoContratacionAgenda
+      | { candidato: boolean },
   ): Promise<IResponseHTTP<string>> {
     return await this.api.request({
       endpoint: `/${idProceso}`,
@@ -157,9 +160,7 @@ export default class ProcesoContratacionService {
     });
   }
 
-  async getSeguimientoHermes(): Promise<
-    IResponseHTTP<IGetSeguimientoHermes>
-  > {
+  async getSeguimientoHermes(): Promise<IResponseHTTP<IGetSeguimientoHermes>> {
     return await this.api.request({
       endpoint: `/obtencion-seguimiento-hermes`,
       method: "GET",

@@ -1,153 +1,217 @@
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FaSearch, FaTimesCircle, FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
 import "./Panorama.css";
-import SolicitudService from "@/services/SolicitudService";
 import CedulaService from "@/services/CedulaService";
 import IResponseHTTP from "@/interfaces/http/Response";
-import { ICedulaBase, IGetCedulas } from "@/schemas/cedulas/GetCedula";
+import {
+  ICedulaBase,
+  IGetCedulas,
+  IGetCedulasActivas,
+} from "@/schemas/cedulas/GetCedula";
 import ILabelValue from "@/interfaces/LabelValue";
+import ProcesoContratacionService from "@/services/ProcesoContratacionService";
+import {
+  IGetProcesosContratacion,
+  IProcesoContratacionBase,
+} from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 
-function mapEstado(fk: number) {
-  switch (fk) {
-    case 1:
-      return "Citado";
-    case 2:
-      return "Evaluado";
-    case 3:
-      return "En procesamiento";
-    case 4:
-      return "En revisión";
-    case 5:
-      return "En firma";
-    case 6:
-      return "Notificado";
-    case 7:
-      return "Cancelado";
-    case 8:
-      return "Terminado";
-    case 13:
-      return "Inicio procesamiento";
-    case 14:
-      return "Procesamiento oficio";
-    case 15:
-      return "Fin procesamiento";
-    default:
-      return "Por iniciar";
-  }
+// Utils -------------------------------------------------------------------
+function mapEstado(fk: number): string {
+  const estados: Record<number, string> = {
+    1: "Citado",
+    2: "Evaluado",
+    3: "En procesamiento",
+    4: "En revisión",
+    5: "En firma",
+    6: "Notificado",
+    7: "Cancelado",
+    8: "Terminado",
+    13: "Inicio procesamiento",
+    14: "Procesamiento oficio",
+    15: "Fin procesamiento",
+  };
+  return estados[fk] ?? "Por iniciar";
 }
+
+function uniqueOptions(values: string[]): ILabelValue[] {
+  return [...new Set(values)].map((v) => ({ value: v, label: v }));
+}
+
+// Interfaces de UI ---------------------------------------------------------
+interface IProcesoAdaptado {
+  idProceso: number;
+  folio: string;
+  hermesNotificacion: string;
+  nombreCandidato: string;
+  puesto: string;
+  estado: string;
+  fechaRecibido: string;
+  // TODO-Desarrollo: reemplazar con campo real de dependencia
+  dependencia: string;
+}
+
+interface ICompetencia {
+  idProceso: number | null;
+  nombreCandidato: string;
+  competenciaReforzar: string;
+  competenciaDesarrollar: string;
+  capacitado: boolean;
+}
+
+interface IFiltrosEvaluacion {
+  estado: ILabelValue | null;
+  dependencia: ILabelValue | null;
+}
+
+// Constantes ----------------------------------------------------------------
+const ESTADOS_OCULTOS = ["Terminado", "Cancelado"] as const;
+
+const OPCIONES_FILTRO_CEDULA: ILabelValue[] = [
+  {
+    value: "Pendiente de validar Jefe de Departamento",
+    label: "Pendiente de validar Jefe de Departamento",
+  },
+  {
+    value: "Pendiente de validar Jefe de Oficina",
+    label: "Pendiente de validar Jefe de Oficina",
+  },
+  { value: "Todas las cédulas", label: "Todas las cédulas" },
+];
 
 function Panorama() {
   const navigate = useNavigate();
 
-  //  Estados de Evaluaciones
-  const [evaluaciones, setEvaluaciones] = useState([]);
-  const [evaluacionesFiltradas, setEvaluacionesFiltradas] = useState([]);
-  const [estadoOptions, setEstadoOptions] = useState([]);
-  const [dependenciaOptions, setDependenciaOptions] = useState([]);
-  const [filtros, setFiltros] = useState({
+  // Estados de Evaluaciones
+  const [evaluaciones, setEvaluaciones] = useState<IProcesoAdaptado[]>([]);
+  const [evaluacionesFiltradas, setEvaluacionesFiltradas] = useState<
+    IProcesoAdaptado[]
+  >([]);
+  const [estadoOptions, setEstadoOptions] = useState<ILabelValue[]>([]);
+  const [dependenciaOptions, setDependenciaOptions] = useState<ILabelValue[]>(
+    [],
+  );
+  const [filtros, setFiltros] = useState<IFiltrosEvaluacion>({
     estado: null,
     dependencia: null,
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [evaluacionesRaw, setEvaluacionesRaw] = useState([]);
+  const [evaluacionesRaw, setEvaluacionesRaw] = useState<
+    IProcesoContratacionBase[]
+  >([]);
 
-  //  Estados de Cédulas
+  // Estados de Cédulas
   const [cedulas, setCedulas] = useState<ICedulaBase[]>([]);
-  const [cedulasFiltradas, setCedulasFiltradas] = useState([]);
-  const [filtroCedula, setFiltroCedula] = useState({
-    value: "Pendiente de validar Jefe de Departamento",
-    label: "Pendiente de validar Jefe de Departamento",
-  });
+  const [cedulasFiltradas, setCedulasFiltradas] = useState<ICedulaBase[]>([]);
+  const [filtroCedula, setFiltroCedula] = useState<ILabelValue>(
+    OPCIONES_FILTRO_CEDULA[0],
+  );
   const [dependenciaCedulaOptions, setDependenciaCedulaOptions] = useState<
     ILabelValue[]
   >([]);
-  const [dependenciaCedulaFiltro, setDependenciaCedulaFiltro] = useState(null);
+  const [dependenciaCedulaFiltro, setDependenciaCedulaFiltro] =
+    useState<ILabelValue | null>(null);
   const [searchCedula, setSearchCedula] = useState("");
   const [loadingCedulas, setLoadingCedulas] = useState(true);
 
-  //  Cargar Evaluaciones
+  // Estados de Competencias
+  const [competencias, setCompetencias] = useState<ICompetencia[]>([]);
+  const [loadingCompetencias, setLoadingCompetencias] = useState(true);
+
+  // Referencias a secciones
+  const evaluacionesRef = useRef<HTMLElement>(null);
+  const cedulasRef = useRef<HTMLElement>(null);
+  const competenciasRef = useRef<HTMLElement>(null);
+
+  // Cargar Evaluaciones ----------------------------------------------------
   useEffect(() => {
     const fetchEvaluaciones = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const SolicitudService = new SolicitudService();
+        const data: IResponseHTTP<IGetProcesosContratacion> =
+          await new ProcesoContratacionService().getProcesosContratacion();
 
-        const data = await SolicitudService.obtenerSolicitudes(token);
-        setEvaluacionesRaw(data);
-        const dataFiltrada = data.filter((s) => s.FKIdAcceso !== null);
+        setEvaluacionesRaw(data.mensaje.procesos);
 
-        const adaptadas = dataFiltrada.map((s, idx) => ({
-          id: s.idProceso || idx,
-          folio: s.folio || "",
-          hermesNotificacion: s.hermesNotificacion || "",
-          nombre: s.nombreCandidato || "Sin candidato",
-          puesto: s.categoriaPuestoOrigen || "Sin puesto",
+        const dataFiltrada = data.mensaje.procesos.filter(
+          (s) => s.FKIdAcceso !== null,
+        );
+
+        const adaptadas: IProcesoAdaptado[] = dataFiltrada.map((s, idx) => ({
+          idProceso: s.idProceso ?? idx,
+          folio: s.folio ?? "",
+          hermesNotificacion: s.hermesNotificacion ?? "",
+          nombreCandidato: s.nombreCandidato ?? "Sin candidato",
+          puesto: s.categoriaPuestoOrigen ?? "Sin puesto",
           estado: mapEstado(s.FKIdEstadoProcesoContratacion),
           fechaRecibido: s.fechaRecibido
             ? new Date(s.fechaRecibido).toLocaleDateString("es-MX")
             : "Sin fecha",
-          dependencia: s.nombre || "Sin dependencia",
+          // TODO-Desarrollo: reemplazar con campo real de dependencia
+          dependencia: s.nombreCandidato ?? "Sin dependencia",
         }));
 
         setEvaluaciones(adaptadas);
-
-        const sinTerminados = adaptadas.filter(
-          (e) => e.estado !== "Terminado" && e.estado !== "Cancelado",
+        setEvaluacionesFiltradas(
+          adaptadas.filter(
+            (e) =>
+              !ESTADOS_OCULTOS.includes(
+                e.estado as (typeof ESTADOS_OCULTOS)[number],
+              ),
+          ),
         );
-
-        setEvaluacionesFiltradas(sinTerminados);
-
-        // Opciones de filtros
-        const estadosUnicos = [...new Set(adaptadas.map((e) => e.estado))].map(
-          (estado) => ({ value: estado, label: estado }),
+        setEstadoOptions(uniqueOptions(adaptadas.map((e) => e.estado)));
+        setDependenciaOptions(
+          uniqueOptions(adaptadas.map((e) => e.dependencia)),
         );
-        setEstadoOptions(estadosUnicos);
-
-        const dependenciasUnicas = [
-          ...new Set(adaptadas.map((e) => e.dependencia)),
-        ].map((d) => ({ value: d, label: d }));
-        setDependenciaOptions(dependenciasUnicas);
       } catch (error) {
         console.error("Error cargando evaluaciones:", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchEvaluaciones();
   }, []);
 
-  //  Filtros de Evaluaciones
+  // Filtros de Evaluaciones -------------------------------------------------
   useEffect(() => {
     let filtradas = [...evaluaciones];
 
+    // Si no hay filtro de estado activo, ocultar terminados y cancelados
     if (!filtros.estado) {
       filtradas = filtradas.filter(
-        (e) => e.estado !== "Terminado" && e.estado !== "Cancelado",
+        (e) =>
+          !ESTADOS_OCULTOS.includes(
+            e.estado as (typeof ESTADOS_OCULTOS)[number],
+          ),
+      );
+    } else {
+      filtradas = filtradas.filter((e) => e.estado === filtros.estado!.value);
+    }
+
+    if (filtros.dependencia) {
+      filtradas = filtradas.filter(
+        (e) => e.dependencia === filtros.dependencia!.value,
       );
     }
-    if (filtros.estado)
-      filtradas = filtradas.filter((e) => e.estado === filtros.estado.value);
-    if (filtros.dependencia)
-      filtradas = filtradas.filter(
-        (e) => e.dependencia === filtros.dependencia.value,
-      );
-    if (searchTerm.trim() !== "") {
+
+    if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       filtradas = filtradas.filter(
         (e) =>
-          e.nombre.toLowerCase().includes(term) ||
+          e.nombreCandidato.toLowerCase().includes(term) ||
           e.folio.toLowerCase().includes(term) ||
           e.puesto.toLowerCase().includes(term),
       );
     }
+
     setEvaluacionesFiltradas(filtradas);
   }, [filtros, searchTerm, evaluaciones]);
 
-  //  Cargar Cédulas (solo FKIdTipoCedula: 2)
+  // Cargar Cédulas (solo FKIdTipoCedula: 2) ----------------------------------
   useEffect(() => {
     const cargarCedulas = async () => {
       try {
@@ -158,91 +222,83 @@ function Panorama() {
         const cedulasTipo2 = response.mensaje.cedulas.filter(
           (c) => c.FKIdTipoCedula === 2,
         );
-        setCedulas(cedulasTipo2);
 
-        const dependenciasUnicas = [
-          ...new Set(cedulasTipo2.map((c) => c.dependencia || "N/A")),
-        ].map((d) => ({ value: d, label: d }));
-        setDependenciaCedulaOptions(dependenciasUnicas);
+        setCedulas(cedulasTipo2);
+        setDependenciaCedulaOptions(
+          uniqueOptions(cedulasTipo2.map((c) => c.dependencia ?? "N/A")),
+        );
       } catch (err) {
         console.error("Error cargando cédulas:", err);
       } finally {
         setLoadingCedulas(false);
       }
     };
+
     cargarCedulas();
   }, []);
 
-  //  Filtros de Cédulas
+  // Filtros de Cédulas -------------------------------------------------------
   useEffect(() => {
     let filtradas = [...cedulas];
 
-    if (filtroCedula?.value === "Pendiente de validar Jefe de Departamento") {
+    switch (filtroCedula?.value) {
+      case "Pendiente de validar Jefe de Departamento":
+        filtradas = filtradas.filter(
+          (c) =>
+            c.FKIdTipoCedula === 2 &&
+            c.aprobadoJefeOficina === true &&
+            (c.aprobadoDireccion === null || c.aprobadoDireccion === false),
+        );
+        break;
+      case "Pendiente de validar Jefe de Oficina":
+        filtradas = filtradas.filter(
+          (c) =>
+            c.FKIdTipoCedula === 2 &&
+            (c.aprobadoJefeOficina === null || c.aprobadoJefeOficina === false),
+        );
+        break;
+      case "Todas las cédulas":
+      default:
+        filtradas = filtradas.filter((c) => c.FKIdTipoCedula === 2);
+        break;
+    }
+
+    if (dependenciaCedulaFiltro) {
       filtradas = filtradas.filter(
-        (c) =>
-          c.FKIdTipoCedula === 2 &&
-          c.aprobadoJefeOficina === true && // Ya validado por Jefe de Oficina
-          (c.aprobadoDireccion === null || //  Pendiente por Jefe de Departamento
-            c.aprobadoDireccion === false),
+        (c) => c.dependencia === dependenciaCedulaFiltro.value,
       );
     }
 
-    // FILTRO: Pendiente de validar Jefe de Oficina
-    else if (filtroCedula?.value === "Pendiente de validar Jefe de Oficina") {
-      filtradas = filtradas.filter(
-        (c) =>
-          c.FKIdTipoCedula === 2 &&
-          (c.aprobadoJefeOficina === null || // ❌ No validado aún por Jefe de Oficina
-            c.aprobadoJefeOficina === false),
-      );
-    }
-
-    // FILTRO: Todas las cédulas
-    else if (filtroCedula?.value === "Todas las cédulas") {
-      filtradas = filtradas.filter((c) => c.FKIdTipoCedula === 2);
-    }
-    if (dependenciaCedulaFiltro)
-      filtradas = filtradas.filter(
-        (c) => c.nombreDependencia === dependenciaCedulaFiltro.value,
-      );
-
-    if (searchCedula.trim() !== "") {
+    if (searchCedula.trim()) {
       const term = searchCedula.toLowerCase();
       filtradas = filtradas.filter(
         (c) =>
-          (c.hermesNotificacion || "").toLowerCase().includes(term) ||
-          (c.nombreCandidato || "").toLowerCase().includes(term) ||
-          (c.nombreDependencia || "").toLowerCase().includes(term) ||
-          (c.puesto || "").toLowerCase().includes(term),
+          (c.hermesNotificacion ?? "").toLowerCase().includes(term) ||
+          (c.nombreCandidato ?? "").toLowerCase().includes(term) ||
+          (c.adscripcion?.nombre ?? "").toLowerCase().includes(term) ||
+          (c.puesto ?? "").toLowerCase().includes(term),
       );
     }
 
     setCedulasFiltradas(filtradas);
   }, [cedulas, filtroCedula, dependenciaCedulaFiltro, searchCedula]);
 
-  //  Estados para Competencias de Candidatos
-  const [competencias, setCompetencias] = useState([]);
-  const [loadingCompetencias, setLoadingCompetencias] = useState(true);
-
+  // Cargar Competencias -----------------------------------------------------
   const cargarCompetencias = async () => {
     try {
       setLoadingCompetencias(true);
-      const token = localStorage.getItem("token");
-      const servicio = new CedulaService();
+      const data: IResponseHTTP<IGetCedulasActivas> =
+        await new CedulaService().getCedulasInternasActivas();
 
-      const data = await servicio.obtenerCedulasActivas(token);
-
-      const filtradas = data.filter(
-        (c) => c.FKIdTipoCedula !== 1 && c.capacitado !== true,
-      );
-
-      const adaptadas = filtradas.map((c) => ({
-        idProceso: c.FKIdProceso ?? null,
-        nombreCandidato: c.nombreCandidato || "N/A",
-        competenciaReforzar: c.competenciaReforzar || "N/A",
-        competenciaDesarrollar: c.competenciaDesarrollar || "N/A",
-        capacitado: false,
-      }));
+      const adaptadas: ICompetencia[] = data.mensaje.cedulas
+        .filter((c) => c.FKIdTipoCedula !== 1 && c.capacitado !== true)
+        .map((c) => ({
+          idProceso: c.FKIdProceso ?? null,
+          nombreCandidato: c.nombreCandidato ?? "N/A",
+          competenciaReforzar: c.competenciaReforzar ?? "N/A",
+          competenciaDesarrollar: c.competenciaDesarrollar ?? "N/A",
+          capacitado: false,
+        }));
 
       setCompetencias(adaptadas);
     } catch (err) {
@@ -252,438 +308,360 @@ function Panorama() {
     }
   };
 
-  //  Cargar Competencias al montar
   useEffect(() => {
     cargarCompetencias();
   }, []);
 
-  //  Referencias a secciones
-  const evaluacionesRef = useRef(null);
-  const cedulasRef = useRef(null);
-  const competenciasRef = useRef(null);
+  // Guardar competencias capacitadas --------------------------------------
+  const handleGuardarCapacitados = async () => {
+    try {
+      const seleccionados = competencias.filter((c) => c.capacitado);
 
-  //  Función para hacer scroll suave
-  const scrollToSection = (ref) => {
-    if (ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      for (const candidato of seleccionados) {
+        if (candidato.idProceso !== null) {
+          await new ProcesoContratacionService().putProcesoContratacion(
+            candidato.idProceso,
+            { candidato: true },
+          );
+        } else {
+          console.warn("Candidato sin idProceso:", candidato);
+        }
+      }
+
+      await cargarCompetencias();
+    } catch (error) {
+      console.error("Error al capacitar candidatos:", error);
+      alert("Ocurrió un error al guardar los candidatos.");
     }
   };
 
+  // Exportar competencias a Excel -------------------------------------------
+  const handleExportarExcel = async () => {
+    const { default: xlsx } = await import("xlsx-js-style");
+
+    const fecha = new Date().toLocaleDateString("es-MX").replaceAll("/", "-");
+
+    const datosProcesados = competencias.map((c) => ({
+      nombre: c.nombreCandidato,
+      reforzar: c.competenciaReforzar
+        ? c.competenciaReforzar.split(",").map((x) => x.trim())
+        : [],
+      desarrollar: c.competenciaDesarrollar
+        ? c.competenciaDesarrollar.split(",").map((x) => x.trim())
+        : [],
+    }));
+
+    const maxReforzar = Math.max(
+      ...datosProcesados.map((d) => d.reforzar.length),
+      0,
+    );
+    const maxDesarrollar = Math.max(
+      ...datosProcesados.map((d) => d.desarrollar.length),
+      0,
+    );
+
+    const headers = [
+      "Nombre del Candidato",
+      ...Array.from(
+        { length: maxReforzar },
+        (_, i) => `Competencia a Reforzar ${i + 1}`,
+      ),
+      ...Array.from(
+        { length: maxDesarrollar },
+        (_, i) => `Competencia a Desarrollar ${i + 1}`,
+      ),
+    ];
+
+    const rows = datosProcesados.map((d) => [
+      d.nombre,
+      ...Array.from({ length: maxReforzar }, (_, i) => d.reforzar[i] ?? ""),
+      ...Array.from(
+        { length: maxDesarrollar },
+        (_, i) => d.desarrollar[i] ?? "",
+      ),
+    ]);
+
+    const ws = xlsx.utils.aoa_to_sheet([headers, ...rows]);
+    ws["!cols"] = headers.map(() => ({ wch: 25 }));
+
+    // Estilo de encabezado
+    const headerStyle = {
+      font: { bold: true, color: { rgb: "FFFFFF" } },
+      alignment: { horizontal: "center" },
+      fill: { patternType: "solid", fgColor: { rgb: "008000" } },
+    };
+    headers.forEach((_, colIdx) => {
+      const cellAddress = xlsx.utils.encode_cell({ r: 0, c: colIdx });
+      if (ws[cellAddress]) ws[cellAddress].s = headerStyle;
+    });
+
+    const wb = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, ws, "Candidatos");
+    xlsx.writeFile(wb, `Tabla Candidatos - ${fecha}.xlsx`);
+  };
+
+  // Helpers de UI -----------------------------------------------------------
+  const scrollToSection = (ref: React.RefObject<HTMLElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleToggleCapacitado = (idx: number, checked: boolean) => {
+    setCompetencias((prev) =>
+      prev.map((item, i) =>
+        i === idx ? { ...item, capacitado: checked } : item,
+      ),
+    );
+  };
+
   return (
-    <div className="panorama-page">
-      <Sidebar tipoAcceso={currentUser?.FKidTipoAcceso} />
-      <main className="main-content">
-        <div className="page-header2">
-          <h1 className="page-title2">Panorama Global</h1>
-        </div>
+    <main className="main-content">
+      <div className="page-header2">
+        <h1 className="page-title2">Panorama Global</h1>
+      </div>
 
-        <div className="main-content-inner">
-          {/*  SECCIÓN EVALUACIONES */}
-          {/*  SECCIÓN EVALUACIONES */}
-          <section className="stats-section" ref={evaluacionesRef}>
-            <h2 className="section-title">📋 Evaluaciones</h2>
+      <div className="main-content-inner">
+        {/* SECCIÓN EVALUACIONES */}
+        <section className="stats-section" ref={evaluacionesRef}>
+          <h2 className="section-title">📋 Evaluaciones</h2>
 
-            <div className="filtros-combobox">
-              <div>
-                <p>Estado</p>
-                <Select
-                  options={estadoOptions}
-                  value={filtros.estado}
-                  onChange={(v) => setFiltros((p) => ({ ...p, estado: v }))}
-                  isClearable
-                />
-              </div>
-
-              <div>
-                <p>Dependencia</p>
-                <Select
-                  options={dependenciaOptions}
-                  value={filtros.dependencia}
-                  onChange={(v) =>
-                    setFiltros((p) => ({ ...p, dependencia: v }))
-                  }
-                  isClearable
-                />
-              </div>
-
-              <div className="filtro-busqueda" style={{ marginTop: "2.8%" }}>
-                <FaSearch className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+          <div className="filtros-combobox">
+            <div>
+              <p>Estado</p>
+              <Select
+                options={estadoOptions}
+                value={filtros.estado}
+                onChange={(v) => setFiltros((p) => ({ ...p, estado: v }))}
+                isClearable
+              />
             </div>
-
-            {loading ? (
-              <p>Cargando evaluaciones...</p>
-            ) : (
-              <table className="tabla-candidatos">
-                <thead>
-                  <tr>
-                    <th>Folio/Hermés</th>
-                    <th>Nombre</th>
-                    <th>Puesto</th>
-                    <th>Fecha recibido</th>
-                    <th>Dependencia</th>
-                    <th style={{ width: "15%" }}>Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {evaluacionesFiltradas.map((e) => (
-                    <tr
-                      key={e.id}
-                      title="Doble clic para abrir en evaluación"
-                      onDoubleClick={() => {
-                        const procesoOriginal = evaluacionesRaw.find(
-                          (s) => s.idProceso === e.id,
-                        );
-                        navigate("/evaluacion", { state: procesoOriginal });
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <td>{e.folio + "/ " + e.hermesNotificacion}</td>
-                      <td>{e.nombre}</td>
-                      <td>{e.puesto}</td>
-
-                      <td>{e.fechaRecibido}</td>
-                      <td>{e.dependencia}</td>
-                      <td>
-                        <span
-                          className={`estado-badge ${e.estado.toLowerCase().replace(/\s/g, "")}`}
-                        >
-                          {e.estado}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </section>
-
-          <hr className="section-divider" />
-
-          {/*  SECCIÓN CÉDULAS */}
-          {/*  SECCIÓN CÉDULAS */}
-          <section className="stats-section" ref={cedulasRef}>
-            <h2 className="section-title">📑 Cédulas</h2>
-
-            <div className="filtros-combobox">
-              <div>
-                <p>Tipo de filtro</p>
-                <Select
-                  options={[
-                    {
-                      value: "Pendiente de validar Jefe de Departamento",
-                      label: "Pendiente de validar Jefe de Departamento",
-                    },
-                    {
-                      value: "Pendiente de validar Jefe de Oficina",
-                      label: "Pendiente de validar Jefe de Oficina",
-                    },
-                    { value: "Todas las cédulas", label: "Todas las cédulas" },
-                  ]}
-                  value={filtroCedula}
-                  onChange={setFiltroCedula}
-                />
-              </div>
-
-              <div>
-                <p>Dependencia</p>
-                <Select
-                  options={dependenciaCedulaOptions}
-                  value={dependenciaCedulaFiltro}
-                  onChange={setDependenciaCedulaFiltro}
-                  isClearable
-                />
-              </div>
-
-              <div className="filtro-busqueda" style={{ marginTop: "2.8%" }}>
-                <FaSearch className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={searchCedula}
-                  onChange={(e) => setSearchCedula(e.target.value)}
-                />
-              </div>
+            <div>
+              <p>Dependencia</p>
+              <Select
+                options={dependenciaOptions}
+                value={filtros.dependencia}
+                onChange={(v) => setFiltros((p) => ({ ...p, dependencia: v }))}
+                isClearable
+              />
             </div>
+            <div className="filtro-busqueda" style={{ marginTop: "2.8%" }}>
+              <FaSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder="Buscar..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
 
-            {loadingCedulas ? (
-              <p>Cargando cédulas...</p>
-            ) : (
-              <table className="tabla-candidatos">
-                <thead>
-                  <tr>
-                    <th>Folio/Hermés</th>
-                    <th>Nombre candidato</th>
-                    <th>Dependencia</th>
-                    <th>Puesto</th>
-                    <th>Aprobado jefe oficina</th>
-                    <th>Aprobado jefe Departamento</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cedulasFiltradas.map((c) => (
-                    <tr
-                      key={c.idCedula}
-                      onClick={() =>
-                        navigate("/crear-cedula", { state: { cedula: c } })
-                      }
-                      style={{ cursor: "pointer" }}
-                    >
-                      <td>
-                        {c.folio || "" + "/" + c.hermesNotificacion || ""}
-                      </td>
-                      <td>{c.nombreCandidato || "N/A"}</td>
-                      <td>{c.nombreDependencia || "N/A"}</td>
-                      <td>{c.puesto || "N/A"}</td>
-                      <td>
-                        {c.aprobadoJefeOficina ? (
-                          <FaCheckCircle style={{ color: "green" }} />
-                        ) : (
-                          <FaTimesCircle style={{ color: "red" }} />
-                        )}
-                      </td>
-                      <td>
-                        {c.aprobadoDireccion === true ? (
-                          <FaCheckCircle style={{ color: "green" }} />
-                        ) : (
-                          <FaTimesCircle style={{ color: "red" }} />
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </section>
-
-          <hr className="section-divider" />
-
-          {/*  SECCIÓN COMPETENCIAS */}
-
-          <section className="stats-section" ref={competenciasRef}>
-            <h2 className="section-title">💡 Competencias de candidatos</h2>
-
-            {loadingCompetencias ? (
-              <p>Cargando competencias...</p>
-            ) : competencias.length === 0 ? (
-              <p>No se encontraron competencias activas.</p>
-            ) : (
-              <>
-                <table className="tabla-candidatos">
-                  <thead>
-                    <tr>
-                      <th>Nombre del candidato</th>
-                      <th>Competencias a Reforzar</th>
-                      <th>Competencias a Desarrollar</th>
-                      <th>Capacitado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {competencias.map((c, idx) => (
-                      <tr key={c.nombreCandidato}>
-                        <td>{c.nombreCandidato}</td>
-                        <td>{c.competenciaReforzar}</td>
-                        <td>{c.competenciaDesarrollar}</td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={c.capacitado || false}
-                            onChange={(e) => {
-                              const checked = e.target.checked;
-                              setCompetencias((prev) =>
-                                prev.map((item, i) =>
-                                  i === idx
-                                    ? { ...item, capacitado: checked }
-                                    : item,
-                                ),
-                              );
-                            }}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/*  Botones de acción */}
-                <div
-                  style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}
-                >
-                  {competencias.some((c) => c.capacitado) && (
-                    <button
-                      className="boton-guardar"
-                      onClick={async () => {
-                        try {
-                          const token = localStorage.getItem("token");
-                          const servicio = new SolicitudService();
-
-                          const seleccionados = competencias.filter(
-                            (c) => c.capacitado,
-                          );
-
-                          for (const candidato of seleccionados) {
-                            if (candidato.idProceso) {
-                              await servicio.capacitarCandidato(
-                                candidato.idProceso,
-                                token,
-                              );
-                            } else {
-                              console.warn(
-                                "Candidato sin idProceso:",
-                                candidato,
-                              );
-                            }
-                          }
-
-                          await cargarCompetencias();
-                        } catch (error) {
-                          console.error(
-                            "Error al capacitar candidatos:",
-                            error,
-                          );
-                          alert("Ocurrió un error al guardar los candidatos.");
-                        }
-                      }}
-                    >
-                      Guardar
-                    </button>
-                  )}
-
-                  <button
-                    className="boton-exportar"
-                    onClick={() => {
-                      import("xlsx-js-style").then((xlsx) => {
-                        const hoy = new Date();
-                        const fecha = hoy
-                          .toLocaleDateString("es-MX")
-                          .replaceAll("/", "-");
-                        const datosProcesados = competencias.map((c) => {
-                          const reforzar = c.competenciaReforzar
-                            ? c.competenciaReforzar
-                                .split(",")
-                                .map((x) => x.trim())
-                            : [];
-
-                          const desarrollar = c.competenciaDesarrollar
-                            ? c.competenciaDesarrollar
-                                .split(",")
-                                .map((x) => x.trim())
-                            : [];
-
-                          return {
-                            nombre: c.nombreCandidato,
-                            reforzar,
-                            desarrollar,
-                          };
-                        });
-
-                        const maxReforzar = Math.max(
-                          ...datosProcesados.map((d) => d.reforzar.length),
-                        );
-                        const maxDesarrollar = Math.max(
-                          ...datosProcesados.map((d) => d.desarrollar.length),
-                        );
-
-                        const headers = ["Nombre del Candidato"];
-
-                        for (let i = 1; i <= maxReforzar; i++) {
-                          headers.push(`Competencia a Reforzar ${i}`);
-                        }
-
-                        for (let i = 1; i <= maxDesarrollar; i++) {
-                          headers.push(`Competencia a Desarrollar ${i}`);
-                        }
-
-                        // -----------------------------------------------
-                        // 4. Crear filas una por una
-                        // -----------------------------------------------
-
-                        const rows = datosProcesados.map((d) => {
-                          const fila = [d.nombre];
-
-                          // Competencias a reforzar
-                          for (let i = 0; i < maxReforzar; i++) {
-                            fila.push(d.reforzar[i] || "");
-                          }
-
-                          // Competencias a desarrollar
-                          for (let i = 0; i < maxDesarrollar; i++) {
-                            fila.push(d.desarrollar[i] || "");
-                          }
-
-                          return fila;
-                        });
-
-                        // -----------------------------------------------
-                        // 5. Convertir todo a hoja Excel
-                        // -----------------------------------------------
-
-                        const ws = xlsx.utils.aoa_to_sheet([headers, ...rows]);
-
-                        // -----------------------------------------------
-                        // 6. Ajustar anchos de columna
-                        // -----------------------------------------------
-
-                        ws["!cols"] = headers.map(() => ({ wch: 25 }));
-
-                        // -----------------------------------------------
-                        // 7. Aplicar estilo al encabezado (como tu archivo)
-                        // -----------------------------------------------
-
-                        Object.keys(ws)
-                          .filter((c) => c.startsWith("A") || c.includes("1"))
-                          .forEach((cell) => {
-                            if (ws[cell] && ws[cell].v === ws[cell].v) {
-                              ws[cell].s = {
-                                font: { bold: true, color: { rgb: "FFFFFF" } },
-                                alignment: { horizontal: "center" },
-                                fill: {
-                                  patternType: "solid",
-                                  fgColor: { rgb: "008000" },
-                                },
-                              };
-                            }
-                          });
-
-                        const wb = xlsx.utils.book_new();
-                        xlsx.utils.book_append_sheet(wb, ws, "Candidatos");
-
-                        xlsx.writeFile(wb, `Tabla Candidatos - ${fecha}.xlsx`);
-                      });
+          {loading ? (
+            <p>Cargando evaluaciones...</p>
+          ) : (
+            <table className="tabla-candidatos">
+              <thead>
+                <tr>
+                  <th>Folio/Hermés</th>
+                  <th>Nombre</th>
+                  <th>Puesto</th>
+                  <th>Fecha recibido</th>
+                  <th>Dependencia</th>
+                  <th style={{ width: "15%" }}>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {evaluacionesFiltradas.map((e) => (
+                  <tr
+                    key={e.idProceso} // FIX: era e.id (campo inexistente)
+                    title="Doble clic para abrir en evaluación"
+                    onDoubleClick={() => {
+                      const procesoOriginal = evaluacionesRaw.find(
+                        (s) => s.idProceso === e.idProceso, // FIX: era e.id
+                      );
+                      navigate("/evaluacion", { state: procesoOriginal });
                     }}
+                    style={{ cursor: "pointer" }}
                   >
-                    Exportar
-                  </button>
-                </div>
-              </>
-            )}
-          </section>
-        </div>
+                    <td>{e.folio + "/ " + e.hermesNotificacion}</td>
+                    <td>{e.nombreCandidato}</td>{" "}
+                    {/* FIX: era e.nombre (campo inexistente) */}
+                    <td>{e.puesto}</td>
+                    <td>{e.fechaRecibido}</td>
+                    <td>{e.dependencia}</td>
+                    <td>
+                      <span
+                        className={`estado-badge ${e.estado.toLowerCase().replace(/\s/g, "")}`}
+                      >
+                        {e.estado}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
 
-        {/*  Botones de navegación flotantes */}
-        <div className="floating-buttons">
-          <button onClick={() => scrollToSection(evaluacionesRef)}>
-            📋 Evaluaciones
-          </button>
-          <button onClick={() => scrollToSection(cedulasRef)}>
-            📑 Cédulas
-          </button>
-          <button onClick={() => scrollToSection(competenciasRef)}>
-            💡 Competencias
-          </button>
-        </div>
-      </main>
-    </div>
+        <hr className="section-divider" />
+
+        {/* SECCIÓN CÉDULAS */}
+        <section className="stats-section" ref={cedulasRef}>
+          <h2 className="section-title">📑 Cédulas</h2>
+
+          <div className="filtros-combobox">
+            <div>
+              <p>Tipo de filtro</p>
+              <Select
+                options={OPCIONES_FILTRO_CEDULA}
+                value={filtroCedula}
+                onChange={(v) => v && setFiltroCedula(v)}
+              />
+            </div>
+            <div>
+              <p>Dependencia</p>
+              <Select
+                options={dependenciaCedulaOptions}
+                value={dependenciaCedulaFiltro}
+                onChange={setDependenciaCedulaFiltro}
+                isClearable
+              />
+            </div>
+            <div className="filtro-busqueda" style={{ marginTop: "2.8%" }}>
+              <FaSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder="Buscar..."
+                value={searchCedula}
+                onChange={(e) => setSearchCedula(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {loadingCedulas ? (
+            <p>Cargando cédulas...</p>
+          ) : (
+            <table className="tabla-candidatos">
+              <thead>
+                <tr>
+                  <th>Folio/Hermés</th>
+                  <th>Nombre candidato</th>
+                  <th>Dependencia</th>
+                  <th>Puesto</th>
+                  <th>Aprobado jefe oficina</th>
+                  <th>Aprobado jefe Departamento</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cedulasFiltradas.map((c) => (
+                  <tr
+                    key={c.idCedula}
+                    onClick={() =>
+                      navigate("/crear-cedula", { state: { cedula: c } })
+                    }
+                    style={{ cursor: "pointer" }}
+                  >
+                    {/* FIX: concatenación con paréntesis para correcta precedencia de || */}
+                    <td>
+                      {(c.folio ?? "") + "/" + (c.hermesNotificacion ?? "")}
+                    </td>
+                    <td>{c.nombreCandidato ?? "N/A"}</td>
+                    <td>{c.adscripcion?.nombre ?? "N/A"}</td>
+                    <td>{c.puesto ?? "N/A"}</td>
+                    <td>
+                      {c.aprobadoJefeOficina ? (
+                        <FaCheckCircle style={{ color: "green" }} />
+                      ) : (
+                        <FaTimesCircle style={{ color: "red" }} />
+                      )}
+                    </td>
+                    <td>
+                      {c.aprobadoDireccion === true ? (
+                        <FaCheckCircle style={{ color: "green" }} />
+                      ) : (
+                        <FaTimesCircle style={{ color: "red" }} />
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+
+        <hr className="section-divider" />
+
+        {/* SECCIÓN COMPETENCIAS */}
+        <section className="stats-section" ref={competenciasRef}>
+          <h2 className="section-title">💡 Competencias de candidatos</h2>
+
+          {loadingCompetencias ? (
+            <p>Cargando competencias...</p>
+          ) : competencias.length === 0 ? (
+            <p>No se encontraron competencias activas.</p>
+          ) : (
+            <>
+              <table className="tabla-candidatos">
+                <thead>
+                  <tr>
+                    <th>Nombre del candidato</th>
+                    <th>Competencias a Reforzar</th>
+                    <th>Competencias a Desarrollar</th>
+                    <th>Capacitado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {competencias.map((c, idx) => (
+                    // FIX: key con idx como fallback seguro; idProceso puede ser null
+                    <tr key={c.idProceso ?? `comp-${idx}`}>
+                      <td>{c.nombreCandidato}</td>
+                      <td>{c.competenciaReforzar}</td>
+                      <td>{c.competenciaDesarrollar}</td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={c.capacitado}
+                          onChange={(e) =>
+                            handleToggleCapacitado(idx, e.target.checked)
+                          }
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
+                {competencias.some((c) => c.capacitado) && (
+                  <button
+                    className="boton-guardar"
+                    onClick={handleGuardarCapacitados}
+                  >
+                    Guardar
+                  </button>
+                )}
+                <button
+                  className="boton-exportar"
+                  onClick={handleExportarExcel}
+                >
+                  Exportar
+                </button>
+              </div>
+            </>
+          )}
+        </section>
+      </div>
+
+      {/* Botones de navegación flotantes */}
+      <div className="floating-buttons">
+        <button onClick={() => scrollToSection(evaluacionesRef)}>
+          📋 Evaluaciones
+        </button>
+        <button onClick={() => scrollToSection(cedulasRef)}>📑 Cédulas</button>
+        <button onClick={() => scrollToSection(competenciasRef)}>
+          💡 Competencias
+        </button>
+      </div>
+    </main>
   );
 }
 
 export default Panorama;
-
-//REQUISIONES LLEVAN CÉDULA SPARH
-//ASIGNACIÓN LLEVAN CÉDULA NORMAL

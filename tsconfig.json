@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     // — Módulos para Vite —
-    "target": "ES2020",
+    "target": "ES2021",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
 
     // — React —
     "jsx": "react-jsx",

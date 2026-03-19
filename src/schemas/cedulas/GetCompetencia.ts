@@ -2,6 +2,7 @@
 export interface ICompetenciaClasificacionCedulaBase {
   idCompetencia: number;
   nombreCompetencia: string;
+  resultadoPorcentaje: number;
 }
 
 export interface IGetCompetenciasClasificacionCedula {

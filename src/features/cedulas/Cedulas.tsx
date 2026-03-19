@@ -93,6 +93,7 @@ const getIdTipoCedula = (id: number): string => {
 function normalizarCedulas(data: ICedulaBase[]): ICedulaBase[] {
   return data.map((cedula) => ({
     idCedula: cedula.idCedula || 0,
+    adscripcion: null,
     analista: cedula.analista || "",
     antecedentesFamiliaresUV: cedula.antecedentesFamiliaresUV || "",
     aprobadoDireccion: false,
