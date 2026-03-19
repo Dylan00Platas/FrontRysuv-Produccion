@@ -19,7 +19,7 @@ export default class AuthService {
       endpoint: "/login",
       method: "POST",
       body: requestData,
-      withCredentials: false,
+      withCredentials: true,
     });
 
     return response;

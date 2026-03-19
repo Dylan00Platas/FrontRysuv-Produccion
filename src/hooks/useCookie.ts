@@ -76,7 +76,6 @@ export function useCookie() {
       } else if (response.estado >= 400) {
         throw new Error("Datos incorrectos del cliente.");
       }
-
       const responseData: IResponseHTTP<ICurrentUser> =
         await new AuthService().session();
       if (responseData.mensaje) {
