@@ -4,6 +4,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -18,7 +20,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {
-          proxy.on("error", (err) => console.log("proxy error", err));
+          proxy.on("error", (err) => console.log("proxy error:\n", err));
         },
       },
     },
@@ -27,6 +29,6 @@ export default defineConfig({
       cert: fs.readFileSync(path.resolve(__dirname, "./ssl/server.crt")),
     },
     host: true,
-    port: 443,
+    port: 5173,
   },
 });
