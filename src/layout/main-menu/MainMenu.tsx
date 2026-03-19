@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import "./MainMenu.css";
 import uvBlanco from "@/assets/uvBlanco.png";
-import Sidebar from "@/layout/sidebar/Sidebar.jsx";
-import { useUser } from "@/hooks/useUser";
+import PageTransition from "../PageTransition";
+import { useCookie } from "@/hooks/useCookie";
 
 export function MainMenu() {
   const logoRef = useRef<HTMLImageElement>(null);
-  const { currentUser } = useUser(); // TODO
   const [isBouncing, setIsBouncing] = useState(false);
 
   const [pos, setPos] = useState({ x: 200, y: 200 });
@@ -55,12 +54,9 @@ export function MainMenu() {
     }
   };
 
-  if (!currentUser) return <div>Cargando usuario...</div>;
-
   return (
     <div className="flex size-full bg-white fixed top-0 left-0">
       <main className="contenido">
-        <Sidebar tipoAcceso={currentUser.FKIdTipoAcceso} />
         <div className="logo-container">
           <img
             ref={logoRef}

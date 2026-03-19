@@ -1,20 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { InputField } from "@/components/InputField/InputField";
-import { AlertBanner } from "@/components/Alert/OnBody/AlertBanner";
-import AuthService from "@/services/AuthService";
-import CatalogoService from "@/services/CatalogosService";
 import { useCookie } from "@/hooks/useCookie";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
 
-interface ILogin {
-  usuario: string;
-  contrasenia: string;
-}
-
-const authService = new AuthService();
 export function Login() {
   const { toast, mostrarToast } = useToast();
   const navigate = useNavigate();

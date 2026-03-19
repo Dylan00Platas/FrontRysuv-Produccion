@@ -42,11 +42,19 @@ function AppRoutes() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
+  // TODO-Desarrollo: Pasar a routes.tsx separados
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Login />} />
-        <Route path="/menu" element={<MainMenu />} />
+        <Route
+          path="/menu"
+          element={
+            <MainLayout>
+              <MainMenu />
+            </MainLayout>
+          }
+        />
         <Route
           path="/agenda"
           element={
@@ -63,64 +71,143 @@ function AppRoutes() {
             </MainLayout>
           }
         />
-        <Route 
-          path="/crear-usuario" 
+        <Route
+          path="/crear-usuario"
           element={
             <MainLayout>
               <CrearUsuario />
             </MainLayout>
-          } 
+          }
         />
         <Route path="/usuarios" element={<Usuarios />} />
-        <Route 
-          path="/iniciar-solicitud" 
+        <Route
+          path="/iniciar-solicitud"
           element={
             <MainLayout>
               <IniciarSolicitud />
             </MainLayout>
-          } />
-        <Route path="/crear-cedula" element={<CrearConstancia />} />
-        <Route path="/no-beneficiados" element={<NoBeneficiados />} />
+          }
+        />
+        <Route
+          path="/crear-cedula"
+          element={
+            <MainLayout>
+              <CrearConstancia />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/no-beneficiados"
+          element={
+            <MainLayout>
+              <NoBeneficiados />
+            </MainLayout>
+          }
+        />
         <Route
           path="/candidato-no-beneficiado"
-          element={<CandidatoNoBeneficiado />}
+          element={
+            <MainLayout>
+              <CandidatoNoBeneficiado />
+            </MainLayout>
+          }
         />
-        <Route 
-          path="/evaluacion" 
+        <Route
+          path="/evaluacion"
           element={
             <MainLayout>
               <Evaluacion />
             </MainLayout>
-        } />
-        <Route path="/crear-cedula-interna" element={<CrearCedulaInterna />} />
-        <Route path="/estadisticas" element={<Estadisticas />} />
-        <Route path="/asignar-solicitud" element={<AsignarSolicitud />} />
-        <Route 
-          path="/procesos" 
+          }
+        />
+        <Route
+          path="/crear-cedula-interna"
+          element={
+            <MainLayout>
+              <CrearCedulaInterna />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/estadisticas"
+          element={
+            <MainLayout>
+              <Estadisticas />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/asignar-solicitud"
+          element={
+            <MainLayout>
+              <AsignarSolicitud />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/procesos"
           element={
             <MainLayout>
               <Procesos />
             </MainLayout>
-        } />
-        <Route path="/solicitudes" element={<Solicitudes />} />
-        <Route 
-          path="/editar-usuario" 
+          }
+        />
+        <Route
+          path="/solicitudes"
+          element={
+            <MainLayout>
+              <Solicitudes />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/editar-usuario"
           element={
             <MainLayout>
               <EditarUsuario />
             </MainLayout>
-          }/>
-        <Route path="/panorama" element={<Panorama />} />
-        <Route path="/generar-oficio" element={<GenerarOficio />} />
-        <Route path="/ver-oficios" element={<VerOficios />} />
-        <Route path="/ver-detalles-oficio" element={<VerDetallesOficio />} />
-        <Route 
-          path="/seguimiento-hermes" 
+          }
+        />
+        <Route
+          path="/panorama"
+          element={
+            <MainLayout>
+              <Panorama />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/generar-oficio"
+          element={
+            <MainLayout>
+              <GenerarOficio />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/ver-oficios"
+          element={
+            <MainLayout>
+              <VerOficios />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/ver-detalles-oficio"
+          element={
+            <MainLayout>
+              <VerDetallesOficio />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/seguimiento-hermes"
           element={
             <MainLayout>
               <SeguimientoHermes />
             </MainLayout>
-        }/>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
