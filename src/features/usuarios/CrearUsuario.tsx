@@ -7,13 +7,13 @@ import AuthService from "@/services/AuthService";
 import type IPostUsuario from "@/schemas/acceso/PostUser";
 import { Toast } from "@/components/Alert/Floating/Toast";
 
-interface IUserData  {
-    usuario: string;
-    nombres: string;
-    primerApellido: string;
-    segundoApellido: string;
-    contrasena: string;
-    rol: string;
+interface IUserData {
+  usuario: string;
+  nombres: string;
+  primerApellido: string;
+  segundoApellido: string;
+  contrasena: string;
+  rol: string;
 }
 
 function CrearUsuario() {
@@ -30,7 +30,7 @@ function CrearUsuario() {
   });
 
   const handleInputChange = (field: keyof IUserData, value: string) => {
-  setFormData((prev: IUserData) => ({
+    setFormData((prev: IUserData) => ({
       ...prev,
       [field]: value,
     }));
@@ -43,8 +43,11 @@ function CrearUsuario() {
     const regexContrasena =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     if (!regexContrasena.test(formData.contrasena)) {
-        mostrarToast("La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial","error")
-        return;
+      mostrarToast(
+        "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial",
+        "error",
+      );
+      return;
     }
 
     try {
@@ -54,11 +57,11 @@ function CrearUsuario() {
         primerApellido: formData.primerApellido,
         segundoApellido: formData.segundoApellido,
         usuario: formData.usuario,
-        FKIdTipoAcceso: formData.rol
-      }
+        FKIdTipoAcceso: formData.rol,
+      };
 
-      const response = new AuthService().register(PostUsuario)
-      mostrarToast("Usuario creado correctamente", "exito")
+      const response = new AuthService().register(PostUsuario);
+      mostrarToast("Usuario creado correctamente", "exito");
       setTimeout(() => {
         navigate("/usuarios");
       }, 1500);
@@ -73,16 +76,16 @@ function CrearUsuario() {
       });
     } catch (error) {
       console.error("CrearUsuario.tsx - Error al registrar usuario:" + error);
-      mostrarToast(`Error al crear usuario`,"error")
+      mostrarToast(`Error al crear usuario`, "error");
     }
   };
 
   return (
-    <div className="crear-usuario-page">
+    <>
+      {/*  Mensaje flotante */}
+      <Toast texto={toast.texto} tipo={toast.tipo} />
       {/* Main Content */}
       <main className="main-content-evaluacion">
-        {/*  Mensaje flotante */}
-        <Toast texto={toast.texto} tipo={toast.tipo} />
         <h1 className="page-title3">Crear Usuarios</h1>
         <form className="form-grid" onSubmit={handleSubmit}>
           {/* Fila 1 */}
@@ -114,7 +117,9 @@ function CrearUsuario() {
                 e.target.setCustomValidity("");
               }}
               onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
-                e.currentTarget.setCustomValidity("El primer apellido es obligatorio");
+                e.currentTarget.setCustomValidity(
+                  "El primer apellido es obligatorio",
+                );
               }}
               required
             />
@@ -173,7 +178,9 @@ function CrearUsuario() {
                       "La contraseña debe tener mínimo 8 caracteres, al menos una mayúscula, un número y un carácter especial",
                     );
                   } else {
-                    e.currentTarget.setCustomValidity("La contraseña es obligatoria");
+                    e.currentTarget.setCustomValidity(
+                      "La contraseña es obligatoria",
+                    );
                   }
                 }}
                 required
@@ -229,7 +236,7 @@ function CrearUsuario() {
           </div>
         </form>
       </main>
-    </div>
+    </>
   );
 }
 

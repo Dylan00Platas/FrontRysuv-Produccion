@@ -74,9 +74,9 @@ function IniciarSolicitud() {
   const [tipoSolicitud, setTipoSolicitud] = useState("");
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
-  const {toast, mostrarToast} = useToast();
+  const { toast, mostrarToast } = useToast();
   const ServicioCatalogo = new CatalogoService();
-  const [datosSesion, setDatosSesion] = useState<IGetSesion|null>();
+  const [datosSesion, setDatosSesion] = useState<IGetSesion | null>();
 
   const [formData, setFormData] = useState<IProcesoContratacion>({
     folio: "",
@@ -133,37 +133,40 @@ function IniciarSolicitud() {
 
   useEffect(() => {
     async function ObtenerSesion() {
-      if(datosSesion === null){
+      if (datosSesion === null) {
         const AuthServicio = new AuthService();
         const respuesta = await AuthServicio.session();
-        if(respuesta.mensaje.usuario){
-          const DatosSesion : IGetSesion = {
+        if (respuesta.mensaje.usuario) {
+          const DatosSesion: IGetSesion = {
             tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
             usuario: respuesta.mensaje.usuario,
             idAcceso: respuesta.mensaje.idAcceso,
             nombre: respuesta.mensaje.nombre,
             primerApellido: respuesta.mensaje.primerApellido,
-            segundoApellido: respuesta.mensaje.segundoApellido
-          }
-          setDatosSesion(DatosSesion)
+            segundoApellido: respuesta.mensaje.segundoApellido,
+          };
+          setDatosSesion(DatosSesion);
         }
       }
     }
     ObtenerSesion();
-  }, [])
+  }, []);
 
   useEffect(() => {
     async function cargarDependencias() {
       if (dependencias.length === 0 && dependenciasCargadas !== true) {
         try {
           const response = await ServicioCatalogo.getDependencias();
-          setDependencias(response.mensaje.dependencias)
+          setDependencias(response.mensaje.dependencias);
           setDependenciasCargadas(true);
         } catch (err) {
-          console.error("IniciarSolicitud.tsx - Error cargando dependencias: ", err);
-          mostrarToast("Error al cargar dependencias", "error")
+          console.error(
+            "IniciarSolicitud.tsx - Error cargando dependencias: ",
+            err,
+          );
+          mostrarToast("Error al cargar dependencias", "error");
         }
-      }else{
+      } else {
         setDependenciasCargadas(true);
       }
     }
@@ -179,14 +182,20 @@ function IniciarSolicitud() {
     );
   }
 
-  const handleInputChange = (field: keyof IProcesoContratacion, value: string | number | boolean | ICandidato[]) => {
+  const handleInputChange = (
+    field: keyof IProcesoContratacion,
+    value: string | number | boolean | ICandidato[],
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.folio.trim() && !formData.hermes.trim()) {
-      mostrarToast("Debes ingresar al menos un Folio o Hermes de notificación", "error")
+      mostrarToast(
+        "Debes ingresar al menos un Folio o Hermes de notificación",
+        "error",
+      );
       return;
     }
     try {
@@ -200,24 +209,70 @@ function IniciarSolicitud() {
         };
         let response;
         const DatosCandidato: IPostProcesoContratacion = {
-          autorizacion: dataConCandidato.autorizacion, beneficiado: dataConCandidato.beneficiado, categoriaAutorizadaOficio: dataConCandidato.categoriaAutorizada, categoriaPuestoOrigen: dataConCandidato.categoriaOrigen,
-          consecutivoExpediente: dataConCandidato.consecutivoExpediente, diasProceso: dataConCandidato.tiempoProceso, experienciaLaboralSolicitada: dataConCandidato.experiencia, familiaFuncional: dataConCandidato.familia,
-          fechaElaboracionPropuesta: dataConCandidato.fechaPropuesta, fechaEntrevista: dataConCandidato.fechaEntrevista, fechaEnvioDEyDP: dataConCandidato.fechaEnvioDEyDP, fechaEnvioEvaluacionDesempenio: dataConCandidato.fechaEvaluacionDesempenio,
-          fechaEvaluacionCompetencias: dataConCandidato.fechaCompetencias, fechaInicioProcesamiento: dataConCandidato.fechaProcesamiento, fechaLiberacionOficio: dataConCandidato.fechaOficio, fechaNotificacion: dataConCandidato.fechaNotificacion,
-          fechaRecibido: dataConCandidato.fechaRecibido, fechaRevisionOfiEval: dataConCandidato.fechaOfiEval, folio: dataConCandidato.folio, FKIdAcceso: datosSesion!.idAcceso, FKIdDependencia: dataConCandidato.idDependencia, FKIdEstadoProcesoContratacion: dataConCandidato.estado, FKIdTemporalDefinitiva: dataConCandidato.tipo === "temporal" ? 1 : 2,
-          FKIdTipoPersonal: dataConCandidato.tipoPersonal === "eventual" ? 1 : 2, FKIdTipoProceso: 0, funcionDesempeniar: dataConCandidato.funcion, hermesNotificacion: dataConCandidato.hermes, lineamientoOficioContinuidad: dataConCandidato.lineamiento, motivo: dataConCandidato.motivo,
-          nombreCandidato: formData.candidatos[i].nombre, numCarpeta: dataConCandidato.numeroCarpeta, numPlaza: dataConCandidato.numPlaza, observaciones: dataConCandidato.observaciones, observacionesAnalista: dataConCandidato.observacionesAnalista, periodoAutorizadoOficioFin: dataConCandidato.periodoInicio,
-          periodoAutorizadoOficioInicio: dataConCandidato.periodoTermino, resultadoEvaluacionCompetencias: dataConCandidato.resultadoEvaluacion, resultadoEvaluacionConocimiento: dataConCandidato.resultadoConocimiento, resultadoHabilidadesExcel: dataConCandidato.resultadoExcel, resultadoHabilidadesWord: dataConCandidato.resultadoWord,
-          resultadoOrtografia: dataConCandidato.resultadoOrtografia, resultadoProcesoEvaluacion: dataConCandidato.resultadoEvaluacion, resultadoReferenciasLaborales: dataConCandidato.referencias, resultadoSeguimientoEvaluacionDesempenio: dataConCandidato.resultadoSeguimiento, titularPlaza: dataConCandidato.titularPlaza
-        } 
+          autorizacion: dataConCandidato.autorizacion,
+          beneficiado: dataConCandidato.beneficiado,
+          categoriaAutorizadaOficio: dataConCandidato.categoriaAutorizada,
+          categoriaPuestoOrigen: dataConCandidato.categoriaOrigen,
+          consecutivoExpediente: dataConCandidato.consecutivoExpediente,
+          diasProceso: dataConCandidato.tiempoProceso,
+          experienciaLaboralSolicitada: dataConCandidato.experiencia,
+          familiaFuncional: dataConCandidato.familia,
+          fechaElaboracionPropuesta: dataConCandidato.fechaPropuesta,
+          fechaEntrevista: dataConCandidato.fechaEntrevista,
+          fechaEnvioDEyDP: dataConCandidato.fechaEnvioDEyDP,
+          fechaEnvioEvaluacionDesempenio:
+            dataConCandidato.fechaEvaluacionDesempenio,
+          fechaEvaluacionCompetencias: dataConCandidato.fechaCompetencias,
+          fechaInicioProcesamiento: dataConCandidato.fechaProcesamiento,
+          fechaLiberacionOficio: dataConCandidato.fechaOficio,
+          fechaNotificacion: dataConCandidato.fechaNotificacion,
+          fechaRecibido: dataConCandidato.fechaRecibido,
+          fechaRevisionOfiEval: dataConCandidato.fechaOfiEval,
+          folio: dataConCandidato.folio,
+          FKIdAcceso: datosSesion!.idAcceso,
+          FKIdDependencia: dataConCandidato.idDependencia,
+          FKIdEstadoProcesoContratacion: dataConCandidato.estado,
+          FKIdTemporalDefinitiva: dataConCandidato.tipo === "temporal" ? 1 : 2,
+          FKIdTipoPersonal:
+            dataConCandidato.tipoPersonal === "eventual" ? 1 : 2,
+          FKIdTipoProceso: 0,
+          funcionDesempeniar: dataConCandidato.funcion,
+          hermesNotificacion: dataConCandidato.hermes,
+          lineamientoOficioContinuidad: dataConCandidato.lineamiento,
+          motivo: dataConCandidato.motivo,
+          nombreCandidato: formData.candidatos[i].nombre,
+          numCarpeta: dataConCandidato.numeroCarpeta,
+          numPlaza: dataConCandidato.numPlaza,
+          observaciones: dataConCandidato.observaciones,
+          observacionesAnalista: dataConCandidato.observacionesAnalista,
+          periodoAutorizadoOficioFin: dataConCandidato.periodoInicio,
+          periodoAutorizadoOficioInicio: dataConCandidato.periodoTermino,
+          resultadoEvaluacionCompetencias: dataConCandidato.resultadoEvaluacion,
+          resultadoEvaluacionConocimiento:
+            dataConCandidato.resultadoConocimiento,
+          resultadoHabilidadesExcel: dataConCandidato.resultadoExcel,
+          resultadoHabilidadesWord: dataConCandidato.resultadoWord,
+          resultadoOrtografia: dataConCandidato.resultadoOrtografia,
+          resultadoProcesoEvaluacion: dataConCandidato.resultadoEvaluacion,
+          resultadoReferenciasLaborales: dataConCandidato.referencias,
+          resultadoSeguimientoEvaluacionDesempenio:
+            dataConCandidato.resultadoSeguimiento,
+          titularPlaza: dataConCandidato.titularPlaza,
+        };
         if (tipoSolicitud === "bolsa") {
-          response = await ProcesoContratacionServicio.postProcesoContratacion(DatosCandidato)
+          response =
+            await ProcesoContratacionServicio.postProcesoContratacion(
+              DatosCandidato,
+            );
         } else {
-          response = await ProcesoContratacionServicio.postProcesoContratacion(DatosCandidato)
+          response =
+            await ProcesoContratacionServicio.postProcesoContratacion(
+              DatosCandidato,
+            );
         }
         console.log(`Solicitud ${i + 1} creada:`, response);
       }
-      mostrarToast( `${cantidad} solicitude(s) creadas correctamente`, "error")
+      mostrarToast(`${cantidad} solicitude(s) creadas correctamente`, "error");
       setTimeout(() => {
         navigate("/solicitudes");
       }, 2000);
@@ -275,22 +330,28 @@ function IniciarSolicitud() {
         candidatos: [{ nombre: "", fechaCita: "" }],
       });
     } catch (error) {
-      console.error("IniciarSolicitud.tsx - Error al iniciar solicitud:" + error);
-      mostrarToast("Error al crear solicitud","error")
+      console.error(
+        "IniciarSolicitud.tsx - Error al iniciar solicitud:" + error,
+      );
+      mostrarToast("Error al crear solicitud", "error");
     }
   };
 
-  const handleBuscarDependencia = (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent) => {
+  const handleBuscarDependencia = (
+    e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent,
+  ) => {
     e.preventDefault();
     const numDep = formData.numDependencia.trim();
-    const dep = dependencias.find(dependecia => dependecia.numDependencia = numDep)
+    const dep = dependencias.find(
+      (dependecia) => (dependecia.numDependencia = numDep),
+    );
     if (dep) {
       handleInputChange("dependencia", dep.nombre);
       handleInputChange("area", dep.areaOrganizacional);
       handleInputChange("region", dep.zona);
       formData.idDependencia = dep.idDependencia;
     } else {
-      mostrarToast("No se encontró la dependencia ingresada", "error")
+      mostrarToast("No se encontró la dependencia ingresada", "error");
     }
   };
 
@@ -310,9 +371,9 @@ function IniciarSolicitud() {
   }, [formData.lineamiento]);
 
   return (
-    <div className="iniciar-solicitud-page">
+    <>
+      <Toast texto={toast.texto} tipo={toast.tipo} />
       <main className="main-content-solicitud">
-        <Toast texto={toast.texto} tipo={toast.tipo}/>
         <div className="page-header-solicitud">
           <h1 className="page-title-solicitud">Iniciar Solicitud</h1>
           <select
@@ -1033,7 +1094,7 @@ function IniciarSolicitud() {
           </form>
         </div>
       </main>
-    </div>
+    </>
   );
 }
 
