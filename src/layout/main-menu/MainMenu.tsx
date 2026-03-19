@@ -53,34 +53,32 @@ export function MainMenu() {
   };
 
   return (
-    <div className="flex size-full bg-white fixed top-0 left-0">
-      <main className="contenido">
-        <div className="logo-container">
-          <img
-            ref={logoRef}
-            src={uvBlanco}
-            alt="Logo UV"
-            className={`logo ${isBouncing ? "bouncing" : ""}`}
-            onDoubleClick={handleDoubleClick}
-            style={{
-              position: isBouncing ? "fixed" : "static",
-              left: isBouncing ? pos.x : "auto",
-              top: isBouncing ? pos.y : "auto",
-            }}
-          />
-          <div className="logo-texts">
-            <p className="linea1">Secretaría de Administración y Finanzas</p>
-            <p className="linea2">Dirección General de Recursos Humanos</p>
-            <p className="linea3">
-              Departamento de Evaluación y Desarrollo de Personal
-            </p>
-            <p className="linea3">
-              Oficina de Evaluación y Proyectos de Recursos Humanos
-            </p>
-          </div>
+    <main className="contenido">
+      <div className="logo-container">
+        <img
+          ref={logoRef}
+          src={uvBlanco}
+          alt="Logo UV"
+          className={`logo ${isBouncing ? "bouncing" : ""}`}
+          onDoubleClick={handleDoubleClick}
+          style={{
+            position: isBouncing ? "fixed" : "static",
+            left: isBouncing ? pos.x : "auto",
+            top: isBouncing ? pos.y : "auto",
+          }}
+        />
+        <div className="logo-texts">
+          <p className="linea1">Secretaría de Administración y Finanzas</p>
+          <p className="linea2">Dirección General de Recursos Humanos</p>
+          <p className="linea3">
+            Departamento de Evaluación y Desarrollo de Personal
+          </p>
+          <p className="linea3">
+            Oficina de Evaluación y Proyectos de Recursos Humanos
+          </p>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
 

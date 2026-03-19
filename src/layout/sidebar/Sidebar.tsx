@@ -12,6 +12,7 @@ import { IoLogOutOutline } from "react-icons/io5";
 import { MdAddBox, MdAssignment } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
+import "./Sidebar.css";
 import uvBlanco from "@/assets/uvBlanco.png";
 
 interface SidebarProps {
@@ -31,7 +32,9 @@ function NavItem({ icon, label, onClick, delay = "0s" }: NavItemProps) {
       role="button"
       tabIndex={0}
       onClick={onClick}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") onClick();
+      }}
       style={{ animationDelay: delay }}
       className="
         group relative flex items-center gap-[0.7rem]

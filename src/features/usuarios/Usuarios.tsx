@@ -8,7 +8,7 @@ import "./Usuarios.css";
 
 function Usuarios() {
   const navigate = useNavigate();
-  const {toast, mostrarToast} = useToast();
+  const { toast, mostrarToast } = useToast();
   const [usuarios, setUsuarios] = useState<IUsuarioBase[]>();
   const [cargando, setCargando] = useState(true);
 
@@ -16,11 +16,13 @@ function Usuarios() {
     const fetchUsuarios = async () => {
       try {
         const data = await new AccesoService().getUsuarios();
-        const usuariosActivos = data.mensaje.usuarios.filter((usuario: IUsuarioBase) => usuario.estado === 1);
+        const usuariosActivos = data.mensaje.usuarios.filter(
+          (usuario: IUsuarioBase) => usuario.estado === 1,
+        );
         setUsuarios(usuariosActivos);
       } catch (err) {
-        console.error("Usuarios.tsx - Error al obtener usuarios: " + err)
-        mostrarToast("Error al obtener usuarios","error")
+        console.error("Usuarios.tsx - Error al obtener usuarios: " + err);
+        mostrarToast("Error al obtener usuarios", "error");
       } finally {
         setCargando(false);
       }
@@ -38,7 +40,8 @@ function Usuarios() {
   };
 
   return (
-    <div className="usuarios-page">
+    <>
+      <Toast texto={toast.texto} tipo={toast.tipo} />
       <main className="main-content">
         <div className="page-header2">
           <h1 className="page-title2">Usuarios</h1>
@@ -51,7 +54,6 @@ function Usuarios() {
         </div>
 
         {cargando && <p>Cargando usuarios...</p>}
-        <Toast texto={toast.texto} tipo={toast.tipo}/>
         {!cargando && !(toast.tipo !== "error") && (
           <ul className="usuarios-list">
             {usuarios?.map((user) => (
@@ -65,7 +67,7 @@ function Usuarios() {
           </ul>
         )}
       </main>
-    </div>
+    </>
   );
 }
 
