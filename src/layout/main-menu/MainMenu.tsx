@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./MainMenu.css";
 import uvBlanco from "@/assets/uvBlanco.png";
-import PageTransition from "../PageTransition";
-import { useCookie } from "@/hooks/useCookie";
 
 export function MainMenu() {
   const logoRef = useRef<HTMLImageElement>(null);
