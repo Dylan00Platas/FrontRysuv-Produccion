@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react"
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
@@ -13,12 +13,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'https://localhost:443',
+      "/api": {
+        target: "https://localhost:443",
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {
-          proxy.on('error', (err) => console.log('proxy error', err));
+          proxy.on("error", (err) => console.log("proxy error", err));
         },
       },
     },
@@ -27,7 +27,6 @@ export default defineConfig({
       cert: fs.readFileSync(path.resolve(__dirname, "./ssl/server.crt")),
     },
     host: true,
-    port: 5173,
+    port: 443,
   },
-  
 });

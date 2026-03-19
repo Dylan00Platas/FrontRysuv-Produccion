@@ -1,13 +1,4 @@
-/**
- * TODO-Desarrollo: Lazy loading
- *    const Agenda = lazy(() => import("./features/Agenda/Agenda.jsx"));
- * TODO-Desarrollo: Verificar protección de rutas por usuario.
- *    <Route element={<PrivateRoute />}>
- *      <Route path="/menu" element={<MenuPrincipal />} />
- *    </Route>
- */
-
-import { Routes, Route, useLocation, useRoutes } from "react-router-dom";
+import { RouteObject, useLocation, useRoutes } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import React, { useEffect } from "react";
 import authRoutes from "./routes/authRoutes";
@@ -18,16 +9,25 @@ import usuariosRoutes from "./routes/usuariosRoutes";
 import oficiosRoutes from "./routes/oficiosRoutes";
 import procesosRoutes from "./routes/procesosRoutes";
 import seguimientoRoutes from "./routes/seguimientoRoutes";
+import Login from "./pages/login/Login";
+import PrivateRoute from "./layout/PrivateRoute";
 
-const allRoutes = [
-  ...authRoutes,
-  ...agendaRoutes,
-  ...cedulasRoutes,
-  ...solicitudesRoutes,
-  ...usuariosRoutes,
-  ...oficiosRoutes,
-  ...procesosRoutes,
-  ...seguimientoRoutes,
+const allRoutes: RouteObject[] = [
+  { path: "/", element: <Login /> },
+  { path: "", element: <Login /> },
+  {
+    element: <PrivateRoute />,
+    children: [
+      ...authRoutes,
+      ...agendaRoutes,
+      ...cedulasRoutes,
+      ...solicitudesRoutes,
+      ...usuariosRoutes,
+      ...oficiosRoutes,
+      ...procesosRoutes,
+      ...seguimientoRoutes,
+    ],
+  },
 ];
 
 function AppRoutes() {

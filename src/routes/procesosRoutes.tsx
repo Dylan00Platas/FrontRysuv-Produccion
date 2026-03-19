@@ -1,11 +1,18 @@
-// routes/otrosRoutes.tsx
 import { RouteObject } from "react-router-dom";
-import CandidatoNoBeneficiado from "@/features/no-beneficiados/CandidatoNoBeneficiado";
-import NoBeneficiados from "@/features/no-beneficiados/NoBeneficiados";
-import Evaluacion from "@/features/procesos/Evaluacion";
-import Procesos from "@/features/procesos/Procesos";
-import SeguimientoHermes from "@/features/seguimiento-hermes/SeguimientoHermes";
+import { lazy } from "react";
 import MainLayout from "@/layout/main-layout/main-layout";
+
+const CandidatoNoBeneficiado = lazy(
+  () => import("@/features/no-beneficiados/CandidatoNoBeneficiado"),
+);
+const NoBeneficiados = lazy(
+  () => import("@/features/no-beneficiados/NoBeneficiados"),
+);
+const Evaluacion = lazy(() => import("@/features/procesos/Evaluacion"));
+const Procesos = lazy(() => import("@/features/procesos/Procesos"));
+const SeguimientoHermes = lazy(
+  () => import("@/features/seguimiento-hermes/SeguimientoHermes"),
+);
 
 const procesosRoutes: RouteObject[] = [
   {

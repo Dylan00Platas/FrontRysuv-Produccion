@@ -1,7 +1,9 @@
 import { RouteObject } from "react-router-dom";
-import Panorama from "@/features/panorama/Panorama";
-import Estadisticas from "@/features/estadisticas/Estadisticas";
+import { lazy } from "react";
 import MainLayout from "@/layout/main-layout/main-layout";
+
+const Panorama = lazy(() => import("@/features/panorama/Panorama"));
+const Estadisticas = lazy(() => import("@/features/estadisticas/Estadisticas"));
 
 const seguimientoRoutes: RouteObject[] = [
   {
