@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Sidebar from "../sidebar/Sidebar";
 import { useCookie } from "@/hooks/useCookie";
 
@@ -8,7 +8,9 @@ type Props = {
 
 export default function MainLayout({ children }: Props) {
   const { currentUser, isLoading, checkSession } = useCookie();
-  checkSession();
+  useEffect(() => {
+    checkSession();
+  }, []);
 
   return (
     <div className="flex lg:flex-col sm:flex-row w-svw h-svh bg-white ">
