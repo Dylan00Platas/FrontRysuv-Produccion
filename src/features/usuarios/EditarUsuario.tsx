@@ -91,7 +91,7 @@ function EditarUsuario() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="main-content-evaluacion">
+      <main className="ml-65 w-[calc(100%-260px)] px-10 py-8 overflow-y-auto min-h-screen bg-slate-50">
         <h1 className="page-title3">Editar Usuario</h1>
 
         <form className="form-grid" onSubmit={handleSubmit}>

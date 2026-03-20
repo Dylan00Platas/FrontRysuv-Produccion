@@ -19,6 +19,7 @@ export default class AuthService {
       endpoint: "/login",
       method: "POST",
       body: requestData,
+      withCredentials: false,
     });
 
     return response;
@@ -28,7 +29,6 @@ export default class AuthService {
     return await this.api.request({
       endpoint: "/sesion",
       method: "GET",
-      withCredentials: true,
     });
   }
 

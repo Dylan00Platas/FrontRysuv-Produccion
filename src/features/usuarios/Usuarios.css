@@ -1,15 +1,3 @@
-/* Main content */
-.main-content {
-  flex: 1;
-  padding: 3% 4%;
-  box-sizing: border-box;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* centra el contenido */
-  margin-left: 240px; /* espacio para el sidebar */
-}
-
 .page-title-usuarios {
   font-size: clamp(60px, 2.5vw, 36px);
   font-weight: 200;
