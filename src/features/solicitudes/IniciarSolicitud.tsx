@@ -6,10 +6,9 @@ import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
 import "./IniciarSolicitud.css";
-import IGetSesion from "@/schemas/acceso/GetSesion";
-import AuthService from "@/services/AuthService";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import IPostProcesoContratacion from "@/schemas/procesos-contratacion/PostProcesoContratacion";
+import { useCookie } from "@/hooks/useCookie";
 
 interface ICandidato {
   nombre: string;
@@ -75,8 +74,7 @@ function IniciarSolicitud() {
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
   const { toast, mostrarToast } = useToast();
-  const ServicioCatalogo = new CatalogoService();
-  const [datosSesion, setDatosSesion] = useState<IGetSesion | null>();
+  const { currentUser } = useCookie();
 
   const [formData, setFormData] = useState<IProcesoContratacion>({
     folio: "",
@@ -132,46 +130,17 @@ function IniciarSolicitud() {
   });
 
   useEffect(() => {
-    async function ObtenerSesion() {
-      if (datosSesion === null) {
-        const AuthServicio = new AuthService();
-        const respuesta = await AuthServicio.session();
-        if (respuesta.mensaje.usuario) {
-          const DatosSesion: IGetSesion = {
-            tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
-            usuario: respuesta.mensaje.usuario,
-            idAcceso: respuesta.mensaje.idAcceso,
-            nombre: respuesta.mensaje.nombre,
-            primerApellido: respuesta.mensaje.primerApellido,
-            segundoApellido: respuesta.mensaje.segundoApellido,
-          };
-          setDatosSesion(DatosSesion);
-        }
-      }
-    }
-    ObtenerSesion();
-  }, []);
-
-  useEffect(() => {
     async function cargarDependencias() {
-      if (dependencias.length === 0 && dependenciasCargadas !== true) {
-        try {
-          const response = await ServicioCatalogo.getDependencias();
-          setDependencias(response.mensaje.dependencias);
-          setDependenciasCargadas(true);
-        } catch (err) {
-          console.error(
-            "IniciarSolicitud.tsx - Error cargando dependencias: ",
-            err,
-          );
-          mostrarToast("Error al cargar dependencias", "error");
-        }
-      } else {
-        setDependenciasCargadas(true);
+      try {
+        const response = await new CatalogoService().getDependencias();
+        setDependencias(response.mensaje.dependencias);
+      } catch (err) {
+        mostrarToast("Error al cargar dependencias", "error");
       }
     }
+
     cargarDependencias();
-  }, [dependenciasCargadas]);
+  }, []);
 
   {
     !dependenciasCargadas && (
@@ -229,7 +198,7 @@ function IniciarSolicitud() {
           fechaRecibido: dataConCandidato.fechaRecibido,
           fechaRevisionOfiEval: dataConCandidato.fechaOfiEval,
           folio: dataConCandidato.folio,
-          FKIdAcceso: datosSesion!.idAcceso,
+          FKIdAcceso: currentUser!.idAcceso,
           FKIdDependencia: dataConCandidato.idDependencia,
           FKIdEstadoProcesoContratacion: dataConCandidato.estado,
           FKIdTemporalDefinitiva: dataConCandidato.tipo === "temporal" ? 1 : 2,
@@ -259,23 +228,16 @@ function IniciarSolicitud() {
             dataConCandidato.resultadoSeguimiento,
           titularPlaza: dataConCandidato.titularPlaza,
         };
-        if (tipoSolicitud === "bolsa") {
-          response =
-            await ProcesoContratacionServicio.postProcesoContratacion(
-              DatosCandidato,
-            );
-        } else {
-          response =
-            await ProcesoContratacionServicio.postProcesoContratacion(
-              DatosCandidato,
-            );
-        }
+        response =
+          await ProcesoContratacionServicio.postProcesoContratacion(
+            DatosCandidato,
+          );
         console.log(`Solicitud ${i + 1} creada:`, response);
       }
-      mostrarToast(`${cantidad} solicitude(s) creadas correctamente`, "error");
+      mostrarToast(`${cantidad} solicitude(s) creadas correctamente`, "exito");
       setTimeout(() => {
         navigate("/solicitudes");
-      }, 2000);
+      }, 1000);
 
       setFormData({
         folio: "",
@@ -343,7 +305,7 @@ function IniciarSolicitud() {
     e.preventDefault();
     const numDep = formData.numDependencia.trim();
     const dep = dependencias.find(
-      (dependecia) => (dependecia.numDependencia = numDep),
+      (dependecia) => dependecia.numDependencia === numDep,
     );
     if (dep) {
       handleInputChange("dependencia", dep.nombre);

@@ -37,8 +37,8 @@ import {
   ICompetenciaClasificacionCedulaBase,
   IGetCompetenciasClasificacionCedula,
 } from "@/schemas/cedulas/GetCompetencia";
-import UserContext from "@/utils/UserContext";
 import { ICedulaResultados } from "@/schemas/cedulas/PostResultadoCedula";
+import { useCookie } from "@/hooks/useCookie";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IDependenciaOption {
@@ -176,7 +176,10 @@ async function cargarPdfDesdeUrl(url: string): Promise<string> {
 function CrearConstancia() {
   const navigate = useNavigate();
   const { toast, mostrarToast } = useToast();
-  const currentUser = useContext(UserContext);
+  const { currentUser, checkSession } = useCookie();
+  useEffect(() => {
+    checkSession();
+  }, [currentUser]);
 
   const [showHelp, setShowHelp] = useState(false);
   const [formData, setFormData] = useState<IFormData>(FORM_INICIAL);

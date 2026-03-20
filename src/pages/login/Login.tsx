@@ -10,23 +10,17 @@ export function Login() {
   const { toast, mostrarToast } = useToast();
   const [usuario, setUsuario] = useState("");
   const [contrasenia, setContrasenia] = useState("");
-  const { login, isLoading: isLoadingLogin, error: errorLogin } = useCookie();
+  const { login, isLoadingLogin } = useCookie();
 
   const handleLogin = async () => {
     try {
       await login({ usuario, contrasenia });
-
-      if (errorLogin) {
-        mostrarToast("Error al inicio sesión.\nIntente de nuevo.", "error");
-      } else {
-        mostrarToast("Sesión iniciada correctamente.", "exito");
-        navigate("/menu");
-      }
+      mostrarToast("Sesión iniciada correctamente.", "exito");
+      navigate("/menu");
     } catch (err) {
       const mensaje =
-        err instanceof Error ? err.message : "Error interno del sistema";
+        err instanceof Error ? err.message : "Error al iniciar sesión.";
       mostrarToast(mensaje, "error");
-      console.error(err);
     }
   };
 

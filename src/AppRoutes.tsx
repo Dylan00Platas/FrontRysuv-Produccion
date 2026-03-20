@@ -1,6 +1,6 @@
 import { RouteObject, useLocation, useRoutes } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import React, { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import authRoutes from "./routes/authRoutes";
 import agendaRoutes from "./routes/agendaRoutes";
 import cedulasRoutes from "./routes/cedulasRoutes";
@@ -9,8 +9,8 @@ import usuariosRoutes from "./routes/usuariosRoutes";
 import oficiosRoutes from "./routes/oficiosRoutes";
 import procesosRoutes from "./routes/procesosRoutes";
 import seguimientoRoutes from "./routes/seguimientoRoutes";
-import Login from "./pages/login/Login";
 import PrivateRoute from "./layout/PrivateRoute";
+import Login from "./pages/login/Login";
 
 const allRoutes: RouteObject[] = [
   { path: "/", element: <Login /> },
@@ -39,8 +39,10 @@ function AppRoutes() {
   }, [location.pathname]);
 
   return (
-    <AnimatePresence mode="wait">
-      {element && React.cloneElement(element, { key: location.pathname })}
+    <AnimatePresence mode="wait" initial={false}>
+      <div key={location.pathname} className="h-full">
+        {element}
+      </div>
     </AnimatePresence>
   );
 }

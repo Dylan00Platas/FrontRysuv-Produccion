@@ -1,17 +1,18 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useCookie } from "@/hooks/useCookie";
-import PageTransition from "./PageTransition";
+import { Suspense } from "react";
+import PageLoader from "./PageLoader";
 
 export default function PrivateRoute() {
   const { currentUser, isLoading } = useCookie();
 
-  if (isLoading) {
-    return (
-      <PageTransition>
-        <div>Cargando...</div>
-      </PageTransition>
-    );
-  }
+  if (isLoading) return <PageLoader />;
+  if (!currentUser) return <Navigate to="/" replace />;
 
-  return currentUser ? <Outlet /> : <Navigate to="/" replace />;
+  // Un solo Suspense que cubre TODAS las rutas privadas
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <Outlet />
+    </Suspense>
+  );
 }
