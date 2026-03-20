@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import { FaUserLock, FaSearch } from "react-icons/fa";
 import CatalogoService from "@/services/CatalogosService";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
@@ -9,7 +9,7 @@ import "./IniciarSolicitud.css";
 import IGetSesion from "@/schemas/acceso/GetSesion";
 import AuthService from "@/services/AuthService";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
-import IPostProcesoContratacion from "@/schemas/procesos-contratacion/PostProcesoContratacion";
+import {IPostProcesoContratacion,ISolicitudAsignacionRequisicion,ISolicitudBolsaTrabajo} from "@/schemas/procesos-contratacion/PostProcesoContratacion";
 
 interface ICandidato {
   nombre: string;
@@ -70,6 +70,7 @@ export interface IProcesoContratacion {
   tipoDeProceso: number;
   candidatos: ICandidato[];
 }
+
 
 function IniciarSolicitud() {
   const navigate = useNavigate();
@@ -211,27 +212,23 @@ function IniciarSolicitud() {
           fechaCita: formData.candidatos[i].fechaCita,
         };
         let response;
-        const DatosCandidato: IPostProcesoContratacion = {
-          autorizacion: dataConCandidato.autorizacion, beneficiado: dataConCandidato.beneficiado, categoriaAutorizadaOficio: dataConCandidato.categoriaAutorizada, categoriaPuestoOrigen: dataConCandidato.categoriaOrigen,
-          consecutivoExpediente: dataConCandidato.consecutivoExpediente, diasProceso: dataConCandidato.tiempoProceso, experienciaLaboralSolicitada: dataConCandidato.experiencia, familiaFuncional: dataConCandidato.familia,
-          fechaElaboracionPropuesta: dataConCandidato.fechaPropuesta, fechaEntrevista: dataConCandidato.fechaEntrevista, fechaEnvioDEyDP: dataConCandidato.fechaEnvioDEyDP, fechaEnvioEvaluacionDesempenio: dataConCandidato.fechaEvaluacionDesempenio,
-          fechaEvaluacionCompetencias: dataConCandidato.fechaCompetencias, fechaInicioProcesamiento: dataConCandidato.fechaProcesamiento, fechaLiberacionOficio: dataConCandidato.fechaOficio, fechaNotificacion: dataConCandidato.fechaNotificacion,
-          fechaRecibido: dataConCandidato.fechaRecibido, fechaRevisionOfiEval: dataConCandidato.fechaOfiEval, folio: dataConCandidato.folio, FKIdAcceso: datosSesion!.idAcceso, FKIdDependencia: dataConCandidato.idDependencia, FKIdEstadoProcesoContratacion: dataConCandidato.estado, FKIdTemporalDefinitiva: dataConCandidato.tipo === "temporal" ? 1 : 2,
-          FKIdTipoPersonal: dataConCandidato.tipoPersonal === "eventual" ? 1 : 2, FKIdTipoProceso: tipoSolicitud === "Asignación" ? 1 : (tipoSolicitud === "Requisición" ? 2 : 3), funcionDesempeniar: dataConCandidato.funcion, hermesNotificacion: dataConCandidato.hermes, lineamientoOficioContinuidad: dataConCandidato.lineamiento, motivo: dataConCandidato.motivo,
-          nombreCandidato: formData.candidatos[i].nombre, numCarpeta: dataConCandidato.numeroCarpeta, numPlaza: dataConCandidato.numPlaza, observaciones: dataConCandidato.observaciones, observacionesAnalista: dataConCandidato.observacionesAnalista, periodoAutorizadoOficioFin: dataConCandidato.periodoInicio,
-          periodoAutorizadoOficioInicio: dataConCandidato.periodoTermino, resultadoEvaluacionCompetencias: dataConCandidato.resultadoEvaluacion, resultadoEvaluacionConocimiento: dataConCandidato.resultadoConocimiento, resultadoHabilidadesExcel: dataConCandidato.resultadoExcel, resultadoHabilidadesWord: dataConCandidato.resultadoWord,
-          resultadoOrtografia: dataConCandidato.resultadoOrtografia, resultadoProcesoEvaluacion: dataConCandidato.resultadoEvaluacion, resultadoReferenciasLaborales: dataConCandidato.referencias, resultadoSeguimientoEvaluacionDesempenio: dataConCandidato.resultadoSeguimiento, titularPlaza: dataConCandidato.titularPlaza
-        } 
         if (tipoSolicitud === "bolsa") {
-          response =
-            await ProcesoContratacionServicio.postProcesoContratacion(
-              DatosCandidato,
-            );
+          const DatosCandidato:ISolicitudBolsaTrabajo = {
+            folio: dataConCandidato.folio, hermesNotificacion: dataConCandidato.hermes, fechaRecibido: dataConCandidato.fechaRecibido, FKIdDependencia: dataConCandidato.idDependencia, FKIdTipoPersonal: dataConCandidato.tipoPersonal === "eventual" ? 1 : 2, numPlaza: dataConCandidato.numPlaza, categoriaPuestoOrigen: dataConCandidato.categoriaOrigen,titularPlaza:dataConCandidato.titularPlaza,
+            lineamientoOficioContinuidad: dataConCandidato.lineamiento, motivo: dataConCandidato.motivo, fechaElaboracionPropuesta: dataConCandidato.fechaPropuesta, fechaLiberacionOficio: dataConCandidato.fechaOficio, periodoAutorizadoOficioFin: dataConCandidato.periodoTermino, periodoAutorizadoOficioInicio: dataConCandidato.periodoInicio, FKIdTemporalDefinitiva: dataConCandidato.tipo === "temporal" ? 1 : 2,
+            FKIdEstadoProcesoContratacion: dataConCandidato.estado, observaciones: dataConCandidato.observaciones, numCarpeta: dataConCandidato.numeroCarpeta, funcionDesempeniar: dataConCandidato.funcion, familiaFuncional: dataConCandidato.familia, fechaEntrevista: dataConCandidato.fechaCita, fechaEvaluacionCompetencias: dataConCandidato.fechaEvaluacionDesempenio, fechaInicioProcesamiento: dataConCandidato.fechaProcesamiento,
+            resultadoEvaluacionConocimiento: dataConCandidato.resultadoConocimiento, experienciaLaboralSolicitada: dataConCandidato.experiencia, resultadoReferenciasLaborales: dataConCandidato.referencias, fechaEnvioDEyDP: dataConCandidato.fechaEnvioDEyDP, beneficiado: dataConCandidato.beneficiado, fechaRevisionOfiEval: dataConCandidato.fechaOfiEval, diasProceso: dataConCandidato.tiempoProceso, fechaEvaluacionDesempenio: dataConCandidato.fechaEvaluacionDesempenio,
+            observacionesAnalista: dataConCandidato.observacionesAnalista, consecutivoExpediente: dataConCandidato.consecutivoExpediente, seguimientoEvaluacionDesempenio: dataConCandidato.seguimientoDesempeno, resultadoSeguimientoEvaluacionDesempenio: dataConCandidato.resultadoSeguimiento, FKIdAcceso: datosSesion!.idAcceso, autorizacion: dataConCandidato.autorizacion, categoriaAutorizadaOficio: dataConCandidato.categoriaAutorizada,
+            FKIdTipoProceso: 3, nombreCandidato: dataConCandidato.candidato, fechaNotificacion: dataConCandidato.fechaNotificacion
+          }
+          response = await ProcesoContratacionServicio.postProcesoContratacion(DatosCandidato);
         } else {
-          response =
-            await ProcesoContratacionServicio.postProcesoContratacion(
-              DatosCandidato,
-            );
+          const DatosCandidato:ISolicitudAsignacionRequisicion = {
+            folio: dataConCandidato.folio, hermesNotificacion: dataConCandidato.hermes, fechaRecibido: dataConCandidato.fechaRecibido, FKIdDependencia: dataConCandidato.idDependencia, FKIdTipoPersonal: dataConCandidato.tipoPersonal === "eventual" ? 1 : 2, FKIdTemporalDefinitiva:  dataConCandidato.tipo === "temporal" ? 1 : 2, FKIdEstadoProcesoContratacion: dataConCandidato.estado, FKIdTipoProceso: tipoSolicitud === "Asignación" ? 1 : 2, FKIdAcceso: datosSesion!.idAcceso,
+            numPlaza: dataConCandidato.numPlaza, categoriaAutorizadaOficio: dataConCandidato.categoriaOrigen, titularPlaza: dataConCandidato.titularPlaza, lineamientoOficioContinuidad: dataConCandidato.lineamiento, motivo: dataConCandidato.motivo, fechaElaboracionPropuesta: dataConCandidato.fechaPropuesta, fechaLiberacionOficio: dataConCandidato.fechaOficio, periodoAutorizadoOficioInicio: dataConCandidato.periodoInicio,
+            periodoAutorizadoOficioFin: dataConCandidato.periodoTermino, observaciones: dataConCandidato.observaciones, autorizacion: dataConCandidato.autorizacion, categoriaPuestoOrigen: dataConCandidato.categoriaAutorizada, nombreCandidato: dataConCandidato.candidato, fechaEntrevista: dataConCandidato.fechaEntrevista
+          }
+          response = await ProcesoContratacionServicio.postProcesoContratacion(DatosCandidato);
         }
         console.log(`Solicitud ${i + 1} creada:`, response);
       }

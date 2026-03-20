@@ -1,4 +1,4 @@
-export default interface IPostProcesoContratacion {
+export interface IPostProcesoContratacion {
   autorizacion: boolean;
   beneficiado: boolean;
   categoriaAutorizadaOficio: string;
@@ -44,4 +44,74 @@ export default interface IPostProcesoContratacion {
   resultadoReferenciasLaborales: string;
   resultadoSeguimientoEvaluacionDesempenio: string;
   titularPlaza: string;
+}
+
+export interface ISolicitudAsignacionRequisicion {
+  folio: string;
+  hermesNotificacion: string; 
+  fechaRecibido: string; 
+  FKIdDependencia: number; 
+  FKIdTipoPersonal: number; 
+  FKIdTemporalDefinitiva: number; 
+  FKIdEstadoProcesoContratacion: number; 
+  FKIdTipoProceso: number; 
+  FKIdAcceso: number;
+  numPlaza: string; 
+  categoriaPuestoOrigen: string; 
+  titularPlaza: string; 
+  lineamientoOficioContinuidad: string; 
+  motivo: string; 
+  fechaElaboracionPropuesta: string; 
+  fechaLiberacionOficio: string; 
+  periodoAutorizadoOficioInicio: string; 
+  periodoAutorizadoOficioFin: string; 
+  observaciones: string; 
+  autorizacion: boolean; 
+  categoriaAutorizadaOficio: string; 
+  nombreCandidato: string; 
+  fechaEntrevista: string; 
+}
+
+export interface ISolicitudBolsaTrabajo {
+  folio: string;
+  hermesNotificacion: string;
+  fechaRecibido: string;
+  FKIdDependencia: number;
+  FKIdTipoPersonal: number;
+  numPlaza: string;
+  categoriaPuestoOrigen: string;
+  titularPlaza: string;
+  lineamientoOficioContinuidad: string;
+  motivo: string;
+  fechaElaboracionPropuesta: string;
+  fechaLiberacionOficio: string;
+  periodoAutorizadoOficioInicio: string;
+  periodoAutorizadoOficioFin: string;
+  FKIdTemporalDefinitiva: number;
+  FKIdEstadoProcesoContratacion: number;
+  observaciones: string;
+  numCarpeta: string;
+  nombreCandidato: string;
+  funcionDesempeniar: string;
+  familiaFuncional: string;
+  fechaEntrevista: string;
+  fechaEvaluacionCompetencias: string;
+  fechaInicioProcesamiento: string;
+  resultadoEvaluacionConocimiento: string;
+  experienciaLaboralSolicitada: string;
+  resultadoReferenciasLaborales: string;
+  fechaEnvioDEyDP: string;
+  beneficiado: boolean;
+  fechaRevisionOfiEval: string;
+  fechaNotificacion: string;
+  diasProceso: string;
+  fechaEvaluacionDesempenio: string;
+  observacionesAnalista: string;
+  consecutivoExpediente: string;
+  seguimientoEvaluacionDesempenio: string;
+  resultadoSeguimientoEvaluacionDesempenio: string;
+  FKIdTipoProceso: number;
+  autorizacion: boolean;
+  categoriaAutorizadaOficio: string;
+  FKIdAcceso: number;
 }
