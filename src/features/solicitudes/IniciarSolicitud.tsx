@@ -65,6 +65,8 @@ export interface IProcesoContratacion {
   idDependencia: number;
   fechaEvaluacionDesempenio: string;
   cantidadCandidatos: string;
+  idAcceso: number;
+  tipoDeProceso: number;
   candidatos: ICandidato[];
 }
 
@@ -77,6 +79,7 @@ function IniciarSolicitud() {
   const { currentUser } = useCookie();
 
   const [formData, setFormData] = useState<IProcesoContratacion>({
+    idAcceso: 0,
     folio: "",
     hermes: "",
     fechaRecibido: "",
@@ -96,7 +99,7 @@ function IniciarSolicitud() {
     periodoTermino: "",
     categoriaAutorizada: "",
     tipo: "",
-    estado: 0,
+    estado: 1,
     autorizacion: false,
     observaciones: "",
     numeroCarpeta: "",
@@ -124,6 +127,7 @@ function IniciarSolicitud() {
     seguimientoDesempeno: "",
     resultadoSeguimiento: "",
     idDependencia: 0,
+    tipoDeProceso: 0,
     fechaEvaluacionDesempenio: "",
     cantidadCandidatos: "1",
     candidatos: [{ nombre: "", fechaCita: "" }],
@@ -259,7 +263,7 @@ function IniciarSolicitud() {
         periodoTermino: "",
         categoriaAutorizada: "",
         tipo: "",
-        estado: 0,
+        estado: 1,
         idDependencia: 0,
         autorizacion: false,
         beneficiado: false,
@@ -290,6 +294,8 @@ function IniciarSolicitud() {
         fechaEvaluacionDesempenio: "",
         cantidadCandidatos: "1",
         candidatos: [{ nombre: "", fechaCita: "" }],
+        tipoDeProceso: 0,
+        idAcceso: 0,
       });
     } catch (error) {
       console.error(
@@ -347,9 +353,9 @@ function IniciarSolicitud() {
               {" "}
               Seleccionar tipo de solicitud
             </option>
-            <option value="asignacion">Asignación</option>
-            <option value="requisicion">Requisición</option>
-            <option value="bolsa">Bolsa de Trabajo</option>
+            <option value="Asignación">Asignación</option>
+            <option value="Requisición">Requisición</option>
+            <option value="Bolsa">Bolsa de Trabajo</option>
           </select>
         </div>
 
@@ -377,14 +383,14 @@ function IniciarSolicitud() {
                   handleInputChange("folio", e.target.value);
                   e.target.setCustomValidity("");
                 }}
-                disabled={tipoSolicitud === "asignacion"}
+                disabled={tipoSolicitud === "Asignación"}
                 style={{
                   backgroundColor:
-                    tipoSolicitud === "asignacion" ? "#e0e0e0" : "white",
+                    tipoSolicitud === "Asignación" ? "#e0e0e0" : "white",
                   color: "black",
                 }}
                 placeholder={
-                  tipoSolicitud === "asignacion"
+                  tipoSolicitud === "Asignación"
                     ? "Este campo está bloqueado para asignación"
                     : ""
                 }
@@ -681,7 +687,7 @@ function IniciarSolicitud() {
             </div>
 
             {/* Campos específicos Bolsa de Trabajo */}
-            {tipoSolicitud === "bolsa" && (
+            {tipoSolicitud === "Bolsa" && (
               <>
                 <h3 className="section-title">Datos del proceso</h3>
                 <div className="form-group">
@@ -976,7 +982,7 @@ function IniciarSolicitud() {
             )}
 
             {/*  Asignación/Requisición */}
-            {tipoSolicitud !== "bolsa" && (
+            {tipoSolicitud !== "Bolsa" && (
               <>
                 <div className="form-group-solicitud">
                   <label className="form-label-solicitud">
