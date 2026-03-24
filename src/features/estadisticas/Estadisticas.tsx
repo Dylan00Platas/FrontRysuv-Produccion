@@ -179,12 +179,9 @@ function Estadisticas() {
             IResponseHTTP<IGetUsuarios>
           >,
         ]);
-
         if (cancelado) return;
-
         const procesos = responseProcesos.mensaje?.procesos ?? [];
         const usuariosLista = responseAnalistas.mensaje?.usuarios ?? [];
-
         setProcesosRaw(procesos);
         setAnalistas(usuariosLista);
 
@@ -250,7 +247,6 @@ function Estadisticas() {
         `${a.nombre} ${a.primerApellido} ${a.segundoApellido ?? ""}`.trim(),
       ]),
     );
-
     return procesosRaw
       .filter((p) => p.FKIdAcceso !== null)
       .map((p, idx) => ({
@@ -259,8 +255,8 @@ function Estadisticas() {
         nombre: p.nombreCandidato ?? "Sin candidato",
         analista: analistasMap[p.FKIdAcceso ?? ""] ?? "Sin analista",
         estado: mapEstado(p.FKIdEstadoProcesoContratacion),
-        region: p.dependencia.zona ?? "Sin región",
-        dependencia: p.dependencia.nombre ?? "Sin dependencia",
+        region: p.zona! ?? "Sin región",
+        dependencia: p.nombre ?? "Sin dependencia",
       }));
   }, [procesosRaw, analistas]);
 

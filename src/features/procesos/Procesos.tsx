@@ -200,9 +200,8 @@ function Procesos() {
 
     const coincideAnalista =
       analistaFiltro?.value === "Todos" || p.analista === analistaFiltro?.value;
-
     const coincideBusqueda =
-      p.folio.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(p.folio).toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.candidato.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.analista.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.estado.toLowerCase().includes(searchTerm.toLowerCase());

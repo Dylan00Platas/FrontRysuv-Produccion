@@ -135,7 +135,7 @@ export default class ProcesoContratacionService {
     data: IPostOficioProcesoContratacion,
   ): Promise<IResponseHTTP<string>> {
     return await this.api.request({
-      endpoint: `/control-version/oficio`,
+      endpoint: `/oficio`,
       method: "POST",
       body: data,
     });

@@ -113,7 +113,7 @@ function Evaluacion() {
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
   const [tarjetasAbiertas, setTarjetasAbiertas] = useState<boolean[]>([]);
   const { toast, mostrarToast } = useToast();
-  const [datosSesion, setDatosSesion] = useState<IGetSesion | null>();
+  const [datosSesion, setDatosSesion] = useState<IGetSesion | null>(null);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
@@ -300,16 +300,35 @@ function Evaluacion() {
     cargarDependencias();
   }, [dependenciasCargadas]);
 
-  useEffect(() => {});
+  useEffect(() => {
+    async function ObtenerSesion() {
+      if (datosSesion === null) {
+        const AuthServicio = new AuthService();
+        const respuesta = await AuthServicio.session();
+        if (respuesta.mensaje.usuario) {
+          const DatosSesion: IGetSesion = {
+            tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
+            usuario: respuesta.mensaje.usuario,
+            idAcceso: respuesta.mensaje.idAcceso,
+            nombre: respuesta.mensaje.nombre,
+            primerApellido: respuesta.mensaje.primerApellido,
+            segundoApellido: respuesta.mensaje.segundoApellido,
+          };
+          setDatosSesion(DatosSesion);
+        }
+      }
+    }
+    ObtenerSesion();
+  }, []);
 
-  const mapFormDataToDto = (form: IPutProceso): IPutProcesoContratacion => {
+  const mapFormDataToDto = (form: IPutProceso, idAcceso: number): IPutProcesoContratacion => {
     const findKey = <T extends object>(map: T, value: string): number =>
       Number(Object.entries(map).find(([, v]) => v === value)?.[0] ?? 0);
     return {
       folio: form.folio,
       hermesNotificacion: form.hermes,
       fechaRecibido: form.fechaRecibido,
-      numPlaza: form.numPlaza,
+      numPlaza: String(form.numPlaza),
       categoriaPuestoOrigen: form.categoria,
       titularPlaza: form.titular,
       lineamientoOficioContinuidad: form.lineamiento,
@@ -358,7 +377,7 @@ function Evaluacion() {
       citaVirtual: false,
       educacionFormal: "",
       fechaAsignacionAnalista: "",
-      FKIdAcceso: 0,
+      FKIdAcceso: idAcceso,
       FKIdTipoPersonal: Number(form.tipoPersonal) || 0,
       resultadoEvaluacionCompetencias: "",
     };
@@ -368,9 +387,8 @@ function Evaluacion() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("token");
       const idProceso = procesoSeleccionado.idProceso;
-      const dto = mapFormDataToDto(formData);
+      const dto = mapFormDataToDto(formData,datosSesion!.idAcceso);
       const respuesta = await ProcesoServicio.putProcesoContratacion(
         idProceso,
         dto,
@@ -378,7 +396,7 @@ function Evaluacion() {
 
       if (respuesta && respuesta.error === false) {
         try {
-          const nombreCompleto = "Usuario"; //usuario.nombre;
+          const nombreCompleto = datosSesion!.usuario;
           const ControlPost: IPostControlVersion = {
             nombreCompleto: nombreCompleto,
             jsonDatos: JSON.stringify(dto),

@@ -53,6 +53,10 @@ export interface IProcesoContratacionBase {
   resultadoSeguimientoEvaluacionDesempenio: string;
   seguimientoEvaluacionDesempenio: string | null;
   titularPlaza: string;
+  numDependencia?: string;
+  nombre?: string;
+  area?: string;
+  zona?: string;
 }
 
 export interface IGetProcesosContratacion {
