@@ -1,0 +1,195 @@
+/* ============================================
+   VerOficios.css
+   Consistent with RySUV design system
+   ============================================ */
+
+/* ---------- Layout principal ---------- */
+.main-content-ver-oficios {
+  flex: 1;
+  padding: 3% 5%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-left: 15%;
+}
+
+/* ---------- Header ---------- */
+.page-header-ver-oficios {
+  margin-bottom: 2rem;
+}
+
+.page-subtitle-ver-oficios {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin: 0 0 0.35rem 0;
+}
+
+.page-title-ver-oficios {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a2e5a;
+  margin: 0 0 0.4rem 0;
+  line-height: 1.2;
+}
+
+.page-title-ver-oficios::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 3px;
+  background-color: #16a34a;
+  margin-top: 0.5rem;
+  border-radius: 2px;
+}
+
+/* ---------- Barra de filtros ---------- */
+.filtros-bar-ver-oficios {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filtro-busqueda-ver-oficios {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0 0.75rem;
+  height: 38px;
+  width: 300px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.filtro-busqueda-ver-oficios:focus-within {
+  border-color: #1a2e5a;
+  box-shadow: 0 0 0 3px rgba(26, 46, 90, 0.1);
+}
+
+.filtro-busqueda-ver-oficios .search-icon-ver-oficios {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.filtro-busqueda-ver-oficios input {
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  color: #111827;
+  background: transparent;
+  width: 100%;
+}
+
+.filtro-busqueda-ver-oficios input::placeholder {
+  color: #9ca3af;
+}
+
+/* ---------- Tabla ---------- */
+.tabla-oficios {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.tabla-oficios thead tr {
+  background-color: #1a2e5a;
+}
+
+.tabla-oficios thead th {
+  padding: 0.85rem 1.25rem;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.tabla-oficios tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s;
+  cursor: pointer;
+}
+
+.tabla-oficios tbody tr:last-child {
+  border-bottom: none;
+}
+
+.tabla-oficios tbody tr:hover {
+  background-color: #f0f4ff;
+}
+
+.tabla-oficios tbody td {
+  padding: 0.85rem 1.25rem;
+  font-size: 0.875rem;
+  color: #374151;
+  vertical-align: middle;
+}
+
+/* ---------- Estados vacío / cargando ---------- */
+.mensaje-cargando-ver-oficios {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-top: 3rem;
+}
+
+.mensaje-vacio-ver-oficios {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  color: #6b7280;
+  text-align: center;
+}
+
+.mensaje-vacio-ver-oficios h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a2e5a;
+  margin: 0 0 0.5rem 0;
+}
+
+.mensaje-vacio-ver-oficios p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .filtro-busqueda-ver-oficios {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-content-ver-oficios {
+    padding: 1.25rem 1rem;
+    margin-left: 0;
+  }
+
+  .tabla-oficios thead th,
+  .tabla-oficios tbody td {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}

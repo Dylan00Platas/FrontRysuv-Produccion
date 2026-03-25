@@ -325,7 +325,7 @@ function Evaluacion() {
     const findKey = <T extends object>(map: T, value: string): number =>
       Number(Object.entries(map).find(([, v]) => v === value)?.[0] ?? 0);
     return {
-      folio: form.folio,
+      folio: String(form.folio),
       hermesNotificacion: form.hermes,
       fechaRecibido: form.fechaRecibido,
       numPlaza: String(form.numPlaza),
@@ -785,19 +785,15 @@ function Evaluacion() {
                   onClick={() => {
                     const data = {
                       idProcesoContratacion: formData.idProcesoContratacion,
-                      folio: formData.folio,
-                      plaza: formData.numPlaza,
+                      folio: String(formData.folio),
+                      plaza: String(formData.numPlaza),
                       motivo: formData.motivo,
                       titularPlaza: formData.titular,
                       categoriaOrigen: formData.categoria,
                       categoriaAutorizada: formData.categoriaAutorizada,
                       candidato: formData.candidato,
                     };
-
-                    const token = localStorage.getItem("token");
-                    sessionStorage.setItem("token", token || "");
                     sessionStorage.setItem("datosOficio", JSON.stringify(data));
-
                     window.open("/generar-oficio", "_blank");
                   }}
                 >
@@ -810,16 +806,10 @@ function Evaluacion() {
                 className="btn-ver-oficios"
                 onClick={() => {
                   const idProceso = formData.idProcesoContratacion;
-                  const token = localStorage.getItem("token") || "";
-
-                  // Guardar en sessionStorage
-                  sessionStorage.setItem("token", token);
                   sessionStorage.setItem(
                     "datosVerOficios",
                     JSON.stringify({ idProceso }),
                   );
-
-                  // Abrir nueva pestaña / ventana
                   window.open("/ver-oficios", "_blank");
                 }}
               >
@@ -1180,8 +1170,8 @@ function Evaluacion() {
                   onClick={() => {
                     const data = {
                       idProcesoContratacion: formData.idProcesoContratacion,
-                      folio: formData.folio,
-                      plaza: formData.numPlaza,
+                      folio: String(formData.folio),
+                      plaza: String(formData.numPlaza),
                       motivo: formData.motivo,
                       titularPlaza: formData.titular,
                       categoriaOrigen: formData.categoria,

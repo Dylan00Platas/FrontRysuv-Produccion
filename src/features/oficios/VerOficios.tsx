@@ -6,16 +6,16 @@ import {
   IOficioProcesoContratacionBase,
 } from "@/schemas/procesos-contratacion/GetOficioProcesoContratacion";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
+import './VerOficios.css'
 
 function VerOficios() {
-  const { toast, mostrarToast } = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
-  const idProceso = location?.state.idProceso;
-
+  const datosIdProceso = JSON.parse(sessionStorage.getItem("datosVerOficios") || "{}");
+  const idProceso = datosIdProceso.idProceso
   const [oficios, setOficios] = useState<IOficioProcesoContratacionBase[]>([]);
   const [oficiosFiltrados, setOficiosFiltrados] = useState<
     IOficioProcesoContratacionBase[]
@@ -70,15 +70,14 @@ function VerOficios() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="main-content">
-        <div className="page-header2">
-          <h1 className="page-title2">Oficios del Proceso</h1>
+      <main className="main-content-ver-oficios">
+        <div className="page-header-ver-oficios">
+          <h1 className="page-title-ver-oficios">Oficios del Proceso</h1>
         </div>
 
-        {/* Barra de búsqueda */}
-        <div className="filtros-bar">
-          <div className="filtro-busqueda" style={{ width: "300px" }}>
-            <FaSearch className="search-icon" />
+        <div className="filtros-bar-ver-oficios">
+          <div className="filtro-busqueda-ver-oficios">
+            <FaSearch className="search-icon-ver-oficios" />
             <input
               type="text"
               placeholder="Buscar..."
@@ -88,16 +87,15 @@ function VerOficios() {
           </div>
         </div>
 
-        {/* Contenido */}
         {loading ? (
-          <p className="mensaje-info">Cargando oficios...</p>
+          <p className="mensaje-cargando-ver-oficios">Cargando oficios...</p>
         ) : oficiosFiltrados.length === 0 ? (
-          <div className="mensaje-vacio-container">
+          <div className="mensaje-vacio-ver-oficios">
             <h2>No hay oficios</h2>
             <p>Este proceso no tiene oficios registrados.</p>
           </div>
         ) : (
-          <table className="tabla-solicitudes">
+          <table className="tabla-oficios">
             <thead>
               <tr>
                 <th>Tipo</th>
@@ -107,11 +105,7 @@ function VerOficios() {
             </thead>
             <tbody>
               {oficiosFiltrados.map((o) => (
-                <tr
-                  key={o.id}
-                  onClick={() => verDetalles(o)}
-                  style={{ cursor: "pointer" }}
-                >
+                <tr key={o.idOficio} onClick={() => verDetalles(o)}>
                   <td>{o.tipo}</td>
                   <td>{o.dirigido}</td>
                   <td>{o.fecha}</td>
