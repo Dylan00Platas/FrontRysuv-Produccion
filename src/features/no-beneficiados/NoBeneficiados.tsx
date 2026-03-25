@@ -95,7 +95,6 @@ function NoBeneficiados() {
   );
 
   // Aplicación de filtrado -----------------------------------------------------
-  // MEJORA: useMemo para no re-filtrar en cada render.
   const candidatosFiltrados = useMemo<ICargaDatos[]>(
     () =>
       candidatos.filter(
@@ -114,16 +113,6 @@ function NoBeneficiados() {
     return (
       <main className="main-content">
         <p className="estado-mensaje">Cargando datos…</p>
-      </main>
-    );
-  }
-
-  if (errorProcesos) {
-    return (
-      <main className="main-content">
-        <p className="estado-mensaje estado-error">
-          Error al cargar los datos. Intente más tarde.
-        </p>
       </main>
     );
   }
