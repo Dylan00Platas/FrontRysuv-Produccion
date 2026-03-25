@@ -1,4 +1,5 @@
 import { Toast } from "@/components/Alert/Floating/Toast";
+import MainHeader from "@/components/header/MainHeader";
 import { useToast } from "@/hooks/useToast";
 import IResponseHTTP from "@/interfaces/http/Response";
 import {
@@ -71,9 +72,10 @@ function VerOficios() {
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
       <main className="main-content">
-        <div className="page-header2">
-          <h1 className="page-title2">Oficios del Proceso</h1>
-        </div>
+        <MainHeader
+          title="Oficios relacionados a proceso"
+          subtitle="Gestión de oficios"
+        />
 
         {/* Barra de búsqueda */}
         <div className="filtros-bar">

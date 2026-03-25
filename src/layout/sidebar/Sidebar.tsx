@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 import "./Sidebar.css";
 import uvBlanco from "@/assets/uvBlanco.png";
+import { useCookie } from "@/hooks/useCookie";
 
 interface SidebarProps {
   tipoAcceso: number;
@@ -82,6 +83,8 @@ function useNavItems(
   const go = (path: string) => () => navigate(path);
 
   const todos = [
+    { icon: <FaRegCalendarAlt />, label: "Agenda", path: "/agenda" },
+    { icon: <MdAssignment />, label: "Cédulas", path: "/cedulas" },
     {
       icon: <MdAddBox />,
       label: "Iniciar Solicitud",
@@ -89,21 +92,19 @@ function useNavItems(
     },
     { icon: <FaEnvelope />, label: "Ver Solicitudes", path: "/solicitudes" },
     { icon: <FaSearch />, label: "Evaluaciones", path: "/procesos" },
-    { icon: <MdAssignment />, label: "Cédulas", path: "/cedulas" },
-    { icon: <FaChartBar />, label: "Estadísticas", path: "/estadisticas" },
-    { icon: <FaGlobeAmericas />, label: "Panorama", path: "/panorama" },
     {
       icon: <FaAddressCard />,
       label: "No Beneficiados",
       path: "/no-beneficiados",
     },
-    { icon: <FaUser />, label: "Usuarios", path: "/usuarios" },
-    { icon: <FaRegCalendarAlt />, label: "Agenda", path: "/agenda" },
+    { icon: <FaChartBar />, label: "Estadísticas", path: "/estadisticas" },
+    { icon: <FaGlobeAmericas />, label: "Panorama", path: "/panorama" },
     {
       icon: <FaTasks />,
       label: "Seguimiento Hermes",
       path: "/seguimiento-hermes",
     },
+    { icon: <FaUser />, label: "Usuarios", path: "/usuarios" },
   ];
 
   const sinUsuarios = todos.filter((i) => i.label !== "Usuarios");
@@ -130,12 +131,14 @@ function useNavItems(
   }));
 }
 
-export function Sidebar({ tipoAcceso = 1 }: SidebarProps) {
+export function Sidebar({ tipoAcceso }: SidebarProps) {
   const navigate = useNavigate();
   const navItems = useNavItems(tipoAcceso, navigate);
+  const { logout } = useCookie();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.clear();
+    await logout();
     navigate("/");
     window.location.reload();
   };

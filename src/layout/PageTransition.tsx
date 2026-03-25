@@ -1,6 +1,5 @@
 import { motion, Variants } from "framer-motion";
 import uvBlanco from "@/assets/uvBlanco.png";
-import { useCookie } from "@/hooks/useCookie";
 
 // Interfaces de UI ------------------------------------------------------------
 interface PageTransitionProps {
@@ -88,31 +87,6 @@ const PageTransition: React.FC<PageTransitionProps> = ({
       }}
       style={{ height: "100%", width: "100%", position: "relative" }}
     >
-      {/* Logo con bouncing */}
-      <motion.div
-        variants={logoVariants}
-        initial="initial"
-        animate={["animate", bouncingAnimation]}
-        style={{ display: "inline-block" }}
-        whileHover={{
-          scale: 1.1,
-          filter: "drop-shadow(0 0 8px rgba(255,255,255,0.5))",
-          transition: { duration: 0.2 },
-        }}
-      >
-        <img
-          src={uvBlanco}
-          alt="Logo Universidad Veracruzana"
-          style={{
-            height: "clamp(25px, 4vw, 40px)",
-            width: "auto",
-            objectFit: "contain",
-            display: "block",
-            filter: "drop-shadow(0 0 2px rgba(255,255,255,0.2))",
-          }}
-        />
-      </motion.div>
-
       {/* Contenido de la página */}
       {children}
     </motion.div>

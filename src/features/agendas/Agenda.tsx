@@ -13,6 +13,7 @@ import SolicitudService from "@/services/ProcesoContratacionService";
 import IResponseHTTP from "@/interfaces/http/Response";
 import ILabelValue from "@/interfaces/LabelValue";
 import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
+import MainHeader from "@/components/header/MainHeader";
 
 // Interfaces de UI -----------------------------------------------------------
 interface IEventoAgenda {
@@ -248,16 +249,7 @@ function Agenda() {
   return (
     <>
       <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1">
-            Gestión de fechas de eventos y procesos
-          </p>
-          <h1 className="text-3xl font-extrabold text-[#18529d] tracking-tight">
-            Agenda
-          </h1>
-          <div className="mt-2 h-1 w-16 rounded-full bg-linear-to-r from-[#18529d] to-[#199532]" />
-        </div>
+        <MainHeader title="Próximos eventos" subtitle="Agenda" />
 
         <div className="bg-white p-3.75 rounded-[10px] shadow-[0_3px_8px_rgba(0,0,0,0.1)] -mt-[3%]">
           <FullCalendar

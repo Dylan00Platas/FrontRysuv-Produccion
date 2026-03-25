@@ -4,6 +4,7 @@ import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
 import { PDFDocument, PDFFont, PDFPage } from "pdf-lib";
 import * as fontkit from "fontkit";
 import ManageFiles from "@/utils/ManageFiles";
+import MainHeader from "@/components/header/MainHeader";
 
 function VerDetallesOficio() {
   const datos = JSON.parse(sessionStorage.getItem("detallesOficio") || "{}");
@@ -227,9 +228,7 @@ function VerDetallesOficio() {
   return (
     <>
       <main className="main-content-solicitud">
-        <div className="page-header-solicitud">
-          <h1 className="page-title-solicitud">Detalles del Oficio</h1>
-        </div>
+        <MainHeader title="Detalles de oficio" subtitle="Gestión de oficios" />
 
         <form className="form-grid">
           <h3 className="section-title">Datos del oficio</h3>

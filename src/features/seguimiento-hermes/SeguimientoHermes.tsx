@@ -8,6 +8,7 @@ import {
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { useToast } from "@/hooks/useToast";
 import "./SeguimientoHermes.css";
+import MainHeader from "@/components/header/MainHeader";
 
 interface ISeguimientoHermes {
   Folio: string;
@@ -184,10 +185,8 @@ function SeguimientoHermes() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="main-content">
-        <div className="seguimiento-header">
-          <h1 className="seguimiento-title">Seguimiento Hermes</h1>
-        </div>
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+        <MainHeader title="Seguimiento de hérmes" subtitle="Hérmes" />
 
         <div className="main-content-inner">
           <div className="filtro-busqueda">

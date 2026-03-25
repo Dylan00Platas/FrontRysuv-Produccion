@@ -39,6 +39,7 @@ import {
 } from "@/schemas/cedulas/GetCompetencia";
 import { ICedulaResultados } from "@/schemas/cedulas/PostResultadoCedula";
 import { useCookie } from "@/hooks/useCookie";
+import MainHeader from "@/components/header/MainHeader";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IDependenciaOption {
@@ -799,10 +800,7 @@ function CrearConstancia() {
         }
       }
 
-      if (
-        currentUser?.FKIdTipoAcceso === 1 ||
-        currentUser?.FKIdTipoAcceso === 4
-      ) {
+      if (currentUser?.idAcceso === 1 || currentUser?.idAcceso === 4) {
         try {
           const firmaBytes = await fetch("/Firma_AVC.png").then((r) =>
             r.arrayBuffer(),
@@ -967,9 +965,7 @@ function CrearConstancia() {
           </div>
         )}
 
-        <div className="page-header2">
-          <h1 className="page-title2">Cédula de Resultados</h1>
-        </div>
+        <MainHeader title="Cédula de resultados" subtitle="Cédulas" />
 
         <div className="contenido-constancia-inner">
           <form className="form-grid" onSubmit={handleSubmit}>

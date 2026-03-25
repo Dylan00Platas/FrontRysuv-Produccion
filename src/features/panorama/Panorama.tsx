@@ -17,6 +17,7 @@ import {
   IGetProcesosContratacion,
   IProcesoContratacionBase,
 } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
+import MainHeader from "@/components/header/MainHeader";
 
 // Utils -------------------------------------------------------------------
 function mapEstado(fk: number): string {
@@ -414,10 +415,8 @@ function Panorama() {
   };
 
   return (
-    <main className="main-content">
-      <div className="page-header2">
-        <h1 className="page-title2">Panorama Global</h1>
-      </div>
+    <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+      <MainHeader title="Panorama general" subtitle="Estadísticas" />
 
       <div className="main-content-inner">
         {/* SECCIÓN EVALUACIONES */}

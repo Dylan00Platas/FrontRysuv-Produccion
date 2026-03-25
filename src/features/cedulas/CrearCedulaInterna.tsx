@@ -29,6 +29,7 @@ import { useDependenciaById } from "@/hooks/useDependenciaById";
 import { useCedulaTipos } from "@/hooks/useCedulaTipos";
 import { getNombreCompetenciaKey } from "@/utils/Constants";
 import ManageFiles from "@/utils/ManageFiles";
+import MainHeader from "@/components/header/MainHeader";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IPostCedulaInternaForm {
@@ -703,7 +704,7 @@ function CrearCedulaInterna() {
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
 
-      <main className="main-content">
+      <main className="flex-1 overflow-auto">
         <div
           role="button"
           tabIndex={0}
@@ -761,12 +762,13 @@ function CrearCedulaInterna() {
           </div>
         )}
 
-        <div className="page-header2">
-          <h1 className="page-title2">Cédula Interna</h1>
-        </div>
+        <MainHeader title="Cédulas" subtitle="Crear cédula interna" />
 
-        <div className="contenido-cedula-interna-inner">
-          <form className="form-grid" onSubmit={handleSubmit}>
+        <div className="flex-1 justify-center p-5 overflow-auto">
+          <form
+            className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))]"
+            onSubmit={handleSubmit}
+          >
             {/* ID de candidato */}
             <div className="form-group">
               {/* TODO-Desarrollo: verificar de donde sacar el ID del Candidato */}
@@ -1016,7 +1018,9 @@ function CrearCedulaInterna() {
             </div>
 
             {/* Selección de cédula */}
-            <h3 className="section-title">Confirmación de Competencias</h3>
+            <h3 className="col-[span_3] text-[20px] font-semibold mt-5 mb-2.5 text-[#18529d] justify-self-start">
+              Confirmación de Competencias
+            </h3>
             <div className="form-group col-span-3">
               <label
                 htmlFor={`${fieldID}-idCedula`}
@@ -1164,7 +1168,7 @@ function CrearCedulaInterna() {
                 </label>
                 <textarea
                   id={`${fieldID}-${key}`}
-                  className="large-textarea"
+                  className="w-full h-[30px] px-[6px] py-[4px] text-[12px] border-[1px] border-solid border-[#b0b0b0] rounded-[4px] bg-[#fff] text-[#000] [transition:all_0.2s_ease-in-out] box-border w-full resize-y"
                   value={(formData[key] as string) ?? ""}
                   onChange={(e) =>
                     handleInputChange(
@@ -1176,13 +1180,16 @@ function CrearCedulaInterna() {
               </div>
             ))}
 
-            <div className="action-buttons">
-              <button type="submit" className="btn-guardar">
+            <div className="pb-20">
+              <button
+                type="submit"
+                className="w-40 h-8 bg-[#199532] text-white border-none rounded-md text-[13px] font-semibold cursor-pointer [transition:background_0.2s_ease] min-w-40 hover:bg-[#147a28]"
+              >
                 Guardar
               </button>
               <button
                 type="button"
-                className="btn-generar"
+                className="w-40 h-8 bg-[#721995] text-white border-none rounded-md text-[13px] font-semibold cursor-pointer [transition:background_0.2s_ease] min-w-40 hover:bg-[#571372]"
                 onClick={handleGenerarPDF}
               >
                 Generar PDF

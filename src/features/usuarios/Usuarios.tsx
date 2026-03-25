@@ -6,6 +6,7 @@ import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
 import AccesoService from "@/services/AccesoService";
 import { IUsuarioBase } from "@/schemas/acceso/GetUsuario";
+import MainHeader from "@/components/header/MainHeader";
 
 // Instancia estable fuera del componente
 const accesoService = new AccesoService();
@@ -42,10 +43,11 @@ function Usuarios() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="ml-65 w-[calc(100%-260px)] px-10 py-8 overflow-y-auto min-h-screen bg-slate-50">
-        <div className="page-header2">
-          <h1 className="page-title2">Usuarios</h1>
-        </div>
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+        <MainHeader
+          title="Consulta de usuarios"
+          subtitle="Gestión de usuarios"
+        />
 
         <div className="usuarios-header">
           <button

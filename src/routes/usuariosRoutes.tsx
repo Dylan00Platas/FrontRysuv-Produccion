@@ -7,7 +7,14 @@ const EditarUsuario = lazy(() => import("@/features/usuarios/EditarUsuario"));
 const Usuarios = lazy(() => import("@/features/usuarios/Usuarios"));
 
 const usuariosRoutes: RouteObject[] = [
-  { path: "/usuarios", element: <Usuarios /> },
+  {
+    path: "/usuarios",
+    element: (
+      <MainLayout>
+        <Usuarios />
+      </MainLayout>
+    ),
+  },
   {
     path: "/crear-usuario",
     element: (

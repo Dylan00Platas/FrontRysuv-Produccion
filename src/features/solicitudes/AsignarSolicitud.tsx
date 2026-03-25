@@ -15,6 +15,7 @@ import {
   IGetUsuarios,
   IUsuarioBase,
 } from "@/schemas/acceso/GetUsuario";
+import MainHeader from "@/components/header/MainHeader";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IFormData {
@@ -330,7 +331,10 @@ function AsignarSolicitud() {
       <Toast texto={toast.texto} tipo={toast.tipo} />
 
       <main className="main-content">
-        <h1 className="page-title4">Asignación de Solicitud</h1>
+        <MainHeader
+          title="Asignar solicitud"
+          subtitle="Gestión de solicitudes"
+        />
 
         <div className="contenido-asignacion-inner">
           <form className="form-grid" onSubmit={handleSubmit}>

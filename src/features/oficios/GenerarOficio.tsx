@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/useToast";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import IResponseHTTP from "@/interfaces/http/Response";
 import IDatosOficio from "@/interfaces/oficios/DatosOficio";
+import MainHeader from "@/components/header/MainHeader";
 
 interface IFormData {
   categoriaAutorizada: string;
@@ -159,9 +160,7 @@ function GenerarOficio() {
       <Toast texto={toast.texto} tipo={toast.tipo} />
 
       <main className="main-content-solicitud">
-        <div className="page-header-solicitud">
-          <h1 className="page-title-solicitud">Generar Oficio</h1>
-        </div>
+        <MainHeader title="Generar oficio" subtitle="Gestión de oficios" />
 
         <form className="form-grid" onSubmit={handleSubmit}>
           {/*  TIPO DE OFICIO */}

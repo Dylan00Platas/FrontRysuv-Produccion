@@ -36,7 +36,7 @@ export function useProcesosNoBeneficiados(): IGettingData<IGetProcesosContrataci
       }
     };
 
-    fetchDependencias();
+    fetchProcesosNoBeneficiados();
   }, []);
 
   return { data, loading, error };

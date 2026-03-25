@@ -3,7 +3,6 @@ import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
-import "./cedulas.css";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import CedulaService from "@/services/CedulaService.js";
 import ILabelValue from "@/interfaces/LabelValue";
@@ -12,6 +11,7 @@ import { useToast } from "@/hooks/useToast";
 import { useCedulas } from "@/hooks/useCedulas";
 import { useCedulasFiltradas } from "@/hooks/UseCedulasFiltradas";
 import { getUniqueOptionsLabelValue } from "@/utils/utils";
+import MainHeader from "@/components/header/MainHeader";
 
 // Utils ---------------------------------------------------------------------
 const selectStyles = {
@@ -335,17 +335,8 @@ function Cedulas() {
       {/* Toast de notificación */}
       <Toast texto={toast.texto} tipo={toast.tipo} />
 
-      <main className="ml-65 w-[calc(100%-260px)] px-10 py-8 overflow-y-auto min-h-screen bg-slate-50">
-        {/* Header */}
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1">
-            Gestión de documentos
-          </p>
-          <h1 className="text-3xl font-extrabold text-[#18529d] tracking-tight">
-            Cédulas
-          </h1>
-          <div className="mt-2 h-1 w-16 rounded-full bg-linear-to-r from-[#18529d] to-[#199532]" />
-        </div>
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+        <MainHeader title="Gestión de cédulas" subtitle="Cédulas" />
 
         <div className="flex flex-col gap-6">
           {/* Filtros */}

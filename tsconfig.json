@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    // File Layout
+    "rootDir": "./src",
+    "outDir": "./dist",
+
     // — Módulos para Vite —
     "target": "ES2021",
     "module": "ESNext",

@@ -9,6 +9,7 @@ import "./IniciarSolicitud.css";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import IPostProcesoContratacion from "@/schemas/procesos-contratacion/PostProcesoContratacion";
 import { useCookie } from "@/hooks/useCookie";
+import MainHeader from "@/components/header/MainHeader";
 
 interface ICandidato {
   nombre: string;
@@ -341,9 +342,13 @@ function IniciarSolicitud() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="main-content-solicitud">
-        <div className="page-header-solicitud">
-          <h1 className="page-title-solicitud">Iniciar Solicitud</h1>
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+        <div className="flex justify-between items-center w-full mb-[2%] gap-[2%]">
+          <MainHeader
+            title="Iniciar solicitud"
+            subtitle="Gestión de solicitudes"
+          />
+
           <select
             className="header-select-solicitud"
             value={tipoSolicitud}
