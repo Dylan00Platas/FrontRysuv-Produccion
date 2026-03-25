@@ -31,6 +31,7 @@ import {
 } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import { IGetUsuarios, IUsuarioBase } from "@/schemas/acceso/GetUsuario";
 import MainHeader from "@/components/header/MainHeader";
+import { InputField } from "@/components/input-field/InputField";
 
 // Interfaces de UI ------------------------------------------------------------
 interface ICedulaAdaptada {
@@ -812,8 +813,7 @@ function Estadisticas() {
               </div>
               <div className="filtro-busqueda mt-[2.8%]">
                 <FaSearch className="search-icon" />
-                <input
-                  type="text"
+                <InputField
                   placeholder="Buscar..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -884,8 +884,7 @@ function Estadisticas() {
               </div>
               <div className="filtro-busqueda">
                 <FaSearch className="search-icon" />
-                <input
-                  type="text"
+                <InputField
                   placeholder="Buscar..."
                   value={searchTermSolicitudes}
                   onChange={(e) => setSearchTermSolicitudes(e.target.value)}

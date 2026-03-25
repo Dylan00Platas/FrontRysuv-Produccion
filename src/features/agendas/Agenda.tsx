@@ -14,6 +14,7 @@ import IResponseHTTP from "@/interfaces/http/Response";
 import ILabelValue from "@/interfaces/LabelValue";
 import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import MainHeader from "@/components/header/MainHeader";
+import { InputField } from "@/components/input-field/InputField";
 
 // Interfaces de UI -----------------------------------------------------------
 interface IEventoAgenda {
@@ -251,7 +252,7 @@ function Agenda() {
       <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto">
         <MainHeader title="Próximos eventos" subtitle="Agenda" />
 
-        <div className="bg-white p-3.75 rounded-[10px] shadow-[0_3px_8px_rgba(0,0,0,0.1)] -mt-[3%]">
+        <div className="bg-white p-3.75 rounded-[10px] shadow-[0_3px_8px_rgba(0,0,0,0.1)] mt-[3%]">
           <FullCalendar
             plugins={[
               dayGridPlugin,
@@ -297,14 +298,9 @@ function Agenda() {
             <p className="mt-2.5 font-semibold text-[#18529d]">Candidato:</p>
             <p className="mt-1">{eventoSeleccionado.candidato}</p>
 
-            <label
-              htmlFor={`${fieldID}-date`}
-              className="mt-2.5 font-semibold text-[#18529d] block"
-            >
-              Fecha:
-            </label>
-            <input
+            <InputField
               id={`${fieldID}-date`}
+              label="Fecha:"
               type="date"
               value={String(eventoSeleccionado.fecha)}
               onChange={(e) =>
@@ -313,7 +309,6 @@ function Agenda() {
                   fecha: e.target.value,
                 })
               }
-              className="w-full px-2 py-2 mt-1.5 rounded-md border border-[#ccc] h-6.25"
             />
 
             <label
@@ -324,7 +319,6 @@ function Agenda() {
             </label>
             <Select<ILabelValue>
               inputId="agenda-estado"
-              className="modal-select" /* react-select necesita esta clase para overrides */
               classNamePrefix="react-select"
               isDisabled={
                 !ESTADOS_EDITABLES.includes(Number(eventoSeleccionado.estado))
@@ -359,8 +353,9 @@ function Agenda() {
             />
 
             <div className="flex items-center mt-3 gap-2">
-              <input
+              <InputField
                 id={`${fieldID}-atendioCita`}
+                label="No asistió"
                 type="checkbox"
                 checked={eventoSeleccionado.atendioCita}
                 onChange={(e) =>
@@ -370,7 +365,6 @@ function Agenda() {
                   })
                 }
               />
-              <label htmlFor={`${fieldID}-atendioCita`}>No asistió</label>
             </div>
 
             <div className="flex flex-col gap-0">

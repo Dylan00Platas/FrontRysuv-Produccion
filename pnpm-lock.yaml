@@ -35,6 +35,9 @@ importers:
       chartjs-plugin-datalabels:
         specifier: ^2.2.0
         version: 2.2.0(chart.js@4.5.1)
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       docx:
         specifier: ^9.6.1
         version: 9.6.1

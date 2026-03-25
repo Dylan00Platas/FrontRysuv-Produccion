@@ -5,6 +5,7 @@ import {
   useCallback,
   useMemo,
   useContext,
+  useId,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { saveAs } from "file-saver";
@@ -40,6 +41,7 @@ import {
 import { ICedulaResultados } from "@/schemas/cedulas/PostResultadoCedula";
 import { useCookie } from "@/hooks/useCookie";
 import MainHeader from "@/components/header/MainHeader";
+import { InputField } from "@/components/input-field/InputField";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IDependenciaOption {
@@ -178,6 +180,7 @@ function CrearConstancia() {
   const navigate = useNavigate();
   const { toast, mostrarToast } = useToast();
   const { currentUser, checkSession } = useCookie();
+  const fieldID = useId();
   useEffect(() => {
     checkSession();
   }, [currentUser]);
@@ -992,14 +995,11 @@ function CrearConstancia() {
               }[]
             ).map(({ label, key, withButton }) => (
               <div key={key} className="form-group">
-                <label htmlFor={key} className="form-label-evaluacion">
-                  {label}
-                </label>
                 {withButton ? (
                   <div className="input-with-button">
-                    <input
-                      id={key}
-                      type="text"
+                    <InputField
+                      id={`${fieldID}-${key}-${label}`}
+                      label={label}
                       className="form-input"
                       value={String(formData[key] ?? "")}
                       onChange={(e) =>
@@ -1018,9 +1018,9 @@ function CrearConstancia() {
                     </button>
                   </div>
                 ) : (
-                  <input
-                    id={key}
-                    type="text"
+                  <InputField
+                    id={`${fieldID}-${key}-${label}`}
+                    label={label}
                     className="form-input"
                     value={String(formData[key] ?? "")}
                     onChange={(e) =>
@@ -1082,15 +1082,9 @@ function CrearConstancia() {
             </div>
 
             <div className="form-group">
-              <label
-                htmlFor="region-constancia"
-                className="form-label-evaluacion"
-              >
-                Región
-              </label>
-              <input
-                id="region-constancia"
-                type="text"
+              <InputField
+                id={`${fieldID}-region-constancia`}
+                label="Región:"
                 className="form-input"
                 value={formData.adscripcion?.zona}
                 readOnly
@@ -1111,9 +1105,9 @@ function CrearConstancia() {
               ] as { label: string; key: keyof IFormData }[]
             ).map(({ label, key }) => (
               <div key={key} className="form-group">
-                <label className="form-label-evaluacion">{label}</label>
-                <input
-                  type="text"
+                <InputField
+                  id={`${fieldID}-${key}-${label}`}
+                  label={label}
                   className="form-input"
                   value={String(formData[key] ?? "")}
                   onChange={(e) => {
@@ -1262,12 +1256,10 @@ function CrearConstancia() {
                   Guardar
                 </button>
 
-                <label htmlFor="archivoPDF" className="styled-file-input">
-                  {nombreArchivo || "Seleccionar archivo PDF"}
-                </label>
-                <input
+                <InputField
+                  id={`${fieldID}-archivoPDF`}
+                  label={nombreArchivo || "Seleccionar archivo PDF"}
                   type="file"
-                  id="archivoPDF"
                   accept="application/pdf"
                   ref={fileInputRef}
                   className="hidden-file-input"
