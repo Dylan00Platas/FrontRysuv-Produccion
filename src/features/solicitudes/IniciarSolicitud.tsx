@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { data, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaUserLock, FaSearch } from "react-icons/fa";
 import CatalogoService from "@/services/CatalogosService";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
@@ -7,9 +7,10 @@ import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
 import "./IniciarSolicitud.css";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
-import { useCookie } from "@/hooks/useCookie";
 import MainHeader from "@/components/header/MainHeader";
-import {IPostProcesoContratacion,ISolicitudAsignacionRequisicion,ISolicitudBolsaTrabajo} from "@/schemas/procesos-contratacion/PostProcesoContratacion";
+import {ISolicitudAsignacionRequisicion,ISolicitudBolsaTrabajo} from "@/schemas/procesos-contratacion/PostProcesoContratacion";
+import IGetSesion from "@/schemas/acceso/GetSesion";
+import AuthService from "@/services/AuthService";
 
 interface ICandidato {
   nombre: string;
@@ -78,7 +79,7 @@ function IniciarSolicitud() {
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
   const { toast, mostrarToast } = useToast();
-  const { currentUser } = useCookie();
+  const [datosSesion, setDatosSesion] = useState<IGetSesion | null>(null);
 
   const [formData, setFormData] = useState<IProcesoContratacion>({
     idAcceso: 0,
@@ -147,6 +148,28 @@ function IniciarSolicitud() {
 
     cargarDependencias();
   }, []);
+
+  useEffect(() => {
+      async function ObtenerSesion() {
+        if (datosSesion === null) {
+          const AuthServicio = new AuthService();
+          const respuesta = await AuthServicio.session();
+          if (respuesta.mensaje.usuario) {
+            const DatosSesion: IGetSesion = {
+              tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
+              usuario: respuesta.mensaje.usuario,
+              idAcceso: respuesta.mensaje.idAcceso,
+              nombre: respuesta.mensaje.nombre,
+              primerApellido: respuesta.mensaje.primerApellido,
+              segundoApellido: respuesta.mensaje.segundoApellido,
+            };
+            setDatosSesion(DatosSesion);
+          }
+        }
+      }
+  
+      ObtenerSesion();
+    }, []);
 
   {
     !dependenciasCargadas && (

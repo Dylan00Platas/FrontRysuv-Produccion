@@ -446,9 +446,9 @@ function VerDetallesOficio() {
               Descargar Word
             </button>
           </div>
-        </div>
-      </div>
-    </main>
+        </form>
+      </main>
+    </>
   );
 }
 

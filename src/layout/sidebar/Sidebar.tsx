@@ -13,7 +13,7 @@ import { MdAddBox, MdAssignment } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
 import "./Sidebar.css";
-import uvBlanco from "@/assets/uvBlanco.png";
+import uvBlanco from "../../assets/uvBlanco.png";
 import { useCookie } from "@/hooks/useCookie";
 
 interface SidebarProps {
