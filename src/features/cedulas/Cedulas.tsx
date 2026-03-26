@@ -12,9 +12,10 @@ import { useCedulas } from "@/hooks/useCedulas";
 import { useCedulasFiltradas } from "@/hooks/UseCedulasFiltradas";
 import { getUniqueOptionsLabelValue } from "@/utils/utils";
 import MainHeader from "@/components/header/MainHeader";
-import { InputField } from "@/components/input-field/InputField";
+import { InputField } from "@/components/input/InputField";
 import FormSectionCard from "@/components/card/FormSectionCard";
 import { CustomButton } from "@/components/button/CustomButton";
+import { CheckboxField } from "@/components/input/CheckBoxField";
 
 // Utils ---------------------------------------------------------------------
 const selectStyles = {
@@ -430,8 +431,7 @@ function Cedulas() {
                       >
                         {showCheckboxes && (
                           <td className="px-4 py-3">
-                            <InputField
-                              type="checkbox"
+                            <CheckboxField
                               checked={selectedCedulas.includes(c.idCedula)}
                               onChange={() => toggleSelect(c.idCedula)}
                               onClick={(e) => e.stopPropagation()}
@@ -490,33 +490,30 @@ function Cedulas() {
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               {!showCheckboxes ? (
-                <button
+                <CustomButton
+                  variant="pdf"
                   onClick={() => setShowCheckboxes(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
                 >
-                  Archivar cédulas
-                </button>
+                  Archivas cédulas
+                </CustomButton>
               ) : (
                 <div className="flex items-center gap-2">
-                  <button
+                  <CustomButton
+                    variant="cancel"
                     onClick={() => {
                       setShowCheckboxes(false);
                       setSelectedCedulas([]);
                     }}
-                    className="px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all shadow-sm"
                   >
                     Cancelar
-                  </button>
+                  </CustomButton>
                   {selectedCedulas.length > 0 && (
-                    <button
-                      onClick={archivarCedulas}
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-amber-500 to-orange-500 rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm"
-                    >
+                    <CustomButton variant="save" onClick={archivarCedulas}>
                       Archivar{" "}
                       <span className="bg-white/20 px-1.5 py-0.5 rounded-md text-xs">
                         {selectedCedulas.length}
                       </span>
-                    </button>
+                    </CustomButton>
                   )}
                 </div>
               )}

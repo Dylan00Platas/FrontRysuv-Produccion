@@ -37,12 +37,15 @@ import {
 import { ICedulaResultados } from "@/schemas/cedulas/PostResultadoCedula";
 import { useCookie } from "@/hooks/useCookie";
 import MainHeader from "@/components/header/MainHeader";
-import { InputField } from "@/components/input-field/InputField";
+import { InputField } from "@/components/input/InputField";
 import {
   ButtonShowModalHelp,
   ModalHelp,
 } from "@/components/Alert/Floating/ModalHelp";
 import FormSectionCard from "@/components/card/FormSectionCard";
+import { SelectField } from "@/components/input/SelectField";
+import { TextAreaField } from "@/components/input/TextareaField";
+import { CustomButton } from "@/components/button/CustomButton";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IDependenciaOption {
@@ -983,31 +986,21 @@ function CrearConstancia() {
                 }
               />
             ))}
-            <div>
-              <label
-                htmlFor="constancia-temporalidad"
-                className="form-label-evaluacion"
-              >
-                Temporalidad
-              </label>
-              <select
-                id="constancia-temporalidad"
-                className="form-input"
-                value={formData.temporalidad}
-                onChange={(e) =>
-                  handleInputChange(
-                    "temporalidad",
-                    e.target.value as IFormData["temporalidad"],
-                  )
-                }
-              >
-                <option value="" disabled hidden>
-                  Seleccionar
-                </option>
-                <option value="1">Temporal</option>
-                <option value="2">Definitiva</option>
-              </select>
-            </div>
+            <SelectField
+              label="Temporalidad:"
+              options={[
+                { value: 1, label: "Temporal" },
+                { value: 2, label: "Definitiva" },
+              ]}
+              value={formData.temporalidad}
+              onChange={(e) =>
+                handleInputChange(
+                  "temporalidad",
+                  e as IFormData["temporalidad"],
+                )
+              }
+            />
+
             <div>
               <label
                 htmlFor="constancia-adscripcion"
@@ -1086,9 +1079,8 @@ function CrearConstancia() {
                     { label: "Efectos de contratación", key: "efectos" },
                   ] as { label: string; key: keyof IFormData }[]
                 ).map(({ label, key }) => (
-                  <InputField
+                  <TextAreaField
                     label={label}
-                    as="textarea"
                     key={key}
                     value={String(formData[key] ?? "")}
                     onChange={(e) =>
@@ -1100,25 +1092,19 @@ function CrearConstancia() {
                   />
                 ))}
 
-                <div className="form-group">
-                  <h3 className="section-title">Resultado Final</h3>
-                  <select
-                    className="resultado-form-input"
-                    value={formData.resultadoFinal}
-                    onChange={(e) =>
-                      handleInputChange("resultadoFinal", e.target.value)
-                    }
-                  >
-                    <option value="" disabled>
-                      Seleccionar
-                    </option>
-                    <option value="Recomendable">Recomendable</option>
-                    <option value="Recomendable con observaciones">
-                      Recomendable con observaciones
-                    </option>
-                    <option value="No recomendable">No recomendable</option>
-                  </select>
-                </div>
+                <SelectField
+                  label="Resultado final:"
+                  options={[
+                    { value: "Recomendable", label: "Recomendable" },
+                    {
+                      value: "Recomendable con observaciones",
+                      label: "Recomendable con observaciones",
+                    },
+                    { value: "No recomendable", label: "No recomendable" },
+                  ]}
+                  value={formData.resultadoFinal}
+                  onChange={(e) => handleInputChange("resultadoFinal", e)}
+                />
 
                 <h3 className="section-title">
                   Resultados cualitativos del sistema de evaluación
@@ -1142,60 +1128,50 @@ function CrearConstancia() {
                   />
                 ))}
 
-                <div className="charts-container">
-                  <div ref={chartGaugeRef} className="chart-box" />
+                <div className="flex justify-center items-center gap-10 mt-5 flex-wrap">
+                  <div ref={chartGaugeRef} className="w-100 h-75" />
                 </div>
-                <div className="charts-container">
-                  <div ref={chartRadarRef} className="chart-box" />
+                <div className="flex justify-center items-center gap-10 mt-5 flex-wrap">
+                  <div ref={chartRadarRef} className="w-100 h-75" />
                 </div>
 
-                <div className="action-buttons">
-                  <button
-                    type="button"
-                    className="btn-graficas"
-                    onClick={handleCrearGraficas}
-                  >
-                    Crear Gráficas
-                  </button>
-                  <button type="submit" className="btn-guardar">
+                <div className="col-[span_3] flex justify-start mt-5">
+                  <CustomButton onClick={handleCrearGraficas}>
+                    Crear gráficas
+                  </CustomButton>
+                  <CustomButton type="submit" variant="save">
                     Guardar
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-generar"
-                    onClick={handleGenerarPDF}
-                  >
+                  </CustomButton>
+                  <CustomButton variant="pdf" onClick={handleGenerarPDF}>
                     Generar PDF
-                  </button>
+                  </CustomButton>
                 </div>
 
-                <div className="floating-approval-buttons">
-                  <button
-                    type="button"
+                <div className="fixed top-24 right-5 flex flex-col gap-3 z-50">
+                  <CustomButton
                     className={`btn-aprobacion ${aprobadoJefeOficina ? "activo" : ""}`}
                     onClick={() => setAprobadoJefeOficina((v) => !v)}
                     disabled={currentUser?.idAcceso !== 1}
                   >
-                    🧾 Jefe de Oficina
-                  </button>
-                  <button
-                    type="button"
+                    Jefe de Oficina
+                  </CustomButton>
+                  <CustomButton
                     className={`btn-aprobacion ${aprobadoDireccion ? "activo" : ""}`}
                     onClick={() => setAprobadoDireccion((v) => !v)}
                     disabled={currentUser?.idAcceso !== 4}
                   >
-                    🗂️ Jefe de Departamento
-                  </button>
+                    Jefe de Departamento
+                  </CustomButton>
                 </div>
               </>
             )}
 
             {/* Tipo 2: Cédula externa */}
             {tipoProceso === 2 && (
-              <div className="action-buttons">
-                <button type="submit" className="btn-guardar">
+              <div className="col-[span_3] flex justify-start mt-5">
+                <CustomButton variant="save" type="submit">
                   Guardar
-                </button>
+                </CustomButton>
 
                 <InputField
                   id={`${fieldID}-archivoPDF`}
@@ -1216,21 +1192,21 @@ function CrearConstancia() {
                 />
 
                 {archivoUrl && (
-                  <div className="pdf-preview-container">
+                  <div className="bg-[#f7f7f7] border border-solid border-[#ccc] rounded-[10px] p-4 mb-6 text-center">
                     <h3>📄 Documento adjunto: {archivoNombre}</h3>
-                    <button
-                      type="button"
-                      className="btn-visualizar"
+                    <CustomButton
                       onClick={() => window.open(archivoUrl, "_blank")}
                     >
                       Ver PDF
-                    </button>
+                    </CustomButton>
                   </div>
                 )}
 
                 {isDragging && (
-                  <div className="drop-overlay">
-                    <div className="drop-message">📂 Suelta aquí</div>
+                  <div className="fixed top-0 left-0 w-full h-full bg-[rgba(30,144,255,0.2)] backdrop-filter backdrop-blur-sm flex justify-center items-center animate-[fadeIn_0.3s_ease]">
+                    <div className="text-[2rem] font-bold text-[#0056b3] bg-[white] border-[3px] border-dashed border-[#007bff] px-16 py-8 rounded-[20px] animate-[bounce_1s_infinite_alternate]">
+                      📂 Suelta aquí
+                    </div>
                   </div>
                 )}
               </div>
@@ -1245,20 +1221,18 @@ function CrearConstancia() {
 
           {/* Visor de PDF */}
           {pdfVisible && archivoBase64 && (
-            <div className="pdf-viewer-container">
-              <div className="pdf-viewer-header">
+            <div className="mt-7.5 rounded-xl bg-[linear-gradient(145deg,#f9faff,#ffffff)] [box-shadow:0_6px_18px_rgba(0,0,0,0.12)] overflow-hidden [transition:all_0.3s_ease] animate-[fadeIn_0.4s_ease-in-out] w-full max-w-full">
+              <div className="flex justify-between items-center bg-[#18529d] px-4.5 py-2.5 text-[15px] font-semibold rounded-tl-xl rounded-tr-xl">
                 <div className="pdf-viewer-title">
                   <span>📄 {nombreArchivo}</span>
                 </div>
-                <button
-                  type="button"
+                <CustomButton
                   onClick={() => {
                     const link = document.createElement("a");
                     link.href = `data:application/pdf;base64,${archivoBase64}`;
                     link.download = nombreArchivo || "Documento.pdf";
                     link.click();
                   }}
-                  className="bg-[rgba(255,255,255,0.15)] border-0 rounded-md text-white py-1.5 px-3.5 cursor-pointer"
                   onMouseEnter={(e) =>
                     ((
                       e.currentTarget as HTMLButtonElement
@@ -1271,12 +1245,13 @@ function CrearConstancia() {
                   }
                 >
                   Descargar
-                </button>
+                </CustomButton>
               </div>
-              <div className="pdf-viewer-frame">
+              <div className="w-full h-200 border-none bg-[#fafafa] justify-between">
                 <iframe
                   src={`data:application/pdf;base64,${archivoBase64}`}
                   title="Vista previa del PDF"
+                  className="w-full h-full border-none rounded-bl-xl rounded-br-xl"
                 />
               </div>
             </div>

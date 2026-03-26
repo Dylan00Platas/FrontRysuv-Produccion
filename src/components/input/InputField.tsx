@@ -24,9 +24,6 @@ export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElem
     | "month"
     | "week"
     | string;
-  // Props para textarea
-  as?: "input" | "textarea";
-  rows?: number;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -40,37 +37,21 @@ export const InputField: React.FC<InputFieldProps> = ({
   searchButtonTitle = "Buscar",
   searchButtonClassName,
   type = "text",
-  // Props para textarea
-  as = "input",
-  rows = 3,
   ...props
 }) => {
   const inputElement = (
     <div className="relative">
-      {as === "textarea" ? (
-        <textarea
-          id={id}
-          rows={rows}
-          {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
-          className={clsx(
-            "w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-300 transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300 resize-y",
-            showSearchButton && "pr-12",
-            className,
-          )}
-        />
-      ) : (
-        <input
-          id={id}
-          type={type}
-          {...props}
-          className={clsx(
-            "w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-300 transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300",
-            showSearchButton && "pr-12",
-            className,
-          )}
-        />
-      )}
-      {showSearchButton && onSearch && as === "input" && (
+      <input
+        id={id}
+        type={type}
+        {...props}
+        className={clsx(
+          "w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-300 transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300",
+          showSearchButton && "pr-12",
+          className,
+        )}
+      />
+      {showSearchButton && onSearch && (
         <button
           type="button"
           onClick={onSearch}

@@ -1,7 +1,6 @@
 import { useEffect, useState, useId } from "react";
 import { useLocation } from "react-router-dom";
-import { FaSave, FaSearch } from "react-icons/fa";
-import { FiHelpCircle } from "react-icons/fi";
+import { FaSave } from "react-icons/fa";
 import { saveAs } from "file-saver";
 import {
   PDFDocument,
@@ -29,13 +28,14 @@ import { useCedulaTipos } from "@/hooks/useCedulaTipos";
 import { getNombreCompetenciaKey } from "@/utils/Constants";
 import ManageFiles from "@/utils/ManageFiles";
 import MainHeader from "@/components/header/MainHeader";
-import { InputField } from "@/components/input-field/InputField";
+import { InputField } from "@/components/input/InputField";
 import {
   ButtonShowModalHelp,
   ModalHelp,
 } from "@/components/Alert/Floating/ModalHelp";
 import FormSectionCard from "@/components/card/FormSectionCard";
 import { CustomButton } from "@/components/button/CustomButton";
+import { TextAreaField } from "@/components/input/TextareaField";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IPostCedulaInternaForm {
@@ -945,28 +945,23 @@ function CrearCedulaInterna() {
                           }
                         >
                           <td className="px-4 py-3 text-slate-700 font-medium">
-                            {item.nombreCompetencia}
-                          </td>
-                          <td className="px-4 py-3 text-slate-600">
                             {item.idCompetencia}
                           </td>
+                          <td className="px-4 py-3 text-slate-600">
+                            {item.nombreCompetencia}
+                          </td>
                           <td className="px-4 py-3">
-                            {inputKeys.map((key) => (
-                              <InputField
-                                key={key}
-                                className="w-2/5 px-2 py-1 text-center text-sm border border-slate-200 rounded-md bg-transparent transition-all duration-150 focus:outline-none focus:border-[#18529d] focus:bg-white focus:ring-1 focus:ring-[#18529d]/20"
-                                value={formData[key] ?? ""}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    key,
-                                    (typeof formData[key] === "number"
-                                      ? Number(e.target.value)
-                                      : e.target
-                                          .value) as IPostCedulaInternaForm[typeof key],
-                                  )
-                                }
-                              />
-                            ))}
+                            <InputField
+                              value={formData[inputKeys[i]] ?? ""}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  inputKeys[i],
+                                  typeof formData[inputKeys[i]] === "number"
+                                    ? Number(e.target.value)
+                                    : e.target.value,
+                                )
+                              }
+                            />
                           </td>
                         </tr>
                       ))
@@ -1046,9 +1041,8 @@ function CrearCedulaInterna() {
                     { label: "Resultados", key: "resultados" },
                   ] as { label: string; key: keyof IPostCedulaInternaForm }[]
                 ).map(({ label, key }) => (
-                  <InputField
+                  <TextAreaField
                     id={`${fieldID}-${key}`}
-                    as="textarea"
                     key={key}
                     label={label}
                     value={(formData[key] as string) ?? ""}

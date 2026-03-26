@@ -14,7 +14,10 @@ import IResponseHTTP from "@/interfaces/http/Response";
 import ILabelValue from "@/interfaces/LabelValue";
 import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import MainHeader from "@/components/header/MainHeader";
-import { InputField } from "@/components/input-field/InputField";
+import { InputField } from "@/components/input/InputField";
+import { CheckboxField } from "@/components/input/CheckBoxField";
+import { CustomButton } from "@/components/button/CustomButton";
+import { FaSave } from "react-icons/fa";
 
 // Interfaces de UI -----------------------------------------------------------
 interface IEventoAgenda {
@@ -353,33 +356,34 @@ function Agenda() {
             />
 
             <div className="flex items-center mt-3 gap-2">
-              <InputField
+              <CheckboxField
                 id={`${fieldID}-atendioCita`}
                 label="No asistió"
-                type="checkbox"
                 checked={eventoSeleccionado.atendioCita}
                 onChange={(e) =>
                   setEventoSeleccionado({
                     ...eventoSeleccionado,
-                    atendioCita: e.target.checked,
+                    atendioCita: e,
                   })
                 }
               />
             </div>
 
             <div className="flex flex-col gap-0">
-              <button
+              <CustomButton
+                variant="save"
+                icon={<FaSave />}
                 onClick={handleGuardarCambios}
-                className="mt-6.25 w-full py-2.5 bg-[#199532] text-white border-none rounded-md cursor-pointer hover:bg-[#157929] transition-colors duration-200"
               >
                 Guardar
-              </button>
-              <button
+              </CustomButton>
+              <CustomButton
+                variant="cancel"
+                icon={<FaSave />}
                 onClick={() => setModalAbierto(false)}
-                className="mt-6.25 w-full py-2.5 bg-[#18529d] text-white border-none rounded-md cursor-pointer hover:bg-[#0f3d75] transition-colors duration-200"
               >
                 Cerrar
-              </button>
+              </CustomButton>
             </div>
           </div>
         </div>

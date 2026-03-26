@@ -31,7 +31,7 @@ import {
 } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import { IGetUsuarios, IUsuarioBase } from "@/schemas/acceso/GetUsuario";
 import MainHeader from "@/components/header/MainHeader";
-import { InputField } from "@/components/input-field/InputField";
+import { InputField } from "@/components/input/InputField";
 
 // Interfaces de UI ------------------------------------------------------------
 interface ICedulaAdaptada {

@@ -9,7 +9,7 @@ import "./IniciarSolicitud.css";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import { useCookie } from "@/hooks/useCookie";
 import MainHeader from "@/components/header/MainHeader";
-import { InputField } from "@/components/input-field/InputField";
+import { InputField } from "@/components/input/InputField";
 import FormSectionCard from "@/components/card/FormSectionCard";
 
 interface ICandidato {

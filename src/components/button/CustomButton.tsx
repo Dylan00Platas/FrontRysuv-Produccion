@@ -42,7 +42,7 @@ const sizeStyles = {
 };
 
 export const CustomButton: React.FC<CustomButtonProps> = ({
-  variant = "submit",
+  variant = "save",
   children,
   icon,
   fullWidth = false,
