@@ -1,28 +1,37 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AccesoService from "@/services/AccesoService";
-import { IUsuarioBase } from "@/schemas/acceso/GetUsuario";
+
+import "./Usuarios.css";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
-import "./Usuarios.css";
+import AccesoService from "@/services/AccesoService";
+import { IUsuarioBase } from "@/schemas/acceso/GetUsuario";
+import MainHeader from "@/components/header/MainHeader";
+
+// Instancia estable fuera del componente
+const accesoService = new AccesoService();
 
 function Usuarios() {
   const navigate = useNavigate();
   const { toast, mostrarToast } = useToast();
-  const [usuarios, setUsuarios] = useState<IUsuarioBase[]>();
+
+  const [usuariosActivos, setUsuariosActivos] = useState<IUsuarioBase[]>([]);
   const [cargando, setCargando] = useState(true);
+  const [hayError, setHayError] = useState(false);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
+      setHayError(false);
       try {
-        const data = await new AccesoService().getUsuarios();
-        const usuariosActivos = data.mensaje.usuarios.filter(
+        const data = await accesoService.getUsuarios();
+        const activos = data.mensaje.usuarios.filter(
           (usuario: IUsuarioBase) => usuario.estado === 1,
         );
-        setUsuarios(usuariosActivos);
+        setUsuariosActivos(activos);
       } catch (err) {
-        console.error("Usuarios.tsx - Error al obtener usuarios: " + err);
+        console.error("Usuarios.tsx - Error al obtener usuarios:", err);
         mostrarToast("Error al obtener usuarios", "error");
+        setHayError(true);
       } finally {
         setCargando(false);
       }
@@ -31,40 +40,48 @@ function Usuarios() {
     fetchUsuarios();
   }, []);
 
-  const handleCrearUsuario = () => {
-    navigate("/crear-usuario");
-  };
-
-  const handleEditarUsuario = (usuario: IUsuarioBase) => {
-    navigate("/editar-usuario", { state: { usuario } });
-  };
-
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="main-content">
-        <div className="page-header2">
-          <h1 className="page-title2">Usuarios</h1>
-        </div>
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+        <MainHeader
+          title="Consulta de usuarios"
+          subtitle="Gestión de usuarios"
+        />
 
         <div className="usuarios-header">
-          <button className="btn-crearUsuario" onClick={handleCrearUsuario}>
+          <button
+            className="btn-crearUsuario"
+            onClick={() => navigate("/crear-usuario")}
+          >
             Crear Usuario
           </button>
         </div>
 
         {cargando && <p>Cargando usuarios...</p>}
-        {!cargando && !(toast.tipo !== "error") && (
-          <ul className="usuarios-list">
-            {usuarios?.map((user) => (
-              <li key={user.idAcceso} onClick={() => handleEditarUsuario(user)}>
-                <span>
-                  {user.nombre} {user.primerApellido}{" "}
-                  {user.segundoApellido ?? ""}
-                </span>
-              </li>
-            ))}
-          </ul>
+
+        {!cargando && !hayError && (
+          <>
+            {usuariosActivos.length === 0 ? (
+              <p>No hay usuarios activos.</p>
+            ) : (
+              <ul className="usuarios-list">
+                {usuariosActivos.map((user) => (
+                  <li
+                    key={user.idAcceso}
+                    onClick={() =>
+                      navigate("/editar-usuario", { state: { usuario: user } })
+                    }
+                  >
+                    <span>
+                      {user.nombre} {user.primerApellido}{" "}
+                      {user.segundoApellido ?? ""}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
         )}
       </main>
     </>

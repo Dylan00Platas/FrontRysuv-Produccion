@@ -13,6 +13,7 @@ import IGetSesion from "@/schemas/acceso/GetSesion";
 import AuthService from "@/services/AuthService";
 import IPostControlVersion from "@/schemas/control-versiones/PostControlVersion";
 import { Toast } from "@/components/Alert/Floating/Toast";
+import MainHeader from "@/components/header/MainHeader";
 
 const mapTipoProceso = {
   1: "asignacion",
@@ -527,9 +528,12 @@ function Evaluacion() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="main-content-evaluacion">
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
         <div className="page-header-evaluacion">
-          <h1 className="page-title-evaluacion">Evaluación</h1>
+          <MainHeader
+            title="Iniciar solicitud"
+            subtitle="Gestión de procesos"
+          />
           <div className="combobox-header-evaluacion">
             <label className="label-opcion-evaluacion">
               {formData.tipoAsignacion === "asignacion"

@@ -30,6 +30,8 @@ import {
   IProcesoContratacionBase,
 } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import { IGetUsuarios, IUsuarioBase } from "@/schemas/acceso/GetUsuario";
+import MainHeader from "@/components/header/MainHeader";
+import { InputField } from "@/components/input-field/InputField";
 
 // Interfaces de UI ------------------------------------------------------------
 interface ICedulaAdaptada {
@@ -501,10 +503,8 @@ function Estadisticas() {
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
 
-      <main className="main-content-estadisticas">
-        <div className="page-header">
-          <h1 className="page-title-estadisticas">Estadísticas</h1>
-        </div>
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+        <MainHeader title="Datos de procesos" subtitle="Estadísticas" />
 
         {/* Selector de gráfica */}
         <div className="w-125 mb-5 mx-auto border-[1.5px] border-[#18529]">
@@ -809,8 +809,7 @@ function Estadisticas() {
               </div>
               <div className="filtro-busqueda mt-[2.8%]">
                 <FaSearch className="search-icon" />
-                <input
-                  type="text"
+                <InputField
                   placeholder="Buscar..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -881,8 +880,7 @@ function Estadisticas() {
               </div>
               <div className="filtro-busqueda">
                 <FaSearch className="search-icon" />
-                <input
-                  type="text"
+                <InputField
                   placeholder="Buscar..."
                   value={searchTermSolicitudes}
                   onChange={(e) => setSearchTermSolicitudes(e.target.value)}

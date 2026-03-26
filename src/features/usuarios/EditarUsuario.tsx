@@ -6,6 +6,7 @@ import { Toast } from "@/components/Alert/Floating/Toast";
 import type IPutUsuario from "@/schemas/acceso/PutUser";
 import "./CrearUsuario.css";
 import { useToast } from "@/hooks/useToast";
+import MainHeader from "@/components/header/MainHeader";
 
 function EditarUsuario() {
   const navigate = useNavigate();
@@ -91,8 +92,8 @@ function EditarUsuario() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="main-content-evaluacion">
-        <h1 className="page-title3">Editar Usuario</h1>
+      <main className="ml-65 w-[calc(100%-260px)] px-10 py-8 overflow-y-auto min-h-screen bg-slate-50">
+        <MainHeader title="Editar usuario" subtitle="Gestión de usuarios" />
 
         <form className="form-grid" onSubmit={handleSubmit}>
           <div className="form-group">

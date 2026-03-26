@@ -6,6 +6,7 @@ import "./NoBeneficiados.css";
 import { useDependencias } from "@/hooks/useDependencias";
 import { useProcesosNoBeneficiados } from "@/hooks/useProcesosNoBeneficiados";
 import ILabelValue from "@/interfaces/LabelValue";
+import MainHeader from "@/components/header/MainHeader";
 
 // Interfaces de UI ---------------------------------------------------------
 interface ICargaDatos {
@@ -94,7 +95,6 @@ function NoBeneficiados() {
   );
 
   // Aplicación de filtrado -----------------------------------------------------
-  // MEJORA: useMemo para no re-filtrar en cada render.
   const candidatosFiltrados = useMemo<ICargaDatos[]>(
     () =>
       candidatos.filter(
@@ -117,21 +117,12 @@ function NoBeneficiados() {
     );
   }
 
-  if (errorProcesos) {
-    return (
-      <main className="main-content">
-        <p className="estado-mensaje estado-error">
-          Error al cargar los datos. Intente más tarde.
-        </p>
-      </main>
-    );
-  }
-
   return (
-    <main className="main-content">
-      <div className="page-header2">
-        <h1 className="page-title2">No beneficiados</h1>
-      </div>
+    <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+      <MainHeader
+        title="Candidatos no beneficiados"
+        subtitle="Gestión de candidatos"
+      />
 
       <div className="contenido-candidatos-inner">
         {/* Filtros */}

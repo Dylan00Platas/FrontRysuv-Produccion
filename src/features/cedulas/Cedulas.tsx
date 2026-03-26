@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
-import "./cedulas.css";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import CedulaService from "@/services/CedulaService.js";
 import ILabelValue from "@/interfaces/LabelValue";
@@ -12,6 +11,8 @@ import { useToast } from "@/hooks/useToast";
 import { useCedulas } from "@/hooks/useCedulas";
 import { useCedulasFiltradas } from "@/hooks/UseCedulasFiltradas";
 import { getUniqueOptionsLabelValue } from "@/utils/utils";
+import MainHeader from "@/components/header/MainHeader";
+import { InputField } from "@/components/input-field/InputField";
 
 // Utils ---------------------------------------------------------------------
 const selectStyles = {
@@ -206,6 +207,7 @@ const CEDULA_OPTIONS: ILabelValue[] = [
 function Cedulas() {
   const navigate = useNavigate();
   const { toast, mostrarToast } = useToast();
+  const fieldID = useId();
   // Obtencion de cedulas -----------------------------------------------------
   const {
     data: cedulasData,
@@ -335,60 +337,48 @@ function Cedulas() {
       {/* Toast de notificación */}
       <Toast texto={toast.texto} tipo={toast.tipo} />
 
-      <main className="ml-65 w-[calc(100%-260px)] px-10 py-8 overflow-y-auto min-h-screen bg-slate-50">
-        {/* Header */}
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1">
-            Gestión de documentos
-          </p>
-          <h1 className="text-3xl font-extrabold text-[#18529d] tracking-tight">
-            Cédulas
-          </h1>
-          <div className="mt-2 h-1 w-16 rounded-full bg-linear-to-r from-[#18529d] to-[#199532]" />
-        </div>
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+        <MainHeader title="Consulta de cédulas" subtitle="Gestión de cédulas" />
 
         <div className="flex flex-col gap-6">
           {/* Filtros */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 px-6 py-4">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex gap-3 flex-1 flex-wrap">
-                <div className="min-w-44 flex-1">
-                  <Select<ILabelValue>
-                    classNamePrefix="rs"
-                    options={CEDULA_OPTIONS}
-                    value={cedulaFiltro}
-                    onChange={setCedulaFiltro}
-                    isClearable
-                    placeholder="Tipo de cédula"
-                    styles={selectStyles}
-                  />
-                </div>
-                <div className="min-w-52 flex-1">
-                  <Select<ILabelValue>
-                    classNamePrefix="rs"
-                    options={dependenciasUnicas}
-                    value={dependenciaFiltro}
-                    onChange={setDependenciaFiltro}
-                    isClearable
-                    placeholder="Dependencia"
-                    styles={selectStyles}
-                  />
-                </div>
-              </div>
-
-              <div className="relative min-w-56 flex-1 max-w-72">
-                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Buscar folio, candidato..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#18529d]/30 focus:border-[#18529d] transition-all placeholder:text-slate-400"
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="w-full sm:w-auto sm:flex-1">
+                <Select<ILabelValue>
+                  classNamePrefix="rs"
+                  options={CEDULA_OPTIONS}
+                  value={cedulaFiltro}
+                  onChange={setCedulaFiltro}
+                  isClearable
+                  placeholder="Tipo de cédula"
+                  styles={selectStyles}
                 />
               </div>
+              <div className="w-full sm:w-auto sm:flex-1">
+                <Select<ILabelValue>
+                  classNamePrefix="rs"
+                  options={dependenciasUnicas}
+                  value={dependenciaFiltro}
+                  onChange={setDependenciaFiltro}
+                  isClearable
+                  placeholder="Dependencia"
+                  styles={selectStyles}
+                />
+              </div>
+              <InputField
+                id={`${fieldID}-searchTerm`}
+                placeholder="Buscar folio, candidato..."
+                autoComplete="on"
+                name="searchTerm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                showSearchButton={true}
+                onSearch={cedulasFiltradas}
+                searchButtonTitle="Buscar por palabra clave"
+              />
             </div>
           </div>
-
           {/* Tabla */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             {cedulasLoading ? (
@@ -438,12 +428,11 @@ function Cedulas() {
                       >
                         {showCheckboxes && (
                           <td className="px-4 py-3">
-                            <input
+                            <InputField
                               type="checkbox"
                               checked={selectedCedulas.includes(c.idCedula)}
                               onChange={() => toggleSelect(c.idCedula)}
                               onClick={(e) => e.stopPropagation()}
-                              className="w-4 h-4 rounded border-slate-300 text-[#18529d] cursor-pointer accent-[#18529d]"
                             />
                           </td>
                         )}
@@ -495,7 +484,6 @@ function Cedulas() {
               </div>
             )}
           </div>
-
           {/* Controles */}
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>

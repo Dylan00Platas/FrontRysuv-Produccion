@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 import "./CandidatoNoBeneficiado.css";
 import { Toast } from "@/components/Alert/Floating/Toast";
+import MainHeader from "@/components/header/MainHeader";
 
 // Interfaces de UI ---------------------------------------------------------
 interface ICandidatoNoBeneficiado {
@@ -41,9 +42,7 @@ function CandidatoNoBeneficiado() {
   return (
     <>
       <main className="main-content">
-        <div className="page-header2">
-          <h1 className="page-title2">Candidato No Beneficiado</h1>
-        </div>
+        <MainHeader title="Candidatos" subtitle="Gestión de candidatos" />
 
         <div className="contenido-cedula-inner">
           {/* Sin onSubmit: formulario de solo lectura, no envía datos */}

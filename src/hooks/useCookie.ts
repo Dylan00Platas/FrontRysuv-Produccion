@@ -1,5 +1,4 @@
 import IResponseHTTP from "@/interfaces/http/Response";
-import IGetSesion from "@/schemas/acceso/GetSesion";
 import AuthService from "@/services/AuthService";
 import { useCallback, useEffect, useState } from "react";
 
@@ -22,30 +21,59 @@ interface ILogin {
   usuario: string;
   contrasenia: string;
 }
-type ICurrentUser = IGetSesion;
-const authService = new AuthService();
+interface ICurrentUser {
+  tipoDeAcceso: number;
+  usuario: string;
+  idAcceso: number;
+  nombre: string;
+  primerApellido: string;
+  segundoApellido: string;
+}
 export function useCookie() {
   const [currentUser, setCurrentUser] = useState<ICurrentUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // sesión global
+  const [isLoadingLogin, setIsLoadingLogin] = useState(false); // solo en el form login
   const [error, setError] = useState<string | null>(null);
 
-  // Verificar sesión activa (al montar o recargar) -------------------------------
+  // Login ---------------------------------------------------------------------
+  const login = useCallback(async (loginData: ILogin) => {
+    setIsLoadingLogin(true);
+    setError(null);
+    setCurrentUser(null);
 
+    try {
+      const responseLogin: IResponseHTTP<string> =
+        await new AuthService().login(loginData);
+
+      if (responseLogin.estado >= 500) {
+        throw new Error("Error interno del servidor.");
+      } else if (responseLogin.estado === 401) {
+        throw new Error("Sesión expirada.");
+      } else if (responseLogin.estado >= 400) {
+        throw new Error("Datos incorrectos del cliente.");
+      }
+
+      await checkSession();
+    } catch (err) {
+      console.error(
+        `useCookie.ts - Error al obtener cookie de usuario \n ${err}`,
+      );
+      setError(err instanceof Error ? err.message : "Error al iniciar sesión.");
+      setCurrentUser(null);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Verificar sesión activa (al montar o recargar) -------------------------------
   const checkSession = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-
-    const API_URL = import.meta.env.VITE_API_ACCESO_URL;
     try {
       const response: IResponseHTTP<ICurrentUser> =
         await new AuthService().session();
-
-      if (response.error == false) {
-        setCurrentUser(response.mensaje);
-      } else {
-        // 401 / 403
-        setCurrentUser(null);
-      }
+      setCurrentUser(response.error === false ? response.mensaje : null);
     } catch {
       setError("Error de conexión al verificar la sesión.");
       setCurrentUser(null);
@@ -55,50 +83,14 @@ export function useCookie() {
   }, []);
 
   useEffect(() => {
-    void checkSession();
+    checkSession();
   }, [checkSession]);
 
-  const login = useCallback(async (loginData: ILogin) => {
-    setIsLoading(true);
-    setError(null);
-
-    const API_URL = import.meta.env.VITE_API_ACCESO_URL;
-
-    try {
-      const response: IResponseHTTP<string> = await new AuthService().login(
-        loginData,
-      );
-
-      if (response.estado >= 500) {
-        throw new Error("Error interno del servidor.");
-      } else if (response.estado === 401) {
-        throw new Error("Sesión expirada.");
-      } else if (response.estado >= 400) {
-        throw new Error("Datos incorrectos del cliente.");
-      }
-      const responseData: IResponseHTTP<ICurrentUser> =
-        await new AuthService().session();
-      if (responseData.mensaje) {
-        setCurrentUser(responseData.mensaje);
-      }
-    } catch (err) {
-      console.error(
-        `useCookie.ts - Error al obtener cookie de usuario \n ${err}`,
-      );
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión.");
-      setCurrentUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   // Logout --------------------------------------------------------------------
-
   const logout = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
-    const API_URL = import.meta.env.VITE_API_ACCESO_URL;
     try {
       await new AuthService().logout();
     } catch {
@@ -109,5 +101,13 @@ export function useCookie() {
     }
   }, []);
 
-  return { currentUser, isLoading, error, login, logout, checkSession };
+  return {
+    currentUser,
+    isLoading,
+    isLoadingLogin,
+    error,
+    login,
+    logout,
+    checkSession,
+  };
 }

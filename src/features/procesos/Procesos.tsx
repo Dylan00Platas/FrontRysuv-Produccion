@@ -6,6 +6,7 @@ import AccesoService from "@/services/AccesoService";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import "./Procesos.css";
+import MainHeader from "@/components/header/MainHeader";
 
 interface IAnalista {
   idAcceso: number;
@@ -211,44 +212,48 @@ function Procesos() {
 
   return (
     <>
-      <main className="main-content">
-        <div className="page-header2">
-          <h1 className="page-title2">Evaluaciones</h1>
-        </div>
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+        <MainHeader title="Evaluaciones" subtitle="Gestión de procesos" />
 
         <div className="main-content-inner">
-          <div className="filtros-combobox">
-            <div>
-              <label>Estado</label>
-              <Select
-                options={estadoOptions}
-                value={estadoFiltro}
-                onChange={(value) => setEstadoFiltro(value)}
-                isClearable={false}
-                placeholder="Estados"
-              />
-            </div>
+          <div className="flex flex-col gap-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 px-6 py-4">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex gap-3 flex-1 flex-wrap">
+                  <div className="min-w-44 flex-1">
+                    <label>Estado</label>
+                    <Select
+                      options={estadoOptions}
+                      value={estadoFiltro}
+                      onChange={(value) => setEstadoFiltro(value)}
+                      isClearable={false}
+                      placeholder="Estados"
+                    />
+                  </div>
 
-            <div>
-              <label>Analista</label>
-              <Select
-                options={analistaOptions}
-                value={analistaFiltro}
-                onChange={(value) => setAnalistaFiltro(value)}
-                isClearable={false}
-                placeholder="Analistas"
-              />
-            </div>
+                  <div className="min-w-44 flex-1">
+                    <label>Analista</label>
+                    <Select
+                      options={analistaOptions}
+                      value={analistaFiltro}
+                      onChange={(value) => setAnalistaFiltro(value)}
+                      isClearable={false}
+                      placeholder="Analistas"
+                    />
+                  </div>
+                </div>
 
-            <div className="filtro-busqueda">
-              <div className="search-input-container">
-                <FaSearch className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <div className="min-w-44 flex-1">
+                  <div className="search-input-container">
+                    <FaSearch className="search-icon" />
+                    <input
+                      type="text"
+                      placeholder="Buscar..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

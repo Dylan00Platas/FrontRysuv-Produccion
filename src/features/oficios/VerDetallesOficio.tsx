@@ -5,6 +5,7 @@ import { PDFDocument, PDFFont, PDFPage } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit"
 import {PDFTextField} from "pdf-lib"
 import ManageFiles from "@/utils/ManageFiles";
+import MainHeader from "@/components/header/MainHeader";
 
 function VerDetallesOficio() {
   const datos = JSON.parse(sessionStorage.getItem("detallesOficio") || "{}");
@@ -184,75 +185,12 @@ function VerDetallesOficio() {
   };
 
   return (
-    <main
-      style={{
-        flex: 1,
-        padding: "3% 5%",
-        boxSizing: "border-box",
-        overflowY: "auto",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        marginLeft: "15%",
-      }}
-    >
-      <div style={{ marginBottom: "2rem" }}>
-        <h1
-          style={{
-            fontSize: "2rem",
-            fontWeight: 700,
-            color: "#1a2e5a",
-            margin: "0 0 0.4rem 0",
-            lineHeight: 1.2,
-          }}
-        >
-          Detalles del Oficio
-        </h1>
-        <span
-          style={{
-            display: "block",
-            width: "48px",
-            height: "3px",
-            backgroundColor: "#16a34a",
-            marginTop: "0.5rem",
-            borderRadius: "2px",
-          }}
-        />
-      </div>
+    <>
+      <main className="main-content-solicitud">
+        <MainHeader title="Detalles de oficio" subtitle="Gestión de oficios" />
 
-      <div
-        style={{
-          background: "#ffffff",
-          borderRadius: "10px",
-          border: "1px solid #e5e7eb",
-          padding: "1.75rem 2rem",
-          marginBottom: "1.5rem",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-        }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "1.25rem 1.5rem",
-            alignItems: "start",
-          }}
-        >
-          <h3
-            style={{
-              gridColumn: "span 3",
-              fontSize: "0.8rem",
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "#1a2e5a",
-              borderBottom: "2px solid #e5e7eb",
-              paddingBottom: "0.5rem",
-              margin: "0.5rem 0 0.25rem 0",
-            }}
-          >
-            Datos del oficio
-          </h3>
+        <form className="form-grid">
+          <h3 className="section-title">Datos del oficio</h3>
 
           {/* Folio */}
           <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>

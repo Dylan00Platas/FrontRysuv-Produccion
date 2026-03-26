@@ -6,9 +6,9 @@ import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
 import "./IniciarSolicitud.css";
-import IGetSesion from "@/schemas/acceso/GetSesion";
-import AuthService from "@/services/AuthService";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
+import { useCookie } from "@/hooks/useCookie";
+import MainHeader from "@/components/header/MainHeader";
 import {IPostProcesoContratacion,ISolicitudAsignacionRequisicion,ISolicitudBolsaTrabajo} from "@/schemas/procesos-contratacion/PostProcesoContratacion";
 
 interface ICandidato {
@@ -78,8 +78,8 @@ function IniciarSolicitud() {
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
   const { toast, mostrarToast } = useToast();
-  const ServicioCatalogo = new CatalogoService();
-  const [datosSesion, setDatosSesion] = useState<IGetSesion|null>(null);
+  const { currentUser } = useCookie();
+
   const [formData, setFormData] = useState<IProcesoContratacion>({
     idAcceso: 0,
     folio: "",
@@ -136,46 +136,17 @@ function IniciarSolicitud() {
   });
 
   useEffect(() => {
-    async function ObtenerSesion() {
-      if (datosSesion === null) {
-        const AuthServicio = new AuthService();
-        const respuesta = await AuthServicio.session();
-        if (respuesta.mensaje.usuario) {
-          const DatosSesion: IGetSesion = {
-            tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
-            usuario: respuesta.mensaje.usuario,
-            idAcceso: respuesta.mensaje.idAcceso,
-            nombre: respuesta.mensaje.nombre,
-            primerApellido: respuesta.mensaje.primerApellido,
-            segundoApellido: respuesta.mensaje.segundoApellido,
-          };
-          setDatosSesion(DatosSesion);
-        }
-      }
-    }
-    ObtenerSesion();
-  }, []);
-
-  useEffect(() => {
     async function cargarDependencias() {
-      if (dependencias.length === 0 && dependenciasCargadas !== true) {
-        try {
-          const response = await ServicioCatalogo.getDependencias();
-          setDependencias(response.mensaje.dependencias);
-          setDependenciasCargadas(true);
-        } catch (err) {
-          console.error(
-            "IniciarSolicitud.tsx - Error cargando dependencias: ",
-            err,
-          );
-          mostrarToast("Error al cargar dependencias", "error");
-        }
-      } else {
-        setDependenciasCargadas(true);
+      try {
+        const response = await new CatalogoService().getDependencias();
+        setDependencias(response.mensaje.dependencias);
+      } catch (err) {
+        mostrarToast("Error al cargar dependencias", "error");
       }
     }
+
     cargarDependencias();
-  }, [dependenciasCargadas]);
+  }, []);
 
   {
     !dependenciasCargadas && (
@@ -232,10 +203,10 @@ function IniciarSolicitud() {
         }
         console.log(`Solicitud ${i + 1} creada:`, response);
       }
-      mostrarToast(`${cantidad} solicitude(s) creadas correctamente`, "error");
+      mostrarToast(`${cantidad} solicitude(s) creadas correctamente`, "exito");
       setTimeout(() => {
         navigate("/solicitudes");
-      }, 2000);
+      }, 1000);
 
       setFormData({
         folio: "",
@@ -289,7 +260,7 @@ function IniciarSolicitud() {
         cantidadCandidatos: "1",
         candidatos: [{ nombre: "", fechaCita: "" }],
         tipoDeProceso: 0,
-        idAcceso: 0
+        idAcceso: 0,
       });
     } catch (error) {
       console.error(
@@ -305,7 +276,7 @@ function IniciarSolicitud() {
     e.preventDefault();
     const numDep = formData.numDependencia.trim();
     const dep = dependencias.find(
-      (dependecia) => (dependecia.numDependencia = numDep),
+      (dependecia) => dependecia.numDependencia === numDep,
     );
     if (dep) {
       handleInputChange("dependencia", dep.nombre);
@@ -335,9 +306,13 @@ function IniciarSolicitud() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="main-content-solicitud">
-        <div className="page-header-solicitud">
-          <h1 className="page-title-solicitud">Iniciar Solicitud</h1>
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
+        <div className="flex justify-between items-center w-full mb-[2%] gap-[2%]">
+          <MainHeader
+            title="Iniciar solicitud"
+            subtitle="Gestión de solicitudes"
+          />
+
           <select
             className="header-select-solicitud"
             value={tipoSolicitud}

@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/useToast";
 import AuthService from "@/services/AuthService";
 import type IPostUsuario from "@/schemas/acceso/PostUser";
 import { Toast } from "@/components/Alert/Floating/Toast";
+import MainHeader from "@/components/header/MainHeader";
 
 interface IUserData {
   usuario: string;
@@ -85,8 +86,8 @@ function CrearUsuario() {
       {/*  Mensaje flotante */}
       <Toast texto={toast.texto} tipo={toast.tipo} />
       {/* Main Content */}
-      <main className="main-content-evaluacion">
-        <h1 className="page-title3">Crear Usuarios</h1>
+      <main className="ml-65 w-[calc(100%-260px)] px-10 py-8 overflow-y-auto min-h-screen bg-slate-50">
+        <MainHeader title="Registrar usuario" subtitle="Gestión de usuarios" />
         <form className="form-grid" onSubmit={handleSubmit}>
           {/* Fila 1 */}
           <div className="form-group">

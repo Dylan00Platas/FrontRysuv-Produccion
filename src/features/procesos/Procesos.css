@@ -72,12 +72,6 @@
   max-width: 25%;
 }
 
-.filtro-busqueda {
-  flex: 2; /* ← aumenta el espacio ocupado */
-  min-width: 300px;
-  max-width: 50%; /* ← puede usar hasta la mitad del contenedor */
-}
-
 .filtro-busqueda input {
   width: 100%;
   padding: 8px 12px 8px 36px;

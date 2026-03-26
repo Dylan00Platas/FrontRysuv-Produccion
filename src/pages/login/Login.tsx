@@ -6,22 +6,21 @@ import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
 
 export function Login() {
-  const { toast, mostrarToast } = useToast();
   const navigate = useNavigate();
+  const { toast, mostrarToast } = useToast();
   const [usuario, setUsuario] = useState("");
   const [contrasenia, setContrasenia] = useState("");
-  const { login, isLoading } = useCookie();
+  const { login, isLoadingLogin } = useCookie();
 
   const handleLogin = async () => {
     try {
       await login({ usuario, contrasenia });
-      mostrarToast("Sesión iniciada correctamente", "exito");
+      mostrarToast("Sesión iniciada correctamente.", "exito");
       navigate("/menu");
     } catch (err) {
       const mensaje =
-        err instanceof Error ? err.message : "Error interno del sistema";
+        err instanceof Error ? err.message : "Error al iniciar sesión.";
       mostrarToast(mensaje, "error");
-      console.error(err);
     }
   };
 
@@ -100,7 +99,7 @@ export function Login() {
             {/* Botón submit */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoadingLogin}
               className="
               mt-2 w-full py-3 rounded-lg text-sm font-semibold text-white
               bg-[#167e2b] hover:bg-[#1a9432]
@@ -112,7 +111,7 @@ export function Login() {
               transition-all duration-200
             "
             >
-              {isLoading ? (
+              {isLoadingLogin ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg
                     className="animate-spin w-4 h-4"
