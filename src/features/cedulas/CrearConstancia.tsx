@@ -4,7 +4,6 @@ import {
   useState,
   useCallback,
   useMemo,
-  useContext,
   useId,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -16,8 +15,6 @@ import {
   PDFRadioGroup,
   PDFDocument,
 } from "pdf-lib";
-import { FaSearch } from "react-icons/fa";
-import { FiHelpCircle } from "react-icons/fi";
 import Select from "react-select";
 import * as echarts from "echarts";
 import * as fontkit from "fontkit";
@@ -27,7 +24,6 @@ import CedulaService from "@/services/CedulaService";
 import ManageFiles from "@/utils/ManageFiles";
 import { useToast } from "@/hooks/useToast";
 import { Toast } from "@/components/Alert/Floating/Toast";
-import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import { useDependencias } from "@/hooks/useDependencias";
 import { useProcesoTipos } from "@/hooks/useProcesoTipos";
 import IResponseHTTP from "@/interfaces/http/Response";
@@ -42,6 +38,11 @@ import { ICedulaResultados } from "@/schemas/cedulas/PostResultadoCedula";
 import { useCookie } from "@/hooks/useCookie";
 import MainHeader from "@/components/header/MainHeader";
 import { InputField } from "@/components/input-field/InputField";
+import {
+  ButtonShowModalHelp,
+  ModalHelp,
+} from "@/components/Alert/Floating/ModalHelp";
+import FormSectionCard from "@/components/card/FormSectionCard";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IDependenciaOption {
@@ -911,130 +912,78 @@ function CrearConstancia() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
+      <ButtonShowModalHelp onClick={() => setShowHelp(true)} />
+      <ModalHelp
+        isOpen={showHelp}
+        onClose={() => setShowHelp(false)}
+        title="Ayuda"
+        warningText="⚠️ Si modificas información cargada automáticamente y presionas 'Guardar' el cambio será irreversible."
+        showWarning={true}
+      >
+        <h2>Ayuda</h2>
+        <p>
+          Esta es la ventana de generar cédula de resultados. En el campo id
+          ingresa el identificador del candidato (lo puedes encontrar en
+          Evaluación) y presiona el icono de lupa para completar la información
+          que la base de datos tenga.
+        </p>
+        <p>
+          Presiona el botón crear gráficas para generar las gráficas de
+          competencias y habilidades.
+        </p>
+        <p>
+          Al finalizar, puedes exportar la cédula en un PDF o guardar la cédula
+          para terminarla más tarde.
+        </p>
+        <p>
+          <strong>
+            Nota: si modificas la información de los campos que haya obtenido la
+            base de datos (como Nombre, Edad o titular) y presionas "GUARDAR" la
+            información se modificará también en la base de datos.
+          </strong>
+        </p>
+      </ModalHelp>
 
-      <main className="main-content">
-        <div
-          role="button"
-          tabIndex={0}
-          className="help-icon"
-          onClick={() => setShowHelp(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") setShowHelp(true);
-          }}
-        >
-          <FiHelpCircle />
-        </div>
-
-        {showHelp && (
-          <div
-            role="presentation"
-            className="modal-overlay"
-            onClick={() => setShowHelp(false)}
-            onKeyDown={() => setShowHelp(false)}
-          >
-            <div
-              role="presentation"
-              className="modal-content"
-              onClick={(e) => e.stopPropagation()}
-              onKeyDown={(e) => e.stopPropagation()}
-            >
-              <h2>Ayuda</h2>
-              <p>
-                Esta es la ventana de generar cédula de resultados. En el campo
-                id ingresa el identificador del candidato (lo puedes encontrar
-                en Evaluación) y presiona el icono de lupa para completar la
-                información que la base de datos tenga.
-              </p>
-              <p>
-                Presiona el botón crear gráficas para generar las gráficas de
-                competencias y habilidades.
-              </p>
-              <p>
-                Al finalizar, puedes exportar la cédula en un PDF o guardar la
-                cédula para terminarla más tarde.
-              </p>
-              <p>
-                <strong>
-                  Nota: si modificas la información de los campos que haya
-                  obtenido la base de datos (como Nombre, Edad o titular) y
-                  presionas "GUARDAR" la información se modificará también en la
-                  base de datos.
-                </strong>
-              </p>
-              <button className="btn-cerrar" onClick={() => setShowHelp(false)}>
-                Cerrar
-              </button>
-            </div>
-          </div>
-        )}
-
+      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
         <MainHeader title="Cédula de resultados" subtitle="Cédulas" />
-
-        <div className="contenido-constancia-inner">
-          <form className="form-grid" onSubmit={handleSubmit}>
-            <h3 className="section-title">
-              Datos de la solicitud de contratación
-            </h3>
-
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <FormSectionCard title="Datos de la solicitud de contratación">
+            <InputField
+              id={`${fieldID}-idProceso`}
+              label="ID del proceso"
+              value={String(formData.FKIdProceso ?? "")}
+              onChange={(e) => handleInputChange("FKIdProceso", e.target.value)}
+              showSearchButton={true}
+              onSearch={handleBuscarCedula}
+              searchButtonTitle="Buscar proceso por ID"
+            />
             {(
               [
-                {
-                  label: "Identificador de candidato",
-                  key: "idProceso",
-                  withButton: true,
-                },
-                { label: "Hermes", key: "hermesNotificacion" },
-                { label: "Plaza", key: "plaza" },
-                { label: "Puesto", key: "puesto" },
-                { label: "Titular de la plaza", key: "titular" },
-                { label: "Oficio de autorización", key: "oficio" },
+                { label: "Hermes:", key: "hermesNotificacion" },
+                { label: "Plaza:", key: "plaza" },
+                { label: "Puesto:", key: "puesto" },
+                { label: "Titular de la plaza:", key: "titular" },
+                { label: "Oficio de autorización:", key: "oficio" },
               ] as {
                 label: string;
                 key: keyof IFormData;
                 withButton?: boolean;
               }[]
-            ).map(({ label, key, withButton }) => (
-              <div key={key} className="form-group">
-                {withButton ? (
-                  <div className="input-with-button">
-                    <InputField
-                      id={`${fieldID}-${key}-${label}`}
-                      label={label}
-                      className="form-input"
-                      value={String(formData[key] ?? "")}
-                      onChange={(e) =>
-                        handleInputChange(
-                          key,
-                          e.target.value as IFormData[typeof key],
-                        )
-                      }
-                    />
-                    <button
-                      type="button"
-                      className="btn-lupa"
-                      onClick={handleBuscarCedula}
-                    >
-                      <FaSearch />
-                    </button>
-                  </div>
-                ) : (
-                  <InputField
-                    id={`${fieldID}-${key}-${label}`}
-                    label={label}
-                    className="form-input"
-                    value={String(formData[key] ?? "")}
-                    onChange={(e) =>
-                      handleInputChange(
-                        key,
-                        e.target.value as IFormData[typeof key],
-                      )
-                    }
-                  />
-                )}
-              </div>
+            ).map(({ label, key }) => (
+              <InputField
+                id={`${fieldID}-${key}-${label}`}
+                label={label}
+                key={key}
+                value={String(formData[key] ?? "")}
+                onChange={(e) =>
+                  handleInputChange(
+                    key,
+                    e.target.value as IFormData[typeof key],
+                  )
+                }
+              />
             ))}
-
-            <div className="form-group">
+            <div>
               <label
                 htmlFor="constancia-temporalidad"
                 className="form-label-evaluacion"
@@ -1059,8 +1008,7 @@ function CrearConstancia() {
                 <option value="2">Definitiva</option>
               </select>
             </div>
-
-            <div className="form-group">
+            <div>
               <label
                 htmlFor="constancia-adscripcion"
                 className="form-label-evaluacion"
@@ -1080,19 +1028,15 @@ function CrearConstancia() {
                 isSearchable
               />
             </div>
-
-            <div className="form-group">
-              <InputField
-                id={`${fieldID}-region-constancia`}
-                label="Región:"
-                className="form-input"
-                value={formData.adscripcion?.zona}
-                readOnly
-              />
-            </div>
-
-            <h3 className="section-title">Datos del candidato</h3>
-
+            <InputField
+              id={`${fieldID}-region-constancia`}
+              label="Región:"
+              className="form-input"
+              value={formData.adscripcion?.zona}
+              readOnly
+            />
+          </FormSectionCard>
+          <FormSectionCard title="Datos del candidato">
             {(
               [
                 { label: "Nombre", key: "nombre" },
@@ -1104,11 +1048,10 @@ function CrearConstancia() {
                 },
               ] as { label: string; key: keyof IFormData }[]
             ).map(({ label, key }) => (
-              <div key={key} className="form-group">
+              <div key={key}>
                 <InputField
                   id={`${fieldID}-${key}-${label}`}
                   label={label}
-                  className="form-input"
                   value={String(formData[key] ?? "")}
                   onChange={(e) => {
                     let value: string = e.target.value;
@@ -1119,6 +1062,12 @@ function CrearConstancia() {
                 />
               </div>
             ))}
+          </FormSectionCard>
+
+          <FormSectionCard title="Datos de la cédula interna">
+            {(tipoProceso <= 1 || tipoProceso === null) && (
+              <p>Por favor seleccione un ID de proceso</p>
+            )}
 
             {/* Tipo 1: Cédula interna */}
             {tipoProceso === 1 && (
@@ -1130,27 +1079,25 @@ function CrearConstancia() {
                     { label: "A Reforzar", key: "reforzar" },
                     { label: "A Desarrollar", key: "desarrollar" },
                     { label: "Habilidades Digitales", key: "habilidades" },
-                    { label: "Evaluación de conocimientos", key: "evaluacion" },
+                    {
+                      label: "Evaluación de conocimientos",
+                      key: "evaluacion",
+                    },
                     { label: "Efectos de contratación", key: "efectos" },
                   ] as { label: string; key: keyof IFormData }[]
                 ).map(({ label, key }) => (
-                  <div
+                  <InputField
+                    label={label}
+                    as="textarea"
                     key={key}
-                    className="form-group"
-                    style={{ gridColumn: "span 3" }}
-                  >
-                    <label className="form-label-evaluacion">{label}</label>
-                    <textarea
-                      className="large-textarea"
-                      value={String(formData[key] ?? "")}
-                      onChange={(e) =>
-                        handleInputChange(
-                          key,
-                          e.target.value as IFormData[typeof key],
-                        )
-                      }
-                    />
-                  </div>
+                    value={String(formData[key] ?? "")}
+                    onChange={(e) =>
+                      handleInputChange(
+                        key,
+                        e.target.value as IFormData[typeof key],
+                      )
+                    }
+                  />
                 ))}
 
                 <div className="form-group">
@@ -1182,23 +1129,17 @@ function CrearConstancia() {
                     { label: "Desarrollar", key: "cualitativoDesarrollar" },
                   ] as { label: string; key: keyof IFormData }[]
                 ).map(({ label, key }) => (
-                  <div
+                  <InputField
+                    label={label}
                     key={key}
-                    className="form-group"
-                    style={{ gridColumn: "span 3" }}
-                  >
-                    <label className="form-label-evaluacion">{label}</label>
-                    <textarea
-                      className="large-textarea"
-                      value={String(formData[key] ?? "")}
-                      onChange={(e) =>
-                        handleInputChange(
-                          key,
-                          e.target.value as IFormData[typeof key],
-                        )
-                      }
-                    />
-                  </div>
+                    value={String(formData[key] ?? "")}
+                    onChange={(e) =>
+                      handleInputChange(
+                        key,
+                        e.target.value as IFormData[typeof key],
+                      )
+                    }
+                  />
                 ))}
 
                 <div className="charts-container">
@@ -1233,7 +1174,7 @@ function CrearConstancia() {
                     type="button"
                     className={`btn-aprobacion ${aprobadoJefeOficina ? "activo" : ""}`}
                     onClick={() => setAprobadoJefeOficina((v) => !v)}
-                    disabled={currentUser?.FKIdTipoAcceso !== 1}
+                    disabled={currentUser?.idAcceso !== 1}
                   >
                     🧾 Jefe de Oficina
                   </button>
@@ -1241,7 +1182,7 @@ function CrearConstancia() {
                     type="button"
                     className={`btn-aprobacion ${aprobadoDireccion ? "activo" : ""}`}
                     onClick={() => setAprobadoDireccion((v) => !v)}
-                    disabled={currentUser?.FKIdTipoAcceso !== 4}
+                    disabled={currentUser?.idAcceso !== 4}
                   >
                     🗂️ Jefe de Departamento
                   </button>
@@ -1294,47 +1235,53 @@ function CrearConstancia() {
                 )}
               </div>
             )}
-          </form>
-        </div>
+          </FormSectionCard>
+        </form>
 
-        {/* Visor de PDF */}
-        {pdfVisible && archivoBase64 && (
-          <div className="pdf-viewer-container">
-            <div className="pdf-viewer-header">
-              <div className="pdf-viewer-title">
-                <span>📄 {nombreArchivo}</span>
+        <FormSectionCard title="Visualización del PDF de la cédula">
+          {(tipoProceso <= 1 || tipoProceso === null) && (
+            <p>Por favor seleccione un ID de proceso</p>
+          )}
+
+          {/* Visor de PDF */}
+          {pdfVisible && archivoBase64 && (
+            <div className="pdf-viewer-container">
+              <div className="pdf-viewer-header">
+                <div className="pdf-viewer-title">
+                  <span>📄 {nombreArchivo}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const link = document.createElement("a");
+                    link.href = `data:application/pdf;base64,${archivoBase64}`;
+                    link.download = nombreArchivo || "Documento.pdf";
+                    link.click();
+                  }}
+                  className="bg-[rgba(255,255,255,0.15)] border-0 rounded-md text-white py-1.5 px-3.5 cursor-pointer"
+                  onMouseEnter={(e) =>
+                    ((
+                      e.currentTarget as HTMLButtonElement
+                    ).style.backgroundColor = "rgba(255,255,255,0.3)")
+                  }
+                  onMouseLeave={(e) =>
+                    ((
+                      e.currentTarget as HTMLButtonElement
+                    ).style.backgroundColor = "rgba(255,255,255,0.15)")
+                  }
+                >
+                  Descargar
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  const link = document.createElement("a");
-                  link.href = `data:application/pdf;base64,${archivoBase64}`;
-                  link.download = nombreArchivo || "Documento.pdf";
-                  link.click();
-                }}
-                className="bg-[rgba(255,255,255,0.15)] border-0 rounded-md text-white py-1.5 px-3.5 cursor-pointer"
-                onMouseEnter={(e) =>
-                  ((
-                    e.currentTarget as HTMLButtonElement
-                  ).style.backgroundColor = "rgba(255,255,255,0.3)")
-                }
-                onMouseLeave={(e) =>
-                  ((
-                    e.currentTarget as HTMLButtonElement
-                  ).style.backgroundColor = "rgba(255,255,255,0.15)")
-                }
-              >
-                Descargar
-              </button>
+              <div className="pdf-viewer-frame">
+                <iframe
+                  src={`data:application/pdf;base64,${archivoBase64}`}
+                  title="Vista previa del PDF"
+                />
+              </div>
             </div>
-            <div className="pdf-viewer-frame">
-              <iframe
-                src={`data:application/pdf;base64,${archivoBase64}`}
-                title="Vista previa del PDF"
-              />
-            </div>
-          </div>
-        )}
+          )}
+        </FormSectionCard>
       </main>
     </>
   );

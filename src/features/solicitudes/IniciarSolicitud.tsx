@@ -10,6 +10,8 @@ import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import IPostProcesoContratacion from "@/schemas/procesos-contratacion/PostProcesoContratacion";
 import { useCookie } from "@/hooks/useCookie";
 import MainHeader from "@/components/header/MainHeader";
+import { InputField } from "@/components/input-field/InputField";
+import FormSectionCard from "@/components/card/FormSectionCard";
 
 interface ICandidato {
   nombre: string;
@@ -355,7 +357,6 @@ function IniciarSolicitud() {
             onChange={(e) => setTipoSolicitud(e.target.value)}
           >
             <option value="" disabled>
-              {" "}
               Seleccionar tipo de solicitud
             </option>
             <option value="Asignación">Asignación</option>
@@ -374,546 +375,372 @@ function IniciarSolicitud() {
             </div>
           )}
 
-          <form className="form-grid-solicitud" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             {/* Campos comunes para ambos tipos */}
-            <h3 className="section-title">Datos generales de la vacante</h3>
+            <FormSectionCard title="Datos generales de la vacante">
+              <div className="form-group">
+                <InputField
+                  label="Folio:"
+                  value={formData.folio}
+                  onChange={(e) => {
+                    handleInputChange("folio", e.target.value);
+                    e.target.setCustomValidity("");
+                  }}
+                  disabled={tipoSolicitud === "Asignación"}
+                  style={{
+                    backgroundColor:
+                      tipoSolicitud === "Asignación" ? "#e0e0e0" : "white",
+                    color: "black",
+                  }}
+                  placeholder={
+                    tipoSolicitud === "Asignación"
+                      ? "Este campo está bloqueado para asignación"
+                      : ""
+                  }
+                />
+              </div>
 
-            <div className="form-group">
-              <label className="form-label-solicitud">Folio </label>
-              <input
-                type="text"
-                className="form-input-solicitud"
-                value={formData.folio}
-                onChange={(e) => {
-                  handleInputChange("folio", e.target.value);
-                  e.target.setCustomValidity("");
-                }}
-                disabled={tipoSolicitud === "Asignación"}
-                style={{
-                  backgroundColor:
-                    tipoSolicitud === "Asignación" ? "#e0e0e0" : "white",
-                  color: "black",
-                }}
-                placeholder={
-                  tipoSolicitud === "Asignación"
-                    ? "Este campo está bloqueado para asignación"
-                    : ""
-                }
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label-solicitud">
-                Hermes de Notificación
-              </label>
-              <input
-                type="text"
-                className="form-input-solicitud"
+              <InputField
+                label="Hermes de notificación:"
                 value={formData.hermes}
                 onChange={(e) => {
                   handleInputChange("hermes", e.target.value);
                   e.target.setCustomValidity("");
                 }}
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Fecha de recibido</label>
-              <input
+              <InputField
+                label="Fecha de recibido:"
                 type="date"
-                className="form-input-solicitud"
                 value={formData.fechaRecibido}
                 onChange={(e) =>
                   handleInputChange("fechaRecibido", e.target.value)
                 }
               />
-            </div>
 
-            <div
-              className="form-group-solicitud"
-              style={{ position: "relative" }}
-            >
-              <label className="form-label-solicitud">
-                Número de Entidad académica o Dependencia
-              </label>
-              <div className="input-with-icon">
-                <input
-                  type="text"
-                  className="form-input-solicitud"
-                  value={formData.numDependencia}
-                  onChange={(e) =>
-                    handleInputChange("numDependencia", e.target.value)
+              <InputField
+                label="Número de entidad académica o dependencia:"
+                value={formData.numDependencia}
+                onChange={(e) =>
+                  handleInputChange("numDependencia", e.target.value)
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleBuscarDependencia(e);
                   }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleBuscarDependencia(e);
-                    }
-                  }}
-                />
-                <FaSearch
-                  className="help-icon lupa-icon"
-                  title="Buscar dependencia"
-                  onClick={(e) => handleBuscarDependencia(e)}
-                />
-              </div>
-            </div>
+                }}
+                showSearchButton={true}
+                onSearch={(e) => handleBuscarDependencia(e)}
+                searchButtonTitle="Buscar dependencia"
+              />
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
-                Entidad académica o Dependencia
-              </label>
-              <input
-                type="text"
-                className="form-input-solicitud"
+              <InputField
+                label="Entidad académica o Dependencia:"
                 value={formData.dependencia}
                 onChange={(e) =>
                   handleInputChange("dependencia", e.target.value)
                 }
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
-                Área Organizacional
-              </label>
-              <input
-                type="text"
-                className="form-input-solicitud"
+              <InputField
+                label="Área Organizacional"
                 value={formData.area}
                 onChange={(e) => handleInputChange("area", e.target.value)}
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Región</label>
-              <input
-                type="text"
-                className="form-input-solicitud"
+              <InputField
+                label="Región:"
                 value={formData.region}
                 onChange={(e) => handleInputChange("region", e.target.value)}
               />
-            </div>
 
-            <div className="form-group">
-              <label className="form-label-solicitud">Tipo de Personal</label>
-              <select
-                className="form-input-solicitud"
-                value={formData.tipoPersonal}
-                onChange={(e) =>
-                  handleInputChange("tipoPersonal", e.target.value)
-                }
-              >
-                <option value="" disabled>
-                  Seleccionar
-                </option>
-                <option value="eventual">Eventual</option>
-                <option value="confianza">Confianza</option>
-              </select>
-            </div>
+              <div className="form-group">
+                <label className="form-label-solicitud">Tipo de Personal</label>
+                <select
+                  className="form-input-solicitud"
+                  value={formData.tipoPersonal}
+                  onChange={(e) =>
+                    handleInputChange("tipoPersonal", e.target.value)
+                  }
+                >
+                  <option value="" disabled>
+                    Seleccionar
+                  </option>
+                  <option value="eventual">Eventual</option>
+                  <option value="confianza">Confianza</option>
+                </select>
+              </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Número de Plaza</label>
-              <input
-                type="text"
-                className="form-input-solicitud"
+              <InputField
+                label="Número de plaza:"
                 value={formData.numPlaza}
                 onChange={(e) => handleInputChange("numPlaza", e.target.value)}
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
-                Categoría/Puesto (origen)
-              </label>
-              <input
-                type="text"
-                className="form-input-solicitud"
+              <InputField
+                label="Categoría/Puesto (origen)"
                 value={formData.categoriaOrigen}
                 onChange={(e) =>
                   handleInputChange("categoriaOrigen", e.target.value)
                 }
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
-                Titular de la Plaza
-              </label>
-              <input
-                type="text"
-                className="form-input-solicitud"
+              <InputField
+                label="Titular de la plaza:"
                 value={formData.titularPlaza}
                 onChange={(e) =>
                   handleInputChange("titularPlaza", e.target.value)
                 }
               />
-            </div>
 
-            {/* Lineamiento que aplica */}
-            <div className="form-group">
-              <label className="form-label-evaluacion">
-                Lineamiento que aplica
-              </label>
-              <select
-                className="form-input-evaluacion"
-                value={formData.lineamiento}
-                onChange={(e) =>
-                  handleInputChange("lineamiento", e.target.value)
-                }
-              >
-                <option value="">Seleccionar</option>
-                <option value="4.1 y 4.2">4.1 y 4.2</option>
-                <option value="5.1 y 5.2">5.1 y 5.2</option>
-                <option value="4.3">4.3</option>
-                <option value="N/A">N/A</option>
-              </select>
-            </div>
+              {/* Lineamiento que aplica */}
+              <div className="form-group">
+                <label className="form-label-evaluacion">
+                  Lineamiento que aplica
+                </label>
+                <select
+                  className="form-input-evaluacion"
+                  value={formData.lineamiento}
+                  onChange={(e) =>
+                    handleInputChange("lineamiento", e.target.value)
+                  }
+                >
+                  <option value="">Seleccionar</option>
+                  <option value="4.1 y 4.2">4.1 y 4.2</option>
+                  <option value="5.1 y 5.2">5.1 y 5.2</option>
+                  <option value="4.3">4.3</option>
+                  <option value="N/A">N/A</option>
+                </select>
+              </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Motivo</label>
-              <input
-                type="text"
-                className="form-input-solicitud"
+              <InputField
+                label="Motivo:"
                 value={formData.motivo}
                 onChange={(e) => handleInputChange("motivo", e.target.value)}
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
-                Fecha de Elaboración Propuesta
-              </label>
-              <input
+              <InputField
+                label="Fecha de elaboración propuesta:"
                 type="date"
-                className="form-input-solicitud"
                 value={formData.fechaPropuesta}
                 onChange={(e) =>
                   handleInputChange("fechaPropuesta", e.target.value)
                 }
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
-                Fecha de liberación de oficio
-              </label>
-              <input
+              <InputField
+                label="Fecha de liberación de oficio:"
                 type="date"
-                className="form-input-solicitud"
                 value={formData.fechaOficio}
                 onChange={(e) =>
                   handleInputChange("fechaOficio", e.target.value)
                 }
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
-                Periodo Autorizado en oficio (inicio)
-              </label>
-              <input
+              <InputField
+                label="Periodo autorizado en oficio (inicio):"
                 type="date"
-                className="form-input-solicitud"
                 value={formData.periodoInicio}
                 onChange={(e) =>
                   handleInputChange("periodoInicio", e.target.value)
                 }
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
-                Periodo Autorizado en oficio (término)
-              </label>
-              <input
+              <InputField
+                label="Periodo autorizado en oficio (fin):"
                 type="date"
-                className="form-input-solicitud"
                 value={formData.periodoTermino}
                 onChange={(e) =>
                   handleInputChange("periodoTermino", e.target.value)
                 }
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">
-                Categoría autorizada en oficio
-              </label>
-              <input
-                type="text"
-                className="form-input-solicitud"
+              <InputField
+                label="Categoría autorizada en oficio:"
                 value={formData.categoriaAutorizada}
                 onChange={(e) =>
                   handleInputChange("categoriaAutorizada", e.target.value)
                 }
               />
-            </div>
 
-            <div className="form-group-solicitud">
-              <label className="form-label-solicitud">Tipo</label>
-              <select
-                className="form-input-solicitud"
-                value={formData.tipo}
-                onChange={(e) => handleInputChange("tipo", e.target.value)}
-              >
-                <option value="" disabled>
-                  Seleccionar
-                </option>
-                <option value="temporal">Temporal</option>
-                <option value="definitiva">Definitiva</option>
-              </select>
-            </div>
+              <div className="form-group-solicitud">
+                <label className="form-label-solicitud">Tipo</label>
+                <select
+                  className="form-input-solicitud"
+                  value={formData.tipo}
+                  onChange={(e) => handleInputChange("tipo", e.target.value)}
+                >
+                  <option value="" disabled>
+                    Seleccionar
+                  </option>
+                  <option value="temporal">Temporal</option>
+                  <option value="definitiva">Definitiva</option>
+                </select>
+              </div>
 
-            <div className="form-group-solicitud checkbox-group-solicitud">
-              <input
+              <InputField
+                label="Autorización:"
                 type="checkbox"
                 checked={formData.autorizacion}
                 onChange={(e) =>
                   handleInputChange("autorizacion", e.target.checked)
                 }
               />
-              <label>Autorización</label>
-            </div>
 
-            <div
-              className="form-group-solicitud"
-              style={{ gridColumn: "span 3" }}
-            >
-              <label className="form-label-solicitud">
-                Observaciones Registro
-              </label>
-              <textarea
-                className="large-textarea-solicitud"
+              <InputField
+                label="Observaciones registro:"
                 value={formData.observaciones}
                 onChange={(e) =>
                   handleInputChange("observaciones", e.target.value)
                 }
               />
-            </div>
+            </FormSectionCard>
 
             {/* Campos específicos Bolsa de Trabajo */}
             {tipoSolicitud === "Bolsa" && (
               <>
-                <h3 className="section-title">Datos del proceso</h3>
-                <div className="form-group">
-                  <label className="form-label-solicitud">
-                    Número Carpeta{" "}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input-solicitud"
+                <FormSectionCard title="Datos del proceso">
+                  <InputField
+                    label="Número de carpeta:"
                     value={formData.numeroCarpeta}
                     onChange={(e) =>
                       handleInputChange("numeroCarpeta", e.target.value)
                     }
                   />
-                </div>
-
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Nombre de Candidato
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Nombre del candidato:"
                     value={formData.candidato}
                     onChange={(e) =>
                       handleInputChange("candidato", e.target.value)
                     }
                   />
-                </div>
-
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Función a desempeñar
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Función a desempeñar:"
                     value={formData.funcion}
                     onChange={(e) =>
                       handleInputChange("funcion", e.target.value)
                     }
                   />
-                </div>
+                  <InputField
+                    label="Función a desempeñar:"
+                    value={formData.funcion}
+                    onChange={(e) =>
+                      handleInputChange("funcion", e.target.value)
+                    }
+                  />
 
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Familia Funcional
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Familia funcional:"
                     value={formData.familia}
                     onChange={(e) =>
                       handleInputChange("familia", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Fecha Entrevista
-                  </label>
-                  <input
-                    type="date"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Fecha entrevista:"
                     value={formData.fechaEntrevista}
                     onChange={(e) =>
                       handleInputChange("fechaEntrevista", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Fecha Evaluación competencias
-                  </label>
-                  <input
-                    type="date"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Fecha evaluación competencias:"
                     value={formData.fechaCompetencias}
                     onChange={(e) =>
                       handleInputChange("fechaCompetencias", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Fecha Se inicia procesamiento
-                  </label>
-                  <input
-                    type="date"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Fecha se inicia procesamiento:"
                     value={formData.fechaProcesamiento}
                     onChange={(e) =>
                       handleInputChange("fechaProcesamiento", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Resultado Evaluación conocimiento
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Resultado evaluación conocimiento:"
                     value={formData.resultadoConocimiento}
                     onChange={(e) =>
                       handleInputChange("resultadoConocimiento", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Experiencia laboral solicitada
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Experiencia laboral solicitada:"
                     value={formData.experiencia}
                     onChange={(e) =>
                       handleInputChange("experiencia", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">Referencias</label>
-                  <input
-                    type="text"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Referencias:"
                     value={formData.referencias}
                     onChange={(e) =>
                       handleInputChange("referencias", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Fecha Envío a DEyDP
-                  </label>
-                  <input
+                  <InputField
+                    label="Fecha envío a DEyDP:"
                     type="date"
-                    className="form-input-solicitud"
                     value={formData.fechaEnvioDes}
                     onChange={(e) =>
                       handleInputChange("fechaEnvioDes", e.target.value)
                     }
                   />
-                </div>
 
-                {/* Otros campos de resultados y seguimiento */}
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">Beneficiado</label>
-                  <select
-                    className="form-input-solicitud"
-                    value={formData.beneficiado ? "si" : "no"}
-                    onChange={(e) =>
-                      handleInputChange("beneficiado", e.target.value)
-                    }
-                  >
-                    <option value="" disabled>
-                      Seleccionar
-                    </option>
-                    <option value="si">Sí</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
+                  {/* Otros campos de resultados y seguimiento */}
+                  <div className="form-group-solicitud">
+                    <label className="form-label-solicitud">Beneficiado</label>
+                    <select
+                      className="form-input-solicitud"
+                      value={formData.beneficiado ? "si" : "no"}
+                      onChange={(e) =>
+                        handleInputChange("beneficiado", e.target.value)
+                      }
+                    >
+                      <option value="" disabled>
+                        Seleccionar
+                      </option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
 
-                <div className="form-group">
-                  <label className="form-label-solicitud">
-                    Fecha Revisión OfiEval
-                  </label>
-                  <input
+                  <InputField
+                    label="Fecha revisión OfiEval:"
                     type="date"
-                    className="form-input-solicitud"
                     value={formData.fechaOfiEval}
                     onChange={(e) =>
                       handleInputChange("fechaOfiEval", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group">
-                  <label className="form-label-solicitud">
-                    Fecha Notificación
-                  </label>
-                  <input
+                  <InputField
+                    label="Fecha notificación:"
                     type="date"
-                    className="form-input-solicitud"
                     value={formData.fechaNotificacion}
                     onChange={(e) =>
                       handleInputChange("fechaNotificacion", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group">
-                  <label className="form-label-solicitud">
-                    Tiempo del proceso
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Tiempo del proceso:"
                     value={formData.tiempoProceso}
                     onChange={(e) =>
                       handleInputChange("tiempoProceso", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group">
-                  <label className="form-label-solicitud">
-                    Fecha de evaluación de desempeño
-                  </label>
-                  <input
+                  <InputField
+                    label="Fecha de evaluación de desempeño:"
                     type="date"
-                    className="form-input-solicitud"
                     value={formData.fechaEvaluacionDesempenio}
                     onChange={(e) =>
                       handleInputChange(
@@ -922,67 +749,54 @@ function IniciarSolicitud() {
                       )
                     }
                   />
-                </div>
 
-                <div className="form-group" style={{ gridColumn: "span 3" }}>
-                  <label className="form-label-solicitud">
-                    Observaciones Analista
-                  </label>
-                  <textarea
-                    className="large-textarea"
+                  <InputField
+                    label="Observaciones analista:"
                     value={formData.observacionesAnalista}
                     onChange={(e) =>
                       handleInputChange("observacionesAnalista", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group">
-                  <label className="form-label-solicitud">
-                    Consecutivo Expediente Físico
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input-solicitud"
+                  <InputField
+                    label="Consecutivo expediente físico:"
                     value={formData.consecutivoExpediente}
                     onChange={(e) =>
                       handleInputChange("consecutivoExpediente", e.target.value)
                     }
                   />
-                </div>
 
-                <div className="form-group">
-                  <label className="form-label-solicitud">
-                    Seguimiento Evaluación Desempeño
-                  </label>
-                  <select
-                    className="form-input-solicitud"
-                    value={formData.seguimientoDesempeno}
-                    onChange={(e) =>
-                      handleInputChange("seguimientoDesempeno", e.target.value)
-                    }
-                  >
-                    <option value="" disabled>
-                      Seleccionar
-                    </option>
-                    <option value="si">Sí</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
+                  <div className="form-group">
+                    <label className="form-label-solicitud">
+                      Seguimiento Evaluación Desempeño
+                    </label>
+                    <select
+                      className="form-input-solicitud"
+                      value={formData.seguimientoDesempeno}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "seguimientoDesempeno",
+                          e.target.value,
+                        )
+                      }
+                    >
+                      <option value="" disabled>
+                        Seleccionar
+                      </option>
+                      <option value="si">Sí</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
 
-                <div className="form-group">
-                  <label className="form-label-solicitud">
-                    Resultado Seguimiento Evaluación Desempeño
-                  </label>
-                  <input
-                    type="text"
+                  <InputField
+                    label="Resultado seguimiento evaluación desempeño:"
                     className="form-input-solicitud"
                     value={formData.resultadoSeguimiento}
                     onChange={(e) =>
                       handleInputChange("resultadoSeguimiento", e.target.value)
                     }
                   />
-                </div>
+                </FormSectionCard>
               </>
             )}
 

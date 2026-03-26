@@ -20,6 +20,7 @@ const cedulasRoutes: RouteObject[] = [
     ),
   },
   {
+    // TODO-Desarrollo: Verificar el tema de la página
     path: "/crear-cedula",
     element: (
       <MainLayout>

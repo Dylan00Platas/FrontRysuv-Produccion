@@ -1,6 +1,6 @@
 import { useEffect, useState, useId } from "react";
 import { useLocation } from "react-router-dom";
-import { FaSearch } from "react-icons/fa";
+import { FaSave, FaSearch } from "react-icons/fa";
 import { FiHelpCircle } from "react-icons/fi";
 import { saveAs } from "file-saver";
 import {
@@ -34,6 +34,8 @@ import {
   ButtonShowModalHelp,
   ModalHelp,
 } from "@/components/Alert/Floating/ModalHelp";
+import FormSectionCard from "@/components/card/FormSectionCard";
+import { CustomButton } from "@/components/button/CustomButton";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IPostCedulaInternaForm {
@@ -707,36 +709,35 @@ function CrearCedulaInterna() {
   return (
     <>
       <Toast texto={toast.texto} tipo={toast.tipo} />
+      <ButtonShowModalHelp onClick={() => setShowToastHelp(true)} />
+      <ModalHelp
+        isOpen={showToastHelp}
+        onClose={() => setShowToastHelp(false)}
+        title="Ayuda"
+        warningText="⚠️ Si modificas información cargada automáticamente y presionas 'Guardar' el cambio será irreversible."
+        showWarning={true}
+      >
+        <p className="text-sm text-slate-600 leading-relaxed">
+          Aquí podrás llenar los datos generales, competencias y resultados de
+          un <strong className="text-slate-800">candidato</strong>.
+        </p>
+        <p className="text-sm text-slate-600 leading-relaxed">
+          Ingresa el{" "}
+          <strong className="text-slate-800">
+            Identificador del candidato
+          </strong>{" "}
+          y presiona el icono de la lupa 🔍 para cargar la información
+          disponible en la base de datos.
+        </p>
+        <p className="text-sm text-slate-600 leading-relaxed">
+          Al finalizar, puedes{" "}
+          <strong className="text-slate-800">guardar</strong> la cédula o{" "}
+          <strong className="text-slate-800">generar el PDF</strong> con todos
+          los datos capturados.
+        </p>
+      </ModalHelp>
 
       <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
-        <ButtonShowModalHelp onClick={() => setShowToastHelp(true)} />
-        <ModalHelp
-          isOpen={showToastHelp}
-          onClose={() => setShowToastHelp(false)}
-          title="Ayuda"
-          warningText="⚠️ Si modificas información cargada automáticamente y presionas 'Guardar' el cambio será irreversible."
-          showWarning={true}
-        >
-          <p className="text-sm text-slate-600 leading-relaxed">
-            Aquí podrás llenar los datos generales, competencias y resultados de
-            un <strong className="text-slate-800">candidato</strong>.
-          </p>
-          <p className="text-sm text-slate-600 leading-relaxed">
-            Ingresa el{" "}
-            <strong className="text-slate-800">
-              Identificador del candidato
-            </strong>{" "}
-            y presiona el icono de la lupa 🔍 para cargar la información
-            disponible en la base de datos.
-          </p>
-          <p className="text-sm text-slate-600 leading-relaxed">
-            Al finalizar, puedes{" "}
-            <strong className="text-slate-800">guardar</strong> la cédula o{" "}
-            <strong className="text-slate-800">generar el PDF</strong> con todos
-            los datos capturados.
-          </p>
-        </ModalHelp>
-
         <MainHeader
           title="Crear cédula interna"
           subtitle="Gestión de cédulas"
@@ -744,166 +745,149 @@ function CrearCedulaInterna() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           {/* ── Card: Datos generales ── */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-              <div className="w-1 h-5 rounded-full bg-[#18529d]" />
-              <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-                Datos Generales
-              </h2>
-            </div>
-            <div className="p-6 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-5">
-              {/* ID de proceso con buscador */}
-              <InputField
-                id={`${fieldID}-FKIdProceso`}
-                label="ID de proceso:"
-                type="number"
-                placeholder="ID de proceso"
-                name="FKIdProceso"
-                value={formData.FKIdProceso}
-                onChange={(e) =>
-                  handleInputChange("FKIdProceso", Number(e.target.value))
+          <FormSectionCard title="Datos generales">
+            {/* ID de proceso con buscador */}
+            <InputField
+              id={`${fieldID}-FKIdProceso`}
+              label="ID de proceso:"
+              type="number"
+              placeholder="ID de proceso"
+              name="FKIdProceso"
+              value={formData.FKIdProceso}
+              onChange={(e) =>
+                handleInputChange("FKIdProceso", Number(e.target.value))
+              }
+              onKeyDown={async (e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  await buscarIdProceso();
                 }
-                onKeyDown={async (e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    await buscarIdProceso();
+              }}
+              showSearchButton={true}
+              onSearch={buscarIdProceso}
+              searchButtonTitle="Buscar proceso por ID"
+            />
+            {/* Campos simples */}
+            {[
+              {
+                id: "hermesNotificacion",
+                label: "Hermes:",
+                type: "text",
+                placeholder: "",
+              },
+              {
+                id: "numPlaza",
+                label: "Número de Plaza",
+                type: "text",
+                placeholder: "",
+              },
+              {
+                id: "fechaElaboracionPropuesta",
+                label: "Fecha de Elaboración",
+                type: "date",
+                placeholder: "",
+              },
+              {
+                id: "nombreCandidato",
+                label: "Nombre de candidato",
+                type: "text",
+                placeholder: "",
+              },
+              { id: "edad", label: "Edad", type: "number", placeholder: "" },
+              {
+                id: "educacionFormal",
+                label: "Educación Formal",
+                type: "text",
+                placeholder: "",
+              },
+              {
+                id: "avaladoPor",
+                label: "Avalado por",
+                type: "text",
+                placeholder: "",
+              },
+              {
+                id: "puesto",
+                label: "Puesto solicitable",
+                type: "text",
+                placeholder: "",
+              },
+              {
+                id: "referidoPor",
+                label: "Referido Por",
+                type: "text",
+                placeholder: "",
+              },
+              {
+                id: "antecedentesFamiliaresUV",
+                label: "Antecedentes Familia UV",
+                type: "text",
+                placeholder: "",
+              },
+            ].map(({ id, label, type }) => (
+              <div key={id} className="flex flex-col gap-1.5">
+                <InputField
+                  id={`${fieldID}-${id}-${label}`}
+                  label={label}
+                  labelClassName="text-xs font-semibold text-slate-500 uppercase tracking-wide"
+                  type={type}
+                  className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-300 transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300"
+                  value={
+                    (formData[id as keyof typeof formData] as string) ?? ""
                   }
-                }}
-                showSearchButton={true}
-                onSearch={buscarIdProceso}
-                searchButtonTitle="Buscar proceso por ID"
-              />
-              {/* Campos simples */}
-              {[
-                {
-                  id: "hermesNotificacion",
-                  label: "Hermes:",
-                  type: "text",
-                  placeholder: "",
-                },
-                {
-                  id: "numPlaza",
-                  label: "Número de Plaza",
-                  type: "text",
-                  placeholder: "",
-                },
-                {
-                  id: "fechaElaboracionPropuesta",
-                  label: "Fecha de Elaboración",
-                  type: "date",
-                  placeholder: "",
-                },
-                {
-                  id: "nombreCandidato",
-                  label: "Nombre de candidato",
-                  type: "text",
-                  placeholder: "",
-                },
-                { id: "edad", label: "Edad", type: "number", placeholder: "" },
-                {
-                  id: "educacionFormal",
-                  label: "Educación Formal",
-                  type: "text",
-                  placeholder: "",
-                },
-                {
-                  id: "avaladoPor",
-                  label: "Avalado por",
-                  type: "text",
-                  placeholder: "",
-                },
-                {
-                  id: "puesto",
-                  label: "Puesto solicitable",
-                  type: "text",
-                  placeholder: "",
-                },
-                {
-                  id: "referidoPor",
-                  label: "Referido Por",
-                  type: "text",
-                  placeholder: "",
-                },
-                {
-                  id: "antecedentesFamiliaresUV",
-                  label: "Antecedentes Familia UV",
-                  type: "text",
-                  placeholder: "",
-                },
-              ].map(({ id, label, type }) => (
-                <div key={id} className="flex flex-col gap-1.5">
-                  <InputField
-                    id={`${fieldID}-${id}-${label}`}
-                    label={label}
-                    labelClassName="text-xs font-semibold text-slate-500 uppercase tracking-wide"
-                    type={type}
-                    className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-300 transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300"
-                    value={
-                      (formData[id as keyof typeof formData] as string) ?? ""
-                    }
-                    onChange={(e) => {
-                      const val =
-                        id === "edad"
-                          ? e.target.value.replace(/\D/g, "").slice(0, 3)
-                          : e.target.value;
-                      handleInputChange(
-                        id as keyof IPostCedulaInternaForm,
-                        val,
-                      );
-                    }}
-                  />
-                </div>
-              ))}
-
-              {/* Adscripción */}
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor={`${fieldID}-adscripcion`}
-                  className="text-xs font-semibold text-slate-500 uppercase tracking-wide"
-                >
-                  Adscripción
-                </label>
-                <Select<IDependenciaFormCedula>
-                  id={`${fieldID}-adscripcion`}
-                  options={
-                    dataDependencias?.dependencias.map((dep) => ({
-                      idDependencia: dep.idDependencia,
-                      nombre: dep.nombre,
-                      zona: dep.zona,
-                    })) ?? []
-                  }
-                  getOptionLabel={(o) => o.nombre}
-                  getOptionValue={(o) => String(o.idDependencia)}
-                  value={formData.adscripcion}
-                  onChange={(selected) =>
-                    handleInputChange(
-                      "adscripcion",
-                      selected
-                        ? {
-                            idDependencia: selected.idDependencia,
-                            nombre: selected.nombre,
-                            zona: selected.zona,
-                          }
-                        : null,
-                    )
-                  }
-                  placeholder="Escribe o selecciona..."
-                  isClearable
-                  isSearchable
+                  onChange={(e) => {
+                    const val =
+                      id === "edad"
+                        ? e.target.value.replace(/\D/g, "").slice(0, 3)
+                        : e.target.value;
+                    handleInputChange(id as keyof IPostCedulaInternaForm, val);
+                  }}
                 />
               </div>
+            ))}
+
+            {/* Adscripción */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor={`${fieldID}-adscripcion`}
+                className="text-xs font-semibold text-slate-500 uppercase tracking-wide"
+              >
+                Adscripción
+              </label>
+              <Select<IDependenciaFormCedula>
+                id={`${fieldID}-adscripcion`}
+                options={
+                  dataDependencias?.dependencias.map((dep) => ({
+                    idDependencia: dep.idDependencia,
+                    nombre: dep.nombre,
+                    zona: dep.zona,
+                  })) ?? []
+                }
+                getOptionLabel={(o) => o.nombre}
+                getOptionValue={(o) => String(o.idDependencia)}
+                value={formData.adscripcion}
+                onChange={(selected) =>
+                  handleInputChange(
+                    "adscripcion",
+                    selected
+                      ? {
+                          idDependencia: selected.idDependencia,
+                          nombre: selected.nombre,
+                          zona: selected.zona,
+                        }
+                      : null,
+                  )
+                }
+                placeholder="Escribe o selecciona..."
+                isClearable
+                isSearchable
+              />
             </div>
-          </div>
+          </FormSectionCard>
 
           {/* ── Card: Competencias ── */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-              <div className="w-1 h-5 rounded-full bg-[#18529d]" />
-              <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-                Confirmación de Competencias
-              </h2>
-            </div>
-            <div className="p-6 flex flex-col gap-5">
+          <FormSectionCard title="Competencias">
+            <div className="flex flex-col">
               {/* Selector de cédula */}
               <div className="flex flex-col gap-1.5 max-w-sm">
                 <label
@@ -935,7 +919,7 @@ function CrearCedulaInterna() {
               </div>
 
               {/* Tabla */}
-              <div className="overflow-x-auto rounded-xl border border-slate-200">
+              <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200">
                 <table className="w-full text-sm table-fixed">
                   <thead>
                     <tr className="bg-linear-to-r from-[#18529d] to-[#1a6abf] text-white">
@@ -1005,89 +989,68 @@ function CrearCedulaInterna() {
                 </table>
               </div>
             </div>
-          </div>
+          </FormSectionCard>
 
           {/* ── Card: Conocimientos específicos ── */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-              <div className="w-1 h-5 rounded-full bg-[#199532]" />
-              <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-                Conocimientos Específicos
-              </h2>
-            </div>
-            <div className="p-6 grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5">
-              {(
-                [
-                  { label: "Word", key: "resultadoHabilidadesWord" },
-                  { label: "Excel", key: "resultadoHabilidadesExcel" },
-                  {
-                    label: "Ortografía y Redacción",
-                    key: "resultadoOrtografia",
-                  },
-                  {
-                    label: "Evaluación de Conocimientos",
-                    key: "evaluacionConocimientos",
-                  },
-                ] as { label: string; key: keyof IPostCedulaInternaForm }[]
-              ).map(({ label, key }) => (
-                <div key={key} className="flex flex-col gap-1.5">
-                  <InputField
-                    id={`${fieldID}-${key}-${label}`}
-                    label={label}
-                    labelClassName="text-xs font-semibold text-slate-500 uppercase tracking-wide"
-                    type="text"
-                    className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300"
-                    value={(formData[key] as string) ?? ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        key,
-                        e.target.value as IPostCedulaInternaForm[typeof key],
-                      )
-                    }
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <FormSectionCard title="Conocimientos específicos">
+            {(
+              [
+                { label: "Word", key: "resultadoHabilidadesWord" },
+                { label: "Excel", key: "resultadoHabilidadesExcel" },
+                {
+                  label: "Ortografía y Redacción",
+                  key: "resultadoOrtografia",
+                },
+                {
+                  label: "Evaluación de Conocimientos",
+                  key: "evaluacionConocimientos",
+                },
+              ] as { label: string; key: keyof IPostCedulaInternaForm }[]
+            ).map(({ label, key }) => (
+              <div key={key} className="flex flex-col gap-1.5">
+                <InputField
+                  id={`${fieldID}-${key}-${label}`}
+                  label={label}
+                  type="text"
+                  value={(formData[key] as string) ?? ""}
+                  onChange={(e) =>
+                    handleInputChange(
+                      key,
+                      e.target.value as IPostCedulaInternaForm[typeof key],
+                    )
+                  }
+                />
+              </div>
+            ))}
+          </FormSectionCard>
 
           {/* ── Card: Conclusiones ── */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-              <div className="w-1 h-5 rounded-full bg-[#721995]" />
-              <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-                Conclusiones
-              </h2>
-            </div>
-            <div className="p-6 flex flex-col gap-5">
-              {(
-                [
-                  {
-                    label: "Expectativas laborales y económicas",
-                    key: "expectativaLaboral",
-                  },
-                  {
-                    label: "Experiencia relacionada al puesto",
-                    key: "experienciaRelacionada",
-                  },
-                  {
-                    label: "Experiencia (Periodo, Funciones, Organización)",
-                    key: "experiencia",
-                  },
-                  { label: "Conclusiones", key: "conclusiones" },
-                  { label: "Resultados", key: "resultados" },
-                ] as { label: string; key: keyof IPostCedulaInternaForm }[]
-              ).map(({ label, key }) => (
-                <div key={key} className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor={`${fieldID}-${key}`}
-                    className="text-xs font-semibold text-slate-500 uppercase tracking-wide"
-                  >
-                    {label}
-                  </label>
-                  <textarea
+            <FormSectionCard title="Conclusiones">
+              <div className="flex flex-col">
+                {(
+                  [
+                    {
+                      label: "Expectativas laborales y económicas",
+                      key: "expectativaLaboral",
+                    },
+                    {
+                      label: "Experiencia relacionada al puesto",
+                      key: "experienciaRelacionada",
+                    },
+                    {
+                      label: "Experiencia (Periodo, Funciones, Organización)",
+                      key: "experiencia",
+                    },
+                    { label: "Conclusiones", key: "conclusiones" },
+                    { label: "Resultados", key: "resultados" },
+                  ] as { label: string; key: keyof IPostCedulaInternaForm }[]
+                ).map(({ label, key }) => (
+                  <InputField
                     id={`${fieldID}-${key}`}
-                    rows={2}
-                    className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 resize-y transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300"
+                    as="textarea"
+                    key={key}
+                    label={label}
                     value={(formData[key] as string) ?? ""}
                     onChange={(e) =>
                       handleInputChange(
@@ -1096,26 +1059,19 @@ function CrearCedulaInterna() {
                       )
                     }
                   />
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </FormSectionCard>
           </div>
 
           {/* ── Botones de acción ── */}
           <div className="flex items-center justify-end gap-3 pb-10 max-[900px]:justify-center">
-            <button
-              type="submit"
-              className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-[#199532] to-[#2eb54a] rounded-lg hover:from-[#147a28] hover:to-[#27a040] shadow-sm hover:shadow-md transition-all duration-200"
-            >
+            <CustomButton variant="save" type="submit" icon={<FaSave />}>
               Guardar
-            </button>
-            <button
-              type="button"
-              onClick={handleGenerarPDF}
-              className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-[#721995] to-[#8e24aa] rounded-lg hover:from-[#52126b] hover:to-[#6a1b9a] shadow-sm hover:shadow-md transition-all duration-200"
-            >
+            </CustomButton>
+            <CustomButton variant="pdf" onClick={handleGenerarPDF}>
               Generar PDF
-            </button>
+            </CustomButton>
           </div>
         </form>
       </main>

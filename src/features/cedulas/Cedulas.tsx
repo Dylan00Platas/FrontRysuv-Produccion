@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useState } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaPlus, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
@@ -13,6 +13,8 @@ import { useCedulasFiltradas } from "@/hooks/UseCedulasFiltradas";
 import { getUniqueOptionsLabelValue } from "@/utils/utils";
 import MainHeader from "@/components/header/MainHeader";
 import { InputField } from "@/components/input-field/InputField";
+import FormSectionCard from "@/components/card/FormSectionCard";
+import { CustomButton } from "@/components/button/CustomButton";
 
 // Utils ---------------------------------------------------------------------
 const selectStyles = {
@@ -342,7 +344,7 @@ function Cedulas() {
 
         <div className="flex flex-col gap-6">
           {/* Filtros */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 px-6 py-4">
+          <FormSectionCard title="Filtros">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="w-full sm:w-auto sm:flex-1">
                 <Select<ILabelValue>
@@ -374,11 +376,11 @@ function Cedulas() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 showSearchButton={true}
-                onSearch={cedulasFiltradas}
+                onSearch={setSearchTerm}
                 searchButtonTitle="Buscar por palabra clave"
               />
             </div>
-          </div>
+          </FormSectionCard>
           {/* Tabla */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             {cedulasLoading ? (
@@ -521,18 +523,20 @@ function Cedulas() {
             </div>
 
             <div className="flex items-center gap-3">
-              <button
+              <CustomButton
+                variant="edit"
+                icon={<FaPlus />}
                 onClick={() => navigate("/crear-cedula-interna")}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-[#721995] to-[#8e24aa] rounded-lg hover:from-[#52126b] hover:to-[#6a1b9a] transition-all shadow-sm hover:shadow-md"
               >
-                <span>+</span> Cédula Interna
-              </button>
-              <button
+                Cédula interna
+              </CustomButton>
+              <CustomButton
+                variant="save"
+                icon={<FaPlus />}
                 onClick={() => navigate("/crear-cedula")}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-[#199532] to-[#2eb54a] rounded-lg hover:from-[#147a28] hover:to-[#27a040] transition-all shadow-sm hover:shadow-md"
               >
-                <span>+</span> Cédula de Resultados
-              </button>
+                Cédula de resultados
+              </CustomButton>
             </div>
           </div>
         </div>
