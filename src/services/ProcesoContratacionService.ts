@@ -1,8 +1,8 @@
-import IPostProcesoContratacion from "@/schemas/procesos-contratacion/PostProcesoContratacion";
+import { IPostProcesoContratacion, ISolicitudAsignacionRequisicion, ISolicitudBolsaTrabajo } from "@/schemas/procesos-contratacion/PostProcesoContratacion";
 import APIClient from "./connection/APIClient";
 import IResponseHTTP from "@/interfaces/http/Response";
-import IPutProcesoContratacion, {
-  IPutProcesoContratacionAgenda,
+import IPutProcesoContratacion, {type 
+  IPutProcesoContratacionCedula,
 } from "@/schemas/procesos-contratacion/PutProcesoContratacion";
 import {
   IGetProcesoContratacion,
@@ -26,7 +26,7 @@ export default class ProcesoContratacionService {
   }
 
   async postProcesoContratacion(
-    data: IPostProcesoContratacion,
+    data: IPostProcesoContratacion | ISolicitudAsignacionRequisicion | ISolicitudBolsaTrabajo,
   ): Promise<IResponseHTTP<string>> {
     return await this.api.request({
       endpoint: "/",
@@ -39,7 +39,7 @@ export default class ProcesoContratacionService {
     idProceso: number,
     data:
       | IPutProcesoContratacion
-      | IPutProcesoContratacionAgenda
+      | IPutProcesoContratacionCedula
       | { candidato: boolean },
   ): Promise<IResponseHTTP<string>> {
     return await this.api.request({
@@ -135,7 +135,7 @@ export default class ProcesoContratacionService {
     data: IPostOficioProcesoContratacion,
   ): Promise<IResponseHTTP<string>> {
     return await this.api.request({
-      endpoint: `/control-version/oficio`,
+      endpoint: `/oficio`,
       method: "POST",
       body: data,
     });

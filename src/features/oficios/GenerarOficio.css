@@ -1,0 +1,223 @@
+/* ============================================
+   GenerarOficio.css
+   Consistent with RySUV design system
+   ============================================ */
+
+/* ---------- Layout principal ---------- */
+.main-content-generar-oficio {
+   flex: 1;
+  padding: 3% 5%;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-left: 15%; /* deja espacio para el sidebar */
+}
+/* ---------- Header ---------- */
+.page-header-generar-oficio {
+  margin-bottom: 2rem;
+}
+
+.page-subtitle-generar-oficio {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin: 0 0 0.35rem 0;
+}
+
+.page-title-generar-oficio {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a2e5a;
+  margin: 0 0 0.4rem 0;
+  line-height: 1.2;
+}
+
+.page-title-generar-oficio::after {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 3px;
+  background-color: #16a34a;
+  margin-top: 0.5rem;
+  border-radius: 2px;
+}
+
+/* ---------- Sección / card ---------- */
+.card-generar-oficio {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- Grid del formulario ---------- */
+.form-grid-generar-oficio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem 1.5rem;
+  align-items: start;
+}
+
+.form-grid-generar-oficio .span-3 {
+  grid-column: span 3;
+}
+
+.form-grid-generar-oficio .span-2 {
+  grid-column: span 2;
+}
+
+/* ---------- Títulos de sección ---------- */
+.section-title-generar-oficio {
+  grid-column: span 3;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1a2e5a;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+  margin: 0.5rem 0 0.25rem 0;
+}
+
+/* ---------- Grupos de campo ---------- */
+.form-group-generar-oficio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* ---------- Labels ---------- */
+.form-label-generar-oficio {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.01em;
+}
+
+/* ---------- Inputs y selects ---------- */
+.form-input-generar-oficio {
+  height: 38px;
+  padding: 0 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #111827;
+  background-color: #ffffff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-input-generar-oficio:focus {
+  border-color: #1a2e5a;
+  box-shadow: 0 0 0 3px rgba(26, 46, 90, 0.1);
+}
+
+.form-input-generar-oficio:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+select.form-input-generar-oficio {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
+  cursor: pointer;
+}
+
+/* ---------- Textareas ---------- */
+.form-textarea-generar-oficio {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #111827;
+  background-color: #ffffff;
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.form-textarea-generar-oficio.tall {
+  min-height: 220px;
+}
+
+.form-textarea-generar-oficio:focus {
+  border-color: #1a2e5a;
+  box-shadow: 0 0 0 3px rgba(26, 46, 90, 0.1);
+}
+
+/* ---------- Botones ---------- */
+.action-buttons-generar-oficio {
+  grid-column: span 3;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.btn-guardar-oficio {
+  padding: 0.55rem 1.75rem;
+  background-color: #1a2e5a;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+}
+
+.btn-guardar-oficio:hover {
+  background-color: #14234a;
+  transform: translateY(-1px);
+}
+
+.btn-guardar-oficio:active {
+  transform: translateY(0);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .form-grid-generar-oficio {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-grid-generar-oficio .span-3,
+  .section-title-generar-oficio,
+  .action-buttons-generar-oficio {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-content-generar-oficio {
+    padding: 1.25rem 1rem;
+  }
+
+  .form-grid-generar-oficio {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid-generar-oficio .span-3,
+  .form-grid-generar-oficio .span-2,
+  .section-title-generar-oficio,
+  .action-buttons-generar-oficio {
+    grid-column: span 1;
+  }
+}
