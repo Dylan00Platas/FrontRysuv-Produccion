@@ -17,9 +17,7 @@ function VerOficios() {
   const datosIdProceso = JSON.parse(sessionStorage.getItem("datosVerOficios") || "{}");
   const idProceso = datosIdProceso.idProceso
   const [oficios, setOficios] = useState<IOficioProcesoContratacionBase[]>([]);
-  const [oficiosFiltrados, setOficiosFiltrados] = useState<
-    IOficioProcesoContratacionBase[]
-  >([]);
+  const [oficiosFiltrados, setOficiosFiltrados] = useState<IOficioProcesoContratacionBase[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -30,8 +28,10 @@ function VerOficios() {
           await new ProcesoContratacionService().getOficio(idProceso);
 
         if (response.mensaje) {
-          const adaptados = response.mensaje.oficios.map((o, idx) => ({
+          const adaptados: IOficioProcesoContratacionBase[] = response.mensaje.oficios.map((o, idx) => ({
             id: o.idOficio ?? idx,
+            idOficio: o.idOficio,
+            FKIdProcesoContratacion: o.FKIdProcesoContratacion,
             tipo: o.tipo || "Sin tipo",
             dirigido: o.dirigido || "Sin destinatario",
             fecha: o.fecha || "Sin fecha",
@@ -62,7 +62,7 @@ function VerOficios() {
     setOficiosFiltrados(filtrados);
   }, [searchTerm, oficios]);
 
-  const verDetalles = (oficio) => {
+  const verDetalles = (oficio: IOficioProcesoContratacionBase) => {
     sessionStorage.setItem("detallesOficio", JSON.stringify(oficio));
     navigate("/Ver-detalles-oficio");
   };

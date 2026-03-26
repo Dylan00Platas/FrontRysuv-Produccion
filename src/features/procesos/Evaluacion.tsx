@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { FaSearch, FaClock, FaCaretDown, FaCaretUp } from "react-icons/fa";
 import { useRef } from "react";
 import { useToast } from "@/hooks/useToast";
+import { useNavigate } from "react-router-dom";
 import IPutProcesoContratacion from "@/schemas/procesos-contratacion/PutProcesoContratacion";
 import CatalogoService from "@/services/CatalogosService";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
@@ -105,6 +106,7 @@ function Evaluacion() {
   const location = useLocation();
   const procesoSeleccionado = location.state || {};
   const [step, setStep] = useState(1);
+  const navigate = useNavigate();
   const ProcesoServicio = new ProcesoContratacionService();
   const [soloLectura, setSoloLectura] = useState<boolean>(true);
   const [showPopup, setShowPopup] = useState(false);
@@ -794,7 +796,7 @@ function Evaluacion() {
                       candidato: formData.candidato,
                     };
                     sessionStorage.setItem("datosOficio", JSON.stringify(data));
-                    window.open("/generar-oficio", "_blank");
+                    navigate("/generar-oficio")
                   }}
                 >
                   Crear Oficio
@@ -810,7 +812,7 @@ function Evaluacion() {
                     "datosVerOficios",
                     JSON.stringify({ idProceso }),
                   );
-                  window.open("/ver-oficios", "_blank");
+                  navigate("/ver-oficios")
                 }}
               >
                 Ver Oficios
@@ -1183,7 +1185,7 @@ function Evaluacion() {
                     sessionStorage.setItem("token", token || "");
                     sessionStorage.setItem("datosOficio", JSON.stringify(data));
 
-                    window.open("/generar-oficio", "_blank");
+                    window.open("/generar-oficio", "_self");
                   }}
                 >
                   Crear Oficio
@@ -1205,7 +1207,7 @@ function Evaluacion() {
                   );
 
                   // Abrir nueva pestaña / ventana
-                  window.open("/ver-oficios", "_blank");
+                  window.open("/ver-oficios", "_self");
                 }}
               >
                 Ver Oficios

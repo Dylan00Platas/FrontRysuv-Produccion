@@ -46,7 +46,6 @@ function Solicitudes() {
   useEffect(() => {
     const fetchSolicitudes = async () => {
       try {
-        const token = localStorage.getItem("token");
         const ProcesoServicio = new ProcesoContratacionService();
         const data = await ProcesoServicio.getProcesosContratacion();
         setSolicitudesRaw(data.mensaje.procesos);
