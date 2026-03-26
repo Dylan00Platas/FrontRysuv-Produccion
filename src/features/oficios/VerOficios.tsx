@@ -7,20 +7,18 @@ import {
   IOficioProcesoContratacionBase,
 } from "@/schemas/procesos-contratacion/GetOficioProcesoContratacion";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
+import './VerOficios.css'
 
 function VerOficios() {
-  const { toast, mostrarToast } = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
-  const idProceso = location?.state.idProceso;
-
+  const datosIdProceso = JSON.parse(sessionStorage.getItem("datosVerOficios") || "{}");
+  const idProceso = datosIdProceso.idProceso
   const [oficios, setOficios] = useState<IOficioProcesoContratacionBase[]>([]);
-  const [oficiosFiltrados, setOficiosFiltrados] = useState<
-    IOficioProcesoContratacionBase[]
-  >([]);
+  const [oficiosFiltrados, setOficiosFiltrados] = useState<IOficioProcesoContratacionBase[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -31,8 +29,10 @@ function VerOficios() {
           await new ProcesoContratacionService().getOficio(idProceso);
 
         if (response.mensaje) {
-          const adaptados = response.mensaje.oficios.map((o, idx) => ({
+          const adaptados: IOficioProcesoContratacionBase[] = response.mensaje.oficios.map((o, idx) => ({
             id: o.idOficio ?? idx,
+            idOficio: o.idOficio,
+            FKIdProcesoContratacion: o.FKIdProcesoContratacion,
             tipo: o.tipo || "Sin tipo",
             dirigido: o.dirigido || "Sin destinatario",
             fecha: o.fecha || "Sin fecha",
@@ -63,7 +63,7 @@ function VerOficios() {
     setOficiosFiltrados(filtrados);
   }, [searchTerm, oficios]);
 
-  const verDetalles = (oficio) => {
+  const verDetalles = (oficio: IOficioProcesoContratacionBase) => {
     sessionStorage.setItem("detallesOficio", JSON.stringify(oficio));
     navigate("/Ver-detalles-oficio");
   };
@@ -77,10 +77,9 @@ function VerOficios() {
           subtitle="Gestión de oficios"
         />
 
-        {/* Barra de búsqueda */}
-        <div className="filtros-bar">
-          <div className="filtro-busqueda" style={{ width: "300px" }}>
-            <FaSearch className="search-icon" />
+        <div className="filtros-bar-ver-oficios">
+          <div className="filtro-busqueda-ver-oficios">
+            <FaSearch className="search-icon-ver-oficios" />
             <input
               type="text"
               placeholder="Buscar..."
@@ -90,16 +89,15 @@ function VerOficios() {
           </div>
         </div>
 
-        {/* Contenido */}
         {loading ? (
-          <p className="mensaje-info">Cargando oficios...</p>
+          <p className="mensaje-cargando-ver-oficios">Cargando oficios...</p>
         ) : oficiosFiltrados.length === 0 ? (
-          <div className="mensaje-vacio-container">
+          <div className="mensaje-vacio-ver-oficios">
             <h2>No hay oficios</h2>
             <p>Este proceso no tiene oficios registrados.</p>
           </div>
         ) : (
-          <table className="tabla-solicitudes">
+          <table className="tabla-oficios">
             <thead>
               <tr>
                 <th>Tipo</th>
@@ -109,11 +107,7 @@ function VerOficios() {
             </thead>
             <tbody>
               {oficiosFiltrados.map((o) => (
-                <tr
-                  key={o.id}
-                  onClick={() => verDetalles(o)}
-                  style={{ cursor: "pointer" }}
-                >
+                <tr key={o.idOficio} onClick={() => verDetalles(o)}>
                   <td>{o.tipo}</td>
                   <td>{o.dirigido}</td>
                   <td>{o.fecha}</td>
