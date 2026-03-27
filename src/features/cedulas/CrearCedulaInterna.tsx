@@ -35,7 +35,8 @@ import {
 } from "@/components/Alert/Floating/ModalHelp";
 import FormSectionCard from "@/components/card/FormSectionCard";
 import { CustomButton } from "@/components/button/CustomButton";
-import { TextAreaField } from "@/components/input/TextareaField";
+import { TextAreaField } from "@/components/input/TextAreaField";
+import IPostCedula from "@/schemas/cedulas/PostCedula";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IPostCedulaInternaForm {
@@ -452,52 +453,54 @@ function CrearCedulaInterna() {
     }
 
     try {
+      const Cedula:IPostCedula = {
+        adscripcion: formData.adscripcion,
+        analista: formData.analista,
+        antecedentesFamiliaresUV: formData.antecedentesFamiliaresUV,
+        aprobadoDireccion: false,
+        aprobadoJefeOficina: false,
+        archivoAdjunto: false,
+        avaladoPor: formData.avaladoPor,
+        competenciaDesarrollar: "",
+        competenciaReforzar: "",
+        competenciasSobresaliente: "",
+        conclusiones: formData.conclusiones,
+        descripcionDesarrollar: "",
+        descripcionReforzar: "",
+        edad: formData.edad,
+        educacionFormal: formData.educacionFormal,
+        efectoContratacion: "",
+        elabora: formData.elabora,
+        evaluacionConocimientos: formData.evaluacionConocimientos,
+        expectativaLaboral: formData.expectativaLaboral,
+        experiencia: formData.experiencia,
+        experienciaRelacionada: formData.experienciaRelacionada,
+        fechaCedulaInterna: "",
+        fechaCedulaResultados: "",
+        fechaElaboracionPropuesta: formData.fechaElaboracionPropuesta,
+        FKIdClasificacionCedula: cedulaFromNav?.FKIdClasificacionCedula,
+        FKIdProceso: formData.FKIdProceso,
+        FKIdResultado: 0,
+        FKIdTipoCedula: formData.idCedula,
+        hermesNotificacion: formData.hermesNotificacion,
+        idCedula: formData.idCedula,
+        motivoCedulaInterna: "",
+        motivoCedulaResultados: "",
+        nombreCandidato: formData.nombreCandidato,
+        numPlaza: formData.numPlaza,
+        oficioAutorizacionDeOcupacion: "",
+        plaza: "",
+        puesto: formData.puesto,
+        referidoPor: formData.referidoPor,
+        resultadoHabilidadesExcel: formData.resultadoHabilidadesExcel,
+        resultadoHabilidadesWord: formData.resultadoHabilidadesWord,
+        resultadoOrtografia: formData.resultadoOrtografia,
+        resultados: formData.resultados,
+        revisa: formData.revisa,
+      }
+      console.log("Cédula a registrar:", Cedula);
       const responseCedula: IResponseHTTP<string | number> =
-        await new CedulaService().postCedulaInterna({
-          adscripcion: formData.adscripcion,
-          analista: formData.analista,
-          antecedentesFamiliaresUV: formData.antecedentesFamiliaresUV,
-          aprobadoDireccion: false,
-          aprobadoJefeOficina: false,
-          archivoAdjunto: false,
-          avaladoPor: formData.avaladoPor,
-          competenciaDesarrollar: "",
-          competenciaReforzar: "",
-          competenciasSobresaliente: "",
-          conclusiones: formData.conclusiones,
-          descripcionDesarrollar: "",
-          descripcionReforzar: "",
-          edad: formData.edad,
-          educacionFormal: formData.educacionFormal,
-          efectoContratacion: "",
-          elabora: formData.elabora,
-          evaluacionConocimientos: formData.evaluacionConocimientos,
-          expectativaLaboral: formData.expectativaLaboral,
-          experiencia: formData.experiencia,
-          experienciaRelacionada: formData.experienciaRelacionada,
-          fechaCedulaInterna: "",
-          fechaCedulaResultados: "",
-          fechaElaboracionPropuesta: formData.fechaElaboracionPropuesta,
-          FKIdClasificacionCedula: 0,
-          FKIdProceso: 0,
-          FKIdResultado: 0,
-          FKIdTipoCedula: 0,
-          hermesNotificacion: formData.hermesNotificacion,
-          idCedula: formData.idCedula,
-          motivoCedulaInterna: "",
-          motivoCedulaResultados: "",
-          nombreCandidato: formData.nombreCandidato,
-          numPlaza: formData.numPlaza,
-          oficioAutorizacionDeOcupacion: "",
-          plaza: "",
-          puesto: formData.puesto,
-          referidoPor: formData.referidoPor,
-          resultadoHabilidadesExcel: formData.resultadoHabilidadesExcel,
-          resultadoHabilidadesWord: formData.resultadoHabilidadesWord,
-          resultadoOrtografia: formData.resultadoOrtografia,
-          resultados: formData.resultados,
-          revisa: formData.revisa,
-        });
+        await new CedulaService().postCedulaInterna(Cedula);
 
       if (responseCedula.error) {
         throw new Error(
