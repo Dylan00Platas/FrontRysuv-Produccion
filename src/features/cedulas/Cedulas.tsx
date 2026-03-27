@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useState } from "react";
-import { FaSearch } from "react-icons/fa";
+import { FaPlus, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 
@@ -12,7 +12,10 @@ import { useCedulas } from "@/hooks/useCedulas";
 import { useCedulasFiltradas } from "@/hooks/UseCedulasFiltradas";
 import { getUniqueOptionsLabelValue } from "@/utils/utils";
 import MainHeader from "@/components/header/MainHeader";
-import { InputField } from "@/components/input-field/InputField";
+import { InputField } from "@/components/input/InputField";
+import FormSectionCard from "@/components/card/FormSectionCard";
+import { CustomButton } from "@/components/button/CustomButton";
+import { CheckboxField } from "@/components/input/CheckBoxField";
 
 // Utils ---------------------------------------------------------------------
 const selectStyles = {
@@ -342,7 +345,7 @@ function Cedulas() {
 
         <div className="flex flex-col gap-6">
           {/* Filtros */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 px-6 py-4">
+          <FormSectionCard title="Filtros">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="w-full sm:w-auto sm:flex-1">
                 <Select<ILabelValue>
@@ -374,11 +377,11 @@ function Cedulas() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 showSearchButton={true}
-                onSearch={cedulasFiltradas}
+                onSearch={setSearchTerm}
                 searchButtonTitle="Buscar por palabra clave"
               />
             </div>
-          </div>
+          </FormSectionCard>
           {/* Tabla */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
             {cedulasLoading ? (
@@ -428,8 +431,7 @@ function Cedulas() {
                       >
                         {showCheckboxes && (
                           <td className="px-4 py-3">
-                            <InputField
-                              type="checkbox"
+                            <CheckboxField
                               checked={selectedCedulas.includes(c.idCedula)}
                               onChange={() => toggleSelect(c.idCedula)}
                               onClick={(e) => e.stopPropagation()}
@@ -488,51 +490,50 @@ function Cedulas() {
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div>
               {!showCheckboxes ? (
-                <button
+                <CustomButton
+                  variant="pdf"
                   onClick={() => setShowCheckboxes(true)}
-                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
                 >
-                  Archivar cédulas
-                </button>
+                  Archivas cédulas
+                </CustomButton>
               ) : (
                 <div className="flex items-center gap-2">
-                  <button
+                  <CustomButton
+                    variant="cancel"
                     onClick={() => {
                       setShowCheckboxes(false);
                       setSelectedCedulas([]);
                     }}
-                    className="px-4 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all shadow-sm"
                   >
                     Cancelar
-                  </button>
+                  </CustomButton>
                   {selectedCedulas.length > 0 && (
-                    <button
-                      onClick={archivarCedulas}
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-amber-500 to-orange-500 rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm"
-                    >
+                    <CustomButton variant="save" onClick={archivarCedulas}>
                       Archivar{" "}
                       <span className="bg-white/20 px-1.5 py-0.5 rounded-md text-xs">
                         {selectedCedulas.length}
                       </span>
-                    </button>
+                    </CustomButton>
                   )}
                 </div>
               )}
             </div>
 
             <div className="flex items-center gap-3">
-              <button
+              <CustomButton
+                variant="edit"
+                icon={<FaPlus />}
                 onClick={() => navigate("/crear-cedula-interna")}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-[#721995] to-[#8e24aa] rounded-lg hover:from-[#52126b] hover:to-[#6a1b9a] transition-all shadow-sm hover:shadow-md"
               >
-                <span>+</span> Cédula Interna
-              </button>
-              <button
+                Cédula interna
+              </CustomButton>
+              <CustomButton
+                variant="save"
+                icon={<FaPlus />}
                 onClick={() => navigate("/crear-cedula")}
-                className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-linear-to-r from-[#199532] to-[#2eb54a] rounded-lg hover:from-[#147a28] hover:to-[#27a040] transition-all shadow-sm hover:shadow-md"
               >
-                <span>+</span> Cédula de Resultados
-              </button>
+                Cédula de resultados
+              </CustomButton>
             </div>
           </div>
         </div>

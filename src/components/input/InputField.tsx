@@ -1,14 +1,37 @@
 import clsx from "clsx";
 import { FaSearch } from "react-icons/fa";
-import { InputFieldProps } from "./InputFieldProps";
+
+export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  className?: string;
+  label?: string;
+  labelClassName?: string;
+  ref?: React.RefObject<HTMLInputElement | null>; // Para manejo de archivos
+  // Props para searchbox
+  showSearchButton?: boolean;
+  onSearch?: () => void;
+  searchButtonTitle?: string;
+  searchButtonClassName?: string;
+  type?:
+    | "text"
+    | "number"
+    | "email"
+    | "password"
+    | "tel"
+    | "url"
+    | "date"
+    | "datetime-local"
+    | "time"
+    | "month"
+    | "week"
+    | string;
+}
 
 export const InputField: React.FC<InputFieldProps> = ({
   className,
   label,
   labelClassName,
   id,
-  autoComplete = "off",
-  // Props para el search box
+  // Props para searchbox
   showSearchButton = false,
   onSearch,
   searchButtonTitle = "Buscar",
@@ -25,9 +48,6 @@ export const InputField: React.FC<InputFieldProps> = ({
         className={clsx(
           "w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-300 transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300",
           showSearchButton && "pr-12",
-          // Estilos específicos para input type date
-          type === "date" &&
-            "appearance-none [&::-webkit-calendar-picker-indicator]:cursor-pointer",
           className,
         )}
       />
