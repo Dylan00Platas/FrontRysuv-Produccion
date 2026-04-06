@@ -1,16 +1,23 @@
-import { useEffect, useState, useContext } from "react";
-import { data, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaUserLock, FaSearch } from "react-icons/fa";
 import CatalogoService from "@/services/CatalogosService";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
+
 import "./IniciarSolicitud.css";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
 import { useCookie } from "@/hooks/useCookie";
 import MainHeader from "@/components/header/MainHeader";
 import { InputField } from "@/components/input/InputField";
 import FormSectionCard from "@/components/card/FormSectionCard";
+import { CustomButton } from "@/components/button/CustomButton";
+import { SelectField } from "@/components/input/SelectField";
+import {
+  ISolicitudAsignacionRequisicion,
+  ISolicitudBolsaTrabajo,
+} from "@/schemas/procesos-contratacion/PostProcesoContratacion";
 
 interface ICandidato {
   nombre: string;
@@ -227,7 +234,7 @@ function IniciarSolicitud() {
               dataConCandidato.seguimientoDesempeno,
             resultadoSeguimientoEvaluacionDesempenio:
               dataConCandidato.resultadoSeguimiento,
-            FKIdAcceso: datosSesion!.idAcceso,
+            FKIdAcceso: currentUser!.idAcceso,
             autorizacion: dataConCandidato.autorizacion,
             categoriaAutorizadaOficio: dataConCandidato.categoriaAutorizada,
             FKIdTipoProceso: 3,
@@ -250,7 +257,7 @@ function IniciarSolicitud() {
               dataConCandidato.tipo === "temporal" ? 1 : 2,
             FKIdEstadoProcesoContratacion: dataConCandidato.estado,
             FKIdTipoProceso: tipoSolicitud === "Asignación" ? 1 : 2,
-            FKIdAcceso: datosSesion!.idAcceso,
+            FKIdAcceso: currentUser!.idAcceso,
             numPlaza: dataConCandidato.numPlaza,
             categoriaAutorizadaOficio: dataConCandidato.categoriaOrigen,
             titularPlaza: dataConCandidato.titularPlaza,
@@ -340,10 +347,7 @@ function IniciarSolicitud() {
     }
   };
 
-  const handleBuscarDependencia = (
-    e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent,
-  ) => {
-    e.preventDefault();
+  const handleBuscarDependencia = () => {
     const numDep = formData.numDependencia.trim();
     const dep = dependencias.find(
       (dependecia) => dependecia.numDependencia === numDep,
@@ -383,18 +387,16 @@ function IniciarSolicitud() {
             subtitle="Gestión de solicitudes"
           />
 
-          <select
-            className="header-select-solicitud"
+          <SelectField
+            label="Tipo de solicitud:"
+            options={[
+              { value: "Asignacion", label: "Asignación" },
+              { value: "Requisición", label: "Requisición" },
+              { value: "Bolsa", label: "Bolsa de trabajo" },
+            ]}
             value={tipoSolicitud}
-            onChange={(e) => setTipoSolicitud(e.target.value)}
-          >
-            <option value="" disabled>
-              Seleccionar tipo de solicitud
-            </option>
-            <option value="Asignación">Asignación</option>
-            <option value="Requisición">Requisición</option>
-            <option value="Bolsa">Bolsa de Trabajo</option>
-          </select>
+            onChange={(e) => setTipoSolicitud}
+          />
         </div>
 
         <div className="form-wrapper">
@@ -458,11 +460,11 @@ function IniciarSolicitud() {
                 }
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    handleBuscarDependencia(e);
+                    handleBuscarDependencia;
                   }
                 }}
                 showSearchButton={true}
-                onSearch={(e) => handleBuscarDependencia(e)}
+                onSearch={() => handleBuscarDependencia}
                 searchButtonTitle="Buscar dependencia"
               />
 
@@ -486,22 +488,15 @@ function IniciarSolicitud() {
                 onChange={(e) => handleInputChange("region", e.target.value)}
               />
 
-              <div className="form-group">
-                <label className="form-label-solicitud">Tipo de Personal</label>
-                <select
-                  className="form-input-solicitud"
-                  value={formData.tipoPersonal}
-                  onChange={(e) =>
-                    handleInputChange("tipoPersonal", e.target.value)
-                  }
-                >
-                  <option value="" disabled>
-                    Seleccionar
-                  </option>
-                  <option value="eventual">Eventual</option>
-                  <option value="confianza">Confianza</option>
-                </select>
-              </div>
+              <SelectField
+                label="Tipo de personal:"
+                value={formData.tipoPersonal}
+                onChange={(e) => handleInputChange("tipoPersonal", e)}
+                options={[
+                  { value: "eventual", label: "Eventual" },
+                  { value: "confianza", label: "Confianza" },
+                ]}
+              />
 
               <InputField
                 label="Número de plaza:"
@@ -525,25 +520,17 @@ function IniciarSolicitud() {
                 }
               />
 
-              {/* Lineamiento que aplica */}
-              <div className="form-group">
-                <label className="form-label-evaluacion">
-                  Lineamiento que aplica
-                </label>
-                <select
-                  className="form-input-evaluacion"
-                  value={formData.lineamiento}
-                  onChange={(e) =>
-                    handleInputChange("lineamiento", e.target.value)
-                  }
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="4.1 y 4.2">4.1 y 4.2</option>
-                  <option value="5.1 y 5.2">5.1 y 5.2</option>
-                  <option value="4.3">4.3</option>
-                  <option value="N/A">N/A</option>
-                </select>
-              </div>
+              <SelectField
+                label="Lineamiento que aplica:"
+                value={formData.lineamiento}
+                onChange={(e) => handleInputChange("lineamiento", e)}
+                options={[
+                  { value: "4.1 y 4.2", label: "4.1 y 4.2" },
+                  { value: "5.1 y 5.2", label: "5.1 y 5.2" },
+                  { value: "4.3", label: "4.3" },
+                  { value: "N/A", label: "N/A" },
+                ]}
+              />
 
               <InputField
                 label="Motivo:"
@@ -595,20 +582,15 @@ function IniciarSolicitud() {
                 }
               />
 
-              <div className="form-group-solicitud">
-                <label className="form-label-solicitud">Tipo</label>
-                <select
-                  className="form-input-solicitud"
-                  value={formData.tipo}
-                  onChange={(e) => handleInputChange("tipo", e.target.value)}
-                >
-                  <option value="" disabled>
-                    Seleccionar
-                  </option>
-                  <option value="temporal">Temporal</option>
-                  <option value="definitiva">Definitiva</option>
-                </select>
-              </div>
+              <SelectField
+                label="Tipo:"
+                value={formData.tipo}
+                onChange={(e) => handleInputChange("tipo", e)}
+                options={[
+                  { value: "temporal", label: "Temporal" },
+                  { value: "Definitiva", label: "Definitiva" },
+                ]}
+              />
 
               <InputField
                 label="Autorización:"
@@ -726,23 +708,15 @@ function IniciarSolicitud() {
                     }
                   />
 
-                  {/* Otros campos de resultados y seguimiento */}
-                  <div className="form-group-solicitud">
-                    <label className="form-label-solicitud">Beneficiado</label>
-                    <select
-                      className="form-input-solicitud"
-                      value={formData.beneficiado ? "si" : "no"}
-                      onChange={(e) =>
-                        handleInputChange("beneficiado", e.target.value)
-                      }
-                    >
-                      <option value="" disabled>
-                        Seleccionar
-                      </option>
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
+                  <SelectField
+                    label="Beneficiado:"
+                    value={formData.beneficiado ? "si" : "no"}
+                    onChange={(e) => handleInputChange("beneficiado", e)}
+                    options={[
+                      { value: "si", label: "Si" },
+                      { value: "no", label: "No" },
+                    ]}
+                  />
 
                   <InputField
                     label="Fecha revisión OfiEval:"
@@ -798,27 +772,17 @@ function IniciarSolicitud() {
                     }
                   />
 
-                  <div className="form-group">
-                    <label className="form-label-solicitud">
-                      Seguimiento Evaluación Desempeño
-                    </label>
-                    <select
-                      className="form-input-solicitud"
-                      value={formData.seguimientoDesempeno}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "seguimientoDesempeno",
-                          e.target.value,
-                        )
-                      }
-                    >
-                      <option value="" disabled>
-                        Seleccionar
-                      </option>
-                      <option value="si">Sí</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
+                  <SelectField
+                    label="Seguimiento evaluación desempeño:"
+                    value={formData.seguimientoDesempeno}
+                    onChange={(e) =>
+                      handleInputChange("seguimientoDesempeno", e)
+                    }
+                    options={[
+                      { value: "si", label: "Si" },
+                      { value: "no", label: "No" },
+                    ]}
+                  />
 
                   <InputField
                     label="Resultado seguimiento evaluación desempeño:"
@@ -835,14 +799,11 @@ function IniciarSolicitud() {
             {/*  Asignación/Requisición */}
             {tipoSolicitud !== "Bolsa" && (
               <>
-                <div className="form-group-solicitud">
-                  <label className="form-label-solicitud">
-                    Cantidad de candidatos
-                  </label>
-                  <input
+                <FormSectionCard title="Datos de los candidatos:">
+                  <InputField
+                    label="Cantidad de candidatos:"
                     type="number"
                     min="1"
-                    className="form-input-solicitud"
                     value={formData.cantidadCandidatos}
                     onChange={(e) => {
                       const cantidad = parseInt(e.target.value, 10) || 1;
@@ -858,57 +819,46 @@ function IniciarSolicitud() {
                       handleInputChange("candidatos", nuevosCandidatos);
                     }}
                   />
-                </div>
 
-                <div style={{ gridColumn: "1 / -1" }}>
-                  {formData.candidatos.map((candidato, index) => (
-                    <div key={index} className="candidato-section">
-                      <h3 className="section-title">Candidato {index + 1}</h3>
-
-                      <div className="form-group-solicitud">
-                        <label className="form-label-solicitud">
-                          Nombre del Candidato
-                        </label>
-                        <input
-                          type="text"
-                          className="form-input-solicitud candidato-input"
-                          value={candidato.nombre}
-                          onChange={(e) => {
-                            const updated = [...formData.candidatos];
-                            updated[index].nombre = e.target.value;
-                            handleInputChange("candidatos", updated);
-                          }}
-                        />
-                      </div>
-
-                      <div className="form-group-solicitud">
-                        <label className="form-label-solicitud">
-                          Fecha de cita
-                        </label>
-                        <input
-                          type="date"
-                          className="form-input-solicitud candidato-input"
-                          value={candidato.fechaCita}
-                          onChange={(e) => {
-                            const updated = [...formData.candidatos];
-                            updated[index].fechaCita = e.target.value;
-                            handleInputChange("candidatos", updated);
-                          }}
-                        />
-                      </div>
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3">
+                      {formData.candidatos.map((candidato, index) => (
+                        <FormSectionCard
+                          key={index}
+                          title={`Candidato ${index + 1}`}
+                        >
+                          <InputField
+                            label="Nombre del candidato:"
+                            value={candidato.nombre}
+                            onChange={(e) => {
+                              const updated = [...formData.candidatos];
+                              updated[index].nombre = e.target.value;
+                              handleInputChange("candidatos", updated);
+                            }}
+                          />
+                          <InputField
+                            label="Fecha de cita:"
+                            type="date"
+                            value={candidato.fechaCita}
+                            onChange={(e) => {
+                              const updated = [...formData.candidatos];
+                              updated[index].fechaCita = e.target.value;
+                              handleInputChange("candidatos", updated);
+                            }}
+                          />
+                        </FormSectionCard>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                </FormSectionCard>
               </>
             )}
 
-            <div
-              className="form-group-solicitud action-buttons"
-              style={{ gridColumn: "span 3" }}
-            >
-              <button type="submit" className="btn-guardar-solicitud">
+            <div className="flex items-center justify-end gap-3 pb-10 max-[900px]:justify-center">
+              <CustomButton variant="save" type="submit">
                 Guardar
-              </button>
+              </CustomButton>
+              <CustomButton variant="cancel">Cancelar</CustomButton>
             </div>
           </form>
         </div>

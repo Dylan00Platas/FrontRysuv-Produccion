@@ -2,8 +2,8 @@ import { useState } from "react";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun, AlignmentType } from "docx";
 import { PDFDocument, PDFFont, PDFPage } from "pdf-lib";
-import fontkit from "@pdf-lib/fontkit"
-import {PDFTextField} from "pdf-lib"
+import fontkit from "@pdf-lib/fontkit";
+import { PDFTextField } from "pdf-lib";
 import ManageFiles from "@/utils/ManageFiles";
 import MainHeader from "@/components/header/MainHeader";
 
@@ -36,7 +36,9 @@ function VerDetallesOficio() {
       const gillSans = await pdfDoc.embedFont(fontBytes);
 
       form.getTextField("dirigido").setText(formData.destinatario || "");
-      form.getTextField("puestoDirigido").setText(formData.puestoDestinatario || "");
+      form
+        .getTextField("puestoDirigido")
+        .setText(formData.puestoDestinatario || "");
       form.getTextField("copiaCarbon").setText(formData.copiaCarbon || "");
       form.getTextField("folio").setText("");
       form.getTextField("fecha").setText("");
@@ -86,13 +88,21 @@ function VerDetallesOficio() {
             if (isLastLine || wordsInLine.length === 1) {
               page.drawText(lineText, { x, y: cursorY, size: fontSize, font });
             } else {
-              const textWidth = font.widthOfTextAtSize(lineText.replace(/ /g, ""), fontSize);
+              const textWidth = font.widthOfTextAtSize(
+                lineText.replace(/ /g, ""),
+                fontSize,
+              );
               const totalSpaces = wordsInLine.length - 1;
               const spaceWidth = (width - textWidth) / totalSpaces;
               let cursorX = x;
 
               wordsInLine.forEach((word) => {
-                page.drawText(word, { x: cursorX, y: cursorY, size: fontSize, font });
+                page.drawText(word, {
+                  x: cursorX,
+                  y: cursorY,
+                  size: fontSize,
+                  font,
+                });
                 cursorX += font.widthOfTextAtSize(word, fontSize) + spaceWidth;
               });
             }
@@ -118,8 +128,22 @@ function VerDetallesOficio() {
         page.drawText(text, { x: rightX - textWidth, y, size: fontSize, font });
       }
 
-      drawRightAlignedText(page, String(formData.folioOficio), 553, 650, gillSans, 11);
-      drawRightAlignedText(page, String(formData.fechaOficio), 553, 636, gillSans, 11);
+      drawRightAlignedText(
+        page,
+        String(formData.folioOficio),
+        553,
+        650,
+        gillSans,
+        11,
+      );
+      drawRightAlignedText(
+        page,
+        String(formData.fechaOficio),
+        553,
+        636,
+        gillSans,
+        11,
+      );
       drawJustifiedText(page, formData.cuerpo, 120, 560, 450, gillSans, 11, 14);
 
       form.getFields().forEach((field) => {
@@ -129,7 +153,9 @@ function VerDetallesOficio() {
       });
 
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([ManageFiles.toArrayBuffer(pdfBytes)], { type: "application/pdf" });
+      const blob = new Blob([ManageFiles.toArrayBuffer(pdfBytes)], {
+        type: "application/pdf",
+      });
       const url = URL.createObjectURL(blob);
 
       const link = document.createElement("a");
@@ -172,7 +198,10 @@ function VerDetallesOficio() {
             new Paragraph({ text: "" }),
             new Paragraph({
               children: [
-                new TextRun({ text: `C.c.p. ${formData.copiaCarbon}`, italics: true }),
+                new TextRun({
+                  text: `C.c.p. ${formData.copiaCarbon}`,
+                  italics: true,
+                }),
               ],
             }),
           ],
@@ -193,10 +222,17 @@ function VerDetallesOficio() {
           <h3 className="section-title">Datos del oficio</h3>
 
           {/* Folio */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}
+          >
             <label
               htmlFor="ver-folio-oficio"
-              style={{ fontSize: "0.78rem", fontWeight: 600, color: "#374151", letterSpacing: "0.01em" }}
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: "#374151",
+                letterSpacing: "0.01em",
+              }}
             >
               Folio del oficio
             </label>
@@ -222,10 +258,17 @@ function VerDetallesOficio() {
           </div>
 
           {/* Fecha */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}
+          >
             <label
               htmlFor="ver-fecha-oficio"
-              style={{ fontSize: "0.78rem", fontWeight: 600, color: "#374151", letterSpacing: "0.01em" }}
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: "#374151",
+                letterSpacing: "0.01em",
+              }}
             >
               Fecha del oficio
             </label>
@@ -251,10 +294,17 @@ function VerDetallesOficio() {
           </div>
 
           {/* Destinatario */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}
+          >
             <label
               htmlFor="ver-destinatario"
-              style={{ fontSize: "0.78rem", fontWeight: 600, color: "#374151", letterSpacing: "0.01em" }}
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: "#374151",
+                letterSpacing: "0.01em",
+              }}
             >
               Destinatario
             </label>
@@ -280,10 +330,17 @@ function VerDetallesOficio() {
           </div>
 
           {/* Puesto destinatario */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}
+          >
             <label
               htmlFor="ver-puesto-destinatario"
-              style={{ fontSize: "0.78rem", fontWeight: 600, color: "#374151", letterSpacing: "0.01em" }}
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: "#374151",
+                letterSpacing: "0.01em",
+              }}
             >
               Puesto (destinatario)
             </label>
@@ -319,7 +376,12 @@ function VerDetallesOficio() {
           >
             <label
               htmlFor="ver-cuerpo-oficio"
-              style={{ fontSize: "0.78rem", fontWeight: 600, color: "#374151", letterSpacing: "0.01em" }}
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: "#374151",
+                letterSpacing: "0.01em",
+              }}
             >
               Cuerpo del Oficio
             </label>
@@ -357,7 +419,12 @@ function VerDetallesOficio() {
           >
             <label
               htmlFor="ver-copia-carbon"
-              style={{ fontSize: "0.78rem", fontWeight: 600, color: "#374151", letterSpacing: "0.01em" }}
+              style={{
+                fontSize: "0.78rem",
+                fontWeight: 600,
+                color: "#374151",
+                letterSpacing: "0.01em",
+              }}
             >
               Copia Carbón
             </label>
@@ -385,25 +452,21 @@ function VerDetallesOficio() {
           </div>
 
           {/* Botones */}
-          <div
-            style={{
-              gridColumn: "span 3",
-              display: "flex",
-              justifyContent: "center",
-              gap: "1rem",
-              marginTop: "0.75rem",
-            }}
-          >
+          <div className="col-span-3 flex justify-center gap-4 mt-3">
             <button
               type="button"
               onClick={handleGenerarPDF}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#14234a";
-                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                  "#14234a";
+                (e.currentTarget as HTMLButtonElement).style.transform =
+                  "translateY(-1px)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1a2e5a";
-                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                  "#1a2e5a";
+                (e.currentTarget as HTMLButtonElement).style.transform =
+                  "translateY(0)";
               }}
               style={{
                 padding: "0.55rem 1.75rem",
@@ -416,6 +479,7 @@ function VerDetallesOficio() {
                 cursor: "pointer",
                 transition: "background-color 0.15s, transform 0.1s",
               }}
+              className="px-[0.55rem] py-7 bg-[#1a2e5a] text-white border-none rounded-md text-sm font-semibold cursor-pointer transition duration-150 hover:bg-[#15803d] hover:translate-y-"
             >
               Generar PDF
             </button>
@@ -424,31 +488,25 @@ function VerDetallesOficio() {
               type="button"
               onClick={handleGenerarWord}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#15803d";
-                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                  "#15803d";
+                (e.currentTarget as HTMLButtonElement).style.transform =
+                  "translateY(-1px)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#16a34a";
-                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                  "#16a34a";
+                (e.currentTarget as HTMLButtonElement).style.transform =
+                  "translateY(0)";
               }}
-              style={{
-                padding: "0.55rem 1.75rem",
-                backgroundColor: "#16a34a",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "0.875rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "background-color 0.15s, transform 0.1s",
-              }}
+              className="px-[0.55rem] py-7 bg-[#16a34a] text-white border-none rounded-md text-sm font-semibold cursor-pointer transition duration-150 hover:bg-[#15803d] hover:translate-y-"
             >
               Descargar Word
             </button>
           </div>
-        </div>
-      </div>
-    </main>
+        </form>
+      </main>
+    </>
   );
 }
 

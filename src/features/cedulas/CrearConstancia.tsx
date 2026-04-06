@@ -1179,7 +1179,6 @@ function CrearConstancia() {
                   type="file"
                   accept="application/pdf"
                   ref={fileInputRef}
-                  className="hidden-file-input"
                   onChange={async (e) => {
                     const archivo = e.target.files?.[0];
                     if (!archivo) return;
