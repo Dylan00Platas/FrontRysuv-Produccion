@@ -7,17 +7,17 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
+import { FaSave } from "react-icons/fa";
 
 import "./Agenda.css";
 import SolicitudService from "@/services/ProcesoContratacionService";
 import IResponseHTTP from "@/interfaces/http/Response";
 import ILabelValue from "@/interfaces/LabelValue";
-import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import MainHeader from "@/components/header/MainHeader";
+import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import { InputField } from "@/components/input/InputField";
-import { CheckboxField } from "@/components/input/CheckBoxField";
 import { CustomButton } from "@/components/button/CustomButton";
-import { FaSave } from "react-icons/fa";
+import { CheckboxField } from "@/components/input/CheckboxField";
 
 // Interfaces de UI -----------------------------------------------------------
 interface IEventoAgenda {
@@ -75,9 +75,9 @@ const mapColorEstado = (estado: EstadoProceso): string => {
       return "#d11a2a";
   }
 };
-function resolverColor(estado: number, atendioCita: boolean): string {
+const resolverColor = (estado: number, atendioCita: boolean): string => {
   return atendioCita ? "#d11a2a" : mapColorEstado(estado);
-}
+};
 function solicitudAEvento(s): IEventoAgenda {
   const colorBase = resolverColor(
     s.FKIdEstadoProcesoContratacion,

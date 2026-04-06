@@ -41,18 +41,6 @@ export const AsyncReactSelectField = <Option,>({
   );
 };
 
-// Uso
-const loadOptions = async (inputValue: string) => {
-  // TODO-Desarrollo:
-  const response = await fetch(`/api/dependencias?search=${inputValue}`);
-  const data = await response.json();
-  return data.map((item: any) => ({
-    value: item.idDependencia,
-    label: item.nombre,
-    zona: item.zona,
-  }));
-};
-
 /*
 <AsyncReactSelectField
   label="Buscar adscripción"

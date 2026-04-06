@@ -34,3 +34,6 @@ dist-ssr
 node_modules
 node_modules/*
 jspm_packages
+pnpm-lock.yaml
+pnpm-workspace.yaml
+*.txt
