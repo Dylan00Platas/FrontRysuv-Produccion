@@ -364,10 +364,10 @@ function CrearCedulaInterna() {
       if (!responseProcesoContratacion.mensaje) return;
 
       const proceso = responseProcesoContratacion.mensaje;
-
+      console.log(proceso)
       const currentDependencia: IResponseHTTP<IDependenciaBase> =
         await new CatalogoService().getDependenciaById(
-          proceso.procesoContratación.FKIdDependencia,
+          proceso.procesoContratacion.FKIdDependencia,
         );
       const dep = currentDependencia.mensaje ?? null;
 
@@ -382,21 +382,21 @@ function CrearCedulaInterna() {
               zona: dep.zona,
             }
           : null,
-        avaladoPor: proceso.procesoContratación.avaladoPor || "",
-        educacionFormal: proceso.procesoContratación.educacionFormal || "",
+        avaladoPor: proceso.procesoContratacion.avaladoPor || "",
+        educacionFormal: proceso.procesoContratacion.educacionFormal || "",
         evaluacionConocimientos:
-          proceso.procesoContratación.resultadoEvaluacionConocimiento || "",
-        FKIdProceso: proceso.procesoContratación.idProceso || prev.FKIdProceso,
+          proceso.procesoContratacion.resultadoEvaluacionConocimiento || "",
+        FKIdProceso: proceso.procesoContratacion.idProceso || prev.FKIdProceso,
         hermesNotificacion:
-          proceso.procesoContratación.hermesNotificacion || "",
-        nombreCandidato: proceso.procesoContratación.nombreCandidato || "",
-        numPlaza: proceso.procesoContratación.numPlaza || "",
+          proceso.procesoContratacion.hermesNotificacion || "",
+        nombreCandidato: proceso.procesoContratacion.nombreCandidato || "",
+        numPlaza: proceso.procesoContratacion.numPlaza || "",
         resultadoHabilidadesExcel:
-          String(proceso.procesoContratación.resultadoHabilidadesExcel) || "",
+          String(proceso.procesoContratacion.resultadoHabilidadesExcel) || "",
         resultadoHabilidadesWord:
-          String(proceso.procesoContratación.resultadoHabilidadesWord) || "",
+          String(proceso.procesoContratacion.resultadoHabilidadesWord) || "",
         resultadoOrtografia:
-          String(proceso.procesoContratación.resultadoOrtografia) || "",
+          String(proceso.procesoContratacion.resultadoOrtografia) || "",
       }));
     } catch (error) {
       console.error(
@@ -422,7 +422,7 @@ function CrearCedulaInterna() {
 
     const cedulaMatch = dataCedulaTipos?.tiposCedula.find((opt) =>
       normalizar(opt.cedula).includes(
-        normalizar(procesoCargado.procesoContratación.funcionDesempeniar),
+        normalizar(procesoCargado.procesoContratacion.funcionDesempeniar),
       ),
     );
 
@@ -549,7 +549,7 @@ function CrearCedulaInterna() {
       });
 
       const solicitudData = {
-        FKIdDependencia: formData.adscripcion?.idDependencia ?? null,
+        FKIdDependencia: formData.adscripcion!.idDependencia,
         numeroPlaza: formData.numPlaza,
         nombreCandidato: formData.nombreCandidato,
         resultadoHabilidadesWord: formData.resultadoHabilidadesWord,

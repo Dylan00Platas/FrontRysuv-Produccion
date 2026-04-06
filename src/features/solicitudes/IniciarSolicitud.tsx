@@ -8,7 +8,6 @@ import { useToast } from "@/hooks/useToast";
 
 import "./IniciarSolicitud.css";
 import { IDependenciaBase } from "@/schemas/catalogos/GetDependencia";
-import { useCookie } from "@/hooks/useCookie";
 import MainHeader from "@/components/header/MainHeader";
 import { InputField } from "@/components/input/InputField";
 import FormSectionCard from "@/components/card/FormSectionCard";
@@ -18,6 +17,7 @@ import {
   ISolicitudAsignacionRequisicion,
   ISolicitudBolsaTrabajo,
 } from "@/schemas/procesos-contratacion/PostProcesoContratacion";
+import IGetSesion from "@/schemas/acceso/GetSesion";
 
 interface ICandidato {
   nombre: string;
@@ -85,7 +85,7 @@ function IniciarSolicitud() {
   const [dependenciasCargadas, setDependenciasCargadas] = useState(false);
   const [dependencias, setDependencias] = useState<IDependenciaBase[]>([]);
   const { toast, mostrarToast } = useToast();
-  const { currentUser } = useCookie();
+  const [datosSesion, setDatosSesion] = useState<IGetSesion | null>(null);
 
   const [formData, setFormData] = useState<IProcesoContratacion>({
     idAcceso: 0,
@@ -153,6 +153,28 @@ function IniciarSolicitud() {
     }
 
     cargarDependencias();
+  }, []);
+
+  useEffect(() => {
+    async function ObtenerSesion() {
+      if (datosSesion === null) {
+        const AuthServicio = new AuthService();
+        const respuesta = await AuthServicio.session();
+        if (respuesta.mensaje.usuario) {
+          const DatosSesion: IGetSesion = {
+            tipoDeAcceso: respuesta.mensaje.tipoDeAcceso,
+            usuario: respuesta.mensaje.usuario,
+            idAcceso: respuesta.mensaje.idAcceso,
+            nombre: respuesta.mensaje.nombre,
+            primerApellido: respuesta.mensaje.primerApellido,
+            segundoApellido: respuesta.mensaje.segundoApellido,
+          };
+          setDatosSesion(DatosSesion);
+        }
+      }
+    }
+
+    ObtenerSesion();
   }, []);
 
   {

@@ -68,7 +68,7 @@ export default class CatalogoService {
     idDependencia: number,
   ): Promise<IResponseHTTP<IDependenciaBase>> {
     return await this.api.request({
-      endpoint: `/dependencias/${idDependencia}`,
+      endpoint: `/dependencia/${idDependencia}`,
       method: "GET",
     });
   }
