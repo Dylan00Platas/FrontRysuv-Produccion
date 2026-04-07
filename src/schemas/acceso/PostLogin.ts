@@ -1,4 +1,4 @@
 export default interface ILogin {
-  usuario: string;
-  contrasenia: string;
+	usuario: string;
+	contrasenia: string;
 }

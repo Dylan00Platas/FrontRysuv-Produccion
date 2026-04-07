@@ -1,8 +1,8 @@
 export default interface IPostUsuario {
-  contrasenia: string;
-  FKIdTipoAcceso: string;
-  nombre: string;
-  primerApellido: string;
-  segundoApellido: string;
-  usuario: string;
+	usuario: string;
+	contrasenia: string;
+	FKIdTipoAcceso: number;
+	nombre: string;
+	primerApellido: string;
+	segundoApellido: string;
 }

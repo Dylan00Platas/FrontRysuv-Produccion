@@ -31,6 +31,8 @@ dist-ssr
 .@/ssl/
 
 # Paquetes
+.vite/
+.vite/*
 node_modules
 node_modules/*
 jspm_packages
