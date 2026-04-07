@@ -9,10 +9,12 @@ import {
 import { IGetCompetenciasClasificacionCedula } from "@/schemas/cedulas/GetCompetencia";
 import { IGetCedulaExterna } from "@/schemas/cedulas-externas/GetCedulaExterna";
 import IPostCedula from "@/schemas/cedulas/PostCedula";
-import IPutCedula, { IPutCedulaPartial } from "@/schemas/cedulas/PutCedula";
-import IPostResultadoCedula, {
-	ICedulaResultados,
-} from "@/schemas/cedulas/PostResultadoCedula";
+import IPutCedula, { IPutCedulaIsArchivado } from "@/schemas/cedulas/PutCedula";
+import IPostResultadoCedula from "@/schemas/cedulas/PostResultadoCedula";
+import {
+	IGetResultadosCedula,
+	IResultadoCedulaBase,
+} from "@/schemas/cedulas/ResultadoCedula";
 
 export default class CedulaService {
 	private api: APIClient = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
@@ -21,7 +23,6 @@ export default class CedulaService {
 		this.api = new APIClient(import.meta.env.VITE_API_CEDULA_URL);
 	}
 
-	// TODO-Desarrollo: Verificar body en backend
 	async postCedulaInterna(
 		requestData: IPostCedula,
 	): Promise<IResponseHTTP<string | number>> {
@@ -48,6 +49,26 @@ export default class CedulaService {
 		});
 	}
 
+	async getCedulaInternaIdProceso(
+		idProceso: number,
+	): Promise<IResponseHTTP<IGetCedula>> {
+		return await this.api.request({
+			endpoint: `/busqueda/${idProceso}`,
+			method: "GET",
+		});
+	}
+
+	async archivarCedula(idCedula: number) {
+		const data: IPutCedulaIsArchivado = {
+			estado: true,
+		};
+		return await this.api.request({
+			endpoint: `/${idCedula}`,
+			method: "PUT",
+			body: data,
+		});
+	}
+
 	async putCedulaInterna(
 		idCedula: number,
 		data: IPutCedula,
@@ -56,15 +77,6 @@ export default class CedulaService {
 			endpoint: `/${idCedula}`,
 			method: "PUT",
 			body: data,
-		});
-	}
-
-	async getCedulaInternaIdProceso(
-		idProceso: number,
-	): Promise<IResponseHTTP<IGetCedula>> {
-		return await this.api.request({
-			endpoint: `/busqueda/${idProceso}`,
-			method: "GET",
 		});
 	}
 
@@ -86,8 +98,28 @@ export default class CedulaService {
 		});
 	}
 
+	async getResultadoCedulaInterna(
+		FKIdCedula: number,
+	): Promise<IResponseHTTP<IGetResultadosCedula>> {
+		return await this.api.request({
+			endpoint: `/resultado`,
+			method: "GET",
+		});
+	}
+
+	async putResultadoCedulaInterna(
+		idResultado: number,
+		data: IResultadoCedulaBase,
+	): Promise<IResponseHTTP<string>> {
+		return await this.api.request({
+			endpoint: `/resultado/${idResultado}`,
+			method: "POST",
+			body: data,
+		});
+	}
+
 	async postResultadoCedulaInterna(
-		data: IPostResultadoCedula | ICedulaResultados,
+		data: IPostResultadoCedula,
 	): Promise<IResponseHTTP<string>> {
 		return await this.api.request({
 			endpoint: `/resultado`,
@@ -96,6 +128,7 @@ export default class CedulaService {
 		});
 	}
 
+	// Cédulas externas -------------------------------------------------------------------
 	async postResultadoCedulaExterna(
 		data: IPostCedulaExterna,
 	): Promise<IResponseHTTP<string>> {
@@ -111,18 +144,7 @@ export default class CedulaService {
 	): Promise<IResponseHTTP<IGetCedulaExterna>> {
 		return await this.api.request({
 			endpoint: `/externa/${FKIdCedula}`,
-			method: "POST",
-		});
-	}
-
-	async archivarCedula(idCedula: number) {
-		const data: IPutCedulaPartial = {
-			estado: true,
-		};
-		return await this.api.request({
-			endpoint: `/${idCedula}`,
-			method: "PUT",
-			body: data,
+			method: "GET",
 		});
 	}
 }

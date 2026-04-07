@@ -44,10 +44,7 @@ export default class ProcesoContratacionService {
 
 	async putProcesoContratacion(
 		idProceso: number,
-		data:
-			| IPutProcesoContratacion
-			| IPutProcesoContratacionCedula
-			| { candidato: boolean },
+		data: IPutProcesoContratacion | IPutProcesoContratacionCedula,
 	): Promise<IResponseHTTP<string>> {
 		return await this.api.request({
 			endpoint: `/${idProceso}`,
@@ -110,6 +107,7 @@ export default class ProcesoContratacionService {
 		});
 	}
 
+	// TODO-Desarrollo: Ya no está en swagger
 	async deleteProcesoContratacionById(
 		idProceso: number,
 	): Promise<IResponseHTTP<string>> {
@@ -119,6 +117,7 @@ export default class ProcesoContratacionService {
 		});
 	}
 
+	// Control de versiones ---------------------------------------------------------------
 	async postControlVersion(
 		data: IPostControlVersion,
 	): Promise<IResponseHTTP<string>> {
@@ -138,6 +137,7 @@ export default class ProcesoContratacionService {
 		});
 	}
 
+	// Oficios ----------------------------------------------------------------------------
 	async postOficio(
 		data: IPostOficioProcesoContratacion,
 	): Promise<IResponseHTTP<string>> {
@@ -157,6 +157,7 @@ export default class ProcesoContratacionService {
 		});
 	}
 
+	// Seguimiento hérmes -----------------------------------------------------------------
 	async postSeguimientoHermes(
 		data: IPostSeguimientoHermes,
 	): Promise<IResponseHTTP<string>> {

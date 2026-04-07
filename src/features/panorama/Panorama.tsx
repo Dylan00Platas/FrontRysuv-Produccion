@@ -442,7 +442,7 @@ function Panorama() {
 								isClearable
 							/>
 						</div>
-						<div className="filtro-busqueda" style={{ marginTop: "2.8%" }}>
+						<div className="filtro-busqueda mt-[2.8%]">
 							<FaSearch className="search-icon" />
 							<input
 								type="text"
@@ -464,7 +464,7 @@ function Panorama() {
 									<th>Puesto</th>
 									<th>Fecha recibido</th>
 									<th>Dependencia</th>
-									<th style={{ width: "15%" }}>Estado</th>
+									<th className="w-[15%]">Estado</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -478,7 +478,7 @@ function Panorama() {
 											);
 											navigate("/evaluacion", { state: procesoOriginal });
 										}}
-										style={{ cursor: "pointer" }}>
+										className="cursor-pointer">
 										<td>{e.folio + "/ " + e.hermesNotificacion}</td>
 										<td>{e.nombreCandidato}</td>{" "}
 										{/* FIX: era e.nombre (campo inexistente) */}
@@ -522,7 +522,7 @@ function Panorama() {
 								isClearable
 							/>
 						</div>
-						<div className="filtro-busqueda" style={{ marginTop: "2.8%" }}>
+						<div className="filtro-busqueda mt-[2.8%]">
 							<FaSearch className="search-icon" />
 							<input
 								type="text"
@@ -554,7 +554,7 @@ function Panorama() {
 										onClick={() =>
 											navigate("/crear-cedula", { state: { cedula: c } })
 										}
-										style={{ cursor: "pointer" }}>
+										className="cursor-pointer">
 										{/* FIX: concatenación con paréntesis para correcta precedencia de || */}
 										<td>
 											{(c.folio ?? "") + "/" + (c.hermesNotificacion ?? "")}
@@ -625,7 +625,7 @@ function Panorama() {
 								</tbody>
 							</table>
 
-							<div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
+							<div className="mt-4 gap-4 flex">
 								{competencias.some((c) => c.capacitado) && (
 									<button
 										className="boton-guardar"
