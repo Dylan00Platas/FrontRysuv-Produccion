@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useId, useState } from "react";
-import { useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Select from "react-select";
 
@@ -11,7 +10,6 @@ import ProcesoContratacionService from "@/services/ProcesoContratacionService";
 import IResponseHTTP from "@/interfaces/http/Response";
 import AccesoService from "@/services/AccesoService";
 import {
-  IGetUsuario,
   IGetUsuarios,
   IUsuarioBase,
 } from "@/schemas/acceso/GetUsuario";
@@ -91,7 +89,7 @@ function AsignarSolicitud() {
   const [funcionesFiltradas, setFuncionesFiltradas] = useState<
     ILabelValue[] | undefined
   >([]);
-  const [avaladoPorSeleccionado, setAvaladoPorSeleccionado] = useState([]);
+  const [avaladoPorSeleccionado, setAvaladoPorSeleccionado] = useState<string[]>([]);
 
   let tipoInicial = "";
   let tipoDisabled = false;
@@ -188,7 +186,7 @@ function AsignarSolicitud() {
               .toISOString()
               .split("T")[0]
           : "",
-        folio: solicitudSeleccionada.folio || "",
+        folio: String(solicitudSeleccionada.folio) || "",
         funcion: solicitudSeleccionada.funcionDesempeniar || "",
         hermes: solicitudSeleccionada.hermesNotificacion || "",
         nombreCandidato: solicitudSeleccionada.nombreCandidato || "",
@@ -206,8 +204,8 @@ function AsignarSolicitud() {
       // Separa por comas, limpia espacios
       const avalados = solicitudSeleccionada.avaladoPor
         .split(",")
-        .map((a) => a.trim())
-        .filter((a) => a !== "");
+        .map((a: string) => a.trim())
+        .filter((a: string) => a !== "");
       setAvaladoPorSeleccionado(avalados);
     } else {
       setAvaladoPorSeleccionado([]);
@@ -624,7 +622,7 @@ function AsignarSolicitud() {
                   </option>
                   <option value="">No asignar</option>
 
-                  {analistas.map((a) => (
+                  {analistas?.map((a) => (
                     <option key={a.idAcceso} value={a.idAcceso}>
                       {a.nombre} {a.primerApellido} {a.segundoApellido || ""}
                     </option>

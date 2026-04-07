@@ -27,7 +27,6 @@ function Solicitudes() {
     const solicitudCompleta = solicitudesRaw?.find(
       (s) => s.idProceso === solicitudAdaptada.id,
     );
-    console.log(solicitudCompleta);
     navigate("/asignar-solicitud", { state: { solicitud: solicitudCompleta } });
   };
 
