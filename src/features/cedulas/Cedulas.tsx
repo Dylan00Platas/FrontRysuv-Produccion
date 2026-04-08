@@ -376,7 +376,7 @@ function Cedulas() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 showSearchButton={true}
-                onSearch={setSearchTerm}
+                onSearch={() => setSearchTerm(searchTerm)}
                 searchButtonTitle="Buscar por palabra clave"
                 className="w-full sm:w-auto sm:flex-1"
               />

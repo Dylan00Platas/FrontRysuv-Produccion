@@ -23,7 +23,7 @@ export default interface IPostCedula {
   fechaElaboracionPropuesta: string;
   FKIdClasificacionCedula: number;
   FKIdProceso: number;
-  FKIdResultado: number;
+  FKIdResultado: number|null;
   FKIdTipoCedula: number;
   fechaCedulaInterna: string;
   fechaCedulaResultados: string;

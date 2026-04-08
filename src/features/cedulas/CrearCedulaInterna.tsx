@@ -35,7 +35,8 @@ import {
 } from "@/components/Alert/Floating/ModalHelp";
 import FormSectionCard from "@/components/card/FormSectionCard";
 import { CustomButton } from "@/components/button/CustomButton";
-import { TextAreaField } from "@/components/input/TextareaField";
+import { TextAreaField } from "@/components/input/TextAreaField";
+import IPostCedula from "@/schemas/cedulas/PostCedula";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IPostCedulaInternaForm {
@@ -451,53 +452,55 @@ function CrearCedulaInterna() {
 			return;
 		}
 
-		try {
-			const responseCedula: IResponseHTTP<string | number> =
-				await new CedulaService().postCedulaInterna({
-					adscripcion: formData.adscripcion,
-					analista: formData.analista,
-					antecedentesFamiliaresUV: formData.antecedentesFamiliaresUV,
-					aprobadoDireccion: false,
-					aprobadoJefeOficina: false,
-					archivoAdjunto: false,
-					avaladoPor: formData.avaladoPor,
-					competenciaDesarrollar: "",
-					competenciaReforzar: "",
-					competenciasSobresaliente: "",
-					conclusiones: formData.conclusiones,
-					descripcionDesarrollar: "",
-					descripcionReforzar: "",
-					edad: formData.edad,
-					educacionFormal: formData.educacionFormal,
-					efectoContratacion: "",
-					elabora: formData.elabora,
-					evaluacionConocimientos: formData.evaluacionConocimientos,
-					expectativaLaboral: formData.expectativaLaboral,
-					experiencia: formData.experiencia,
-					experienciaRelacionada: formData.experienciaRelacionada,
-					fechaCedulaInterna: "",
-					fechaCedulaResultados: "",
-					fechaElaboracionPropuesta: formData.fechaElaboracionPropuesta,
-					FKIdClasificacionCedula: 0,
-					FKIdProceso: 0,
-					FKIdResultado: 0,
-					FKIdTipoCedula: 0,
-					hermesNotificacion: formData.hermesNotificacion,
-					idCedula: formData.idCedula,
-					motivoCedulaInterna: "",
-					motivoCedulaResultados: "",
-					nombreCandidato: formData.nombreCandidato,
-					numPlaza: formData.numPlaza,
-					oficioAutorizacionDeOcupacion: "",
-					plaza: "",
-					puesto: formData.puesto,
-					referidoPor: formData.referidoPor,
-					resultadoHabilidadesExcel: formData.resultadoHabilidadesExcel,
-					resultadoHabilidadesWord: formData.resultadoHabilidadesWord,
-					resultadoOrtografia: formData.resultadoOrtografia,
-					resultados: formData.resultados,
-					revisa: formData.revisa,
-				});
+    try {
+      const Cedula:IPostCedula = {
+        adscripcion: formData.adscripcion,
+        analista: formData.analista,
+        antecedentesFamiliaresUV: formData.antecedentesFamiliaresUV,
+        aprobadoDireccion: false,
+        aprobadoJefeOficina: false,
+        archivoAdjunto: false,
+        avaladoPor: formData.avaladoPor,
+        competenciaDesarrollar: "",
+        competenciaReforzar: "",
+        competenciasSobresaliente: "",
+        conclusiones: formData.conclusiones,
+        descripcionDesarrollar: "",
+        descripcionReforzar: "",
+        edad: formData.edad,
+        educacionFormal: formData.educacionFormal,
+        efectoContratacion: "",
+        elabora: formData.elabora,
+        evaluacionConocimientos: formData.evaluacionConocimientos,
+        expectativaLaboral: formData.expectativaLaboral,
+        experiencia: formData.experiencia,
+        experienciaRelacionada: formData.experienciaRelacionada,
+        fechaCedulaInterna: "",
+        fechaCedulaResultados: "",
+        fechaElaboracionPropuesta: formData.fechaElaboracionPropuesta,
+        FKIdClasificacionCedula: formData.idCedula,
+        FKIdProceso: formData.FKIdProceso,
+        FKIdResultado: null,
+        FKIdTipoCedula: formData.idCedula,
+        hermesNotificacion: formData.hermesNotificacion,
+        idCedula: formData.idCedula,
+        motivoCedulaInterna: "",
+        motivoCedulaResultados: "",
+        nombreCandidato: formData.nombreCandidato,
+        numPlaza: formData.numPlaza,
+        oficioAutorizacionDeOcupacion: "",
+        plaza: "",
+        puesto: formData.puesto,
+        referidoPor: formData.referidoPor,
+        resultadoHabilidadesExcel: formData.resultadoHabilidadesExcel,
+        resultadoHabilidadesWord: formData.resultadoHabilidadesWord,
+        resultadoOrtografia: formData.resultadoOrtografia,
+        resultados: formData.resultados,
+        revisa: formData.revisa,
+      }
+      console.log("Cédula a registrar:", Cedula);
+      const responseCedula: IResponseHTTP<string | number> =
+        await new CedulaService().postCedulaInterna(Cedula);
 
 			if (responseCedula.error) {
 				throw new Error(
@@ -507,46 +510,73 @@ function CrearCedulaInterna() {
 				);
 			}
 
-			const idCedula = Number(responseCedula.mensaje);
-			if (!idCedula)
-				throw new Error("No se recibió el ID de la cédula registrada");
+      const idCedula = (responseCedula.mensaje as any).idCedula;
+      console.log(idCedula);
+      if (!idCedula)
+        throw new Error("No se recibió el ID de la cédula registrada");
 
-			await new CedulaService().postResultadoCedulaInterna({
-				FKIdCedula: formData.idCedula,
-				psicometriaAnalisisProblemas: Number(
-					formData.psicometriaAnalisisProblemas,
-				),
-				psicometriaComunicacion: Number(formData.psicometriaComunicacion),
-				psicometriaControlActividades: Number(
-					formData.psicometriaControlActividades,
-				),
-				psicometriaDinamismo: Number(formData.psicometriaDinamismo),
-				psicometriaEnfoqueCalidad: Number(formData.psicometriaEnfoqueCalidad),
-				psicometriaEnfoqueResultados: Number(
-					formData.psicometriaEnfoqueResultados,
-				),
-				psicometriaInnovacion: Number(formData.psicometriaInnovacion),
-				psicometriaLiderazgo: Number(formData.psicometriaLiderazgo),
-				psicometriaNegociacion: Number(formData.psicometriaNegociacion),
-				psicometriaOrientacionAlServicio: Number(
-					formData.psicometriaOrientacionAlServicio,
-				),
-				psicometriaPensamientoEstrategico: Number(
-					formData.psicometriaPensamientoEstrategico,
-				),
-				psicometriaPlaneacionOrganizacion: Number(
-					formData.psicometriaPlaneacionOrganizacion,
-				),
-				psicometriaRelacionesInterpersonales: Number(
-					formData.psicometriaRelacionesInterpersonales,
-				),
-				psicometriaSensibilidadALineamientos: Number(
-					formData.psicometriaSensibilidadALineamientos,
-				),
-				psicometriaTomaDecisiones: Number(formData.psicometriaTomaDecisiones),
-				psicometriaTrabajoEnEquipo: Number(formData.psicometriaTrabajoEnEquipo),
-				resultadoPorcentaje: Number(formData.resultados),
-			});
+      const psicometrias = [
+        formData.psicometriaAnalisisProblemas,
+        formData.psicometriaComunicacion,
+        formData.psicometriaControlActividades,
+        formData.psicometriaDinamismo,
+        formData.psicometriaEnfoqueCalidad,
+        formData.psicometriaEnfoqueResultados,
+        formData.psicometriaInnovacion,
+        formData.psicometriaLiderazgo,
+        formData.psicometriaNegociacion,
+        formData.psicometriaOrientacionAlServicio,
+        formData.psicometriaPensamientoEstrategico,
+        formData.psicometriaPlaneacionOrganizacion,
+        formData.psicometriaRelacionesInterpersonales,
+        formData.psicometriaSensibilidadALineamientos,
+        formData.psicometriaTomaDecisiones,
+        formData.psicometriaTrabajoEnEquipo,
+      ].map(Number);
+
+      const valoresValidos = psicometrias.filter(n => n > 0);
+      const maximo = valoresValidos.length * 10;
+      const suma = valoresValidos.reduce((acc, n) => acc + n, 0);
+      const porcentajeFinal = maximo > 0
+        ? (suma / maximo) * 100
+        : 0;
+
+      await new CedulaService().postResultadoCedulaInterna({
+        FKIdCedula: idCedula,
+        psicometriaAnalisisProblemas: Number(
+          formData.psicometriaAnalisisProblemas,
+        ),
+        psicometriaComunicacion: Number(formData.psicometriaComunicacion),
+        psicometriaControlActividades: Number(
+          formData.psicometriaControlActividades,
+        ),
+        psicometriaDinamismo: Number(formData.psicometriaDinamismo),
+        psicometriaEnfoqueCalidad: Number(formData.psicometriaEnfoqueCalidad),
+        psicometriaEnfoqueResultados: Number(
+          formData.psicometriaEnfoqueResultados,
+        ),
+        psicometriaInnovacion: Number(formData.psicometriaInnovacion),
+        psicometriaLiderazgo: Number(formData.psicometriaLiderazgo),
+        psicometriaNegociacion: Number(formData.psicometriaNegociacion),
+        psicometriaOrientacionAlServicio: Number(
+          formData.psicometriaOrientacionAlServicio,
+        ),
+        psicometriaPensamientoEstrategico: Number(
+          formData.psicometriaPensamientoEstrategico,
+        ),
+        psicometriaPlaneacionOrganizacion: Number(
+          formData.psicometriaPlaneacionOrganizacion,
+        ),
+        psicometriaRelacionesInterpersonales: Number(
+          formData.psicometriaRelacionesInterpersonales,
+        ),
+        psicometriaSensibilidadALineamientos: Number(
+          formData.psicometriaSensibilidadALineamientos,
+        ),
+        psicometriaTomaDecisiones: Number(formData.psicometriaTomaDecisiones),
+        psicometriaTrabajoEnEquipo: Number(formData.psicometriaTrabajoEnEquipo),
+        resultadoPorcentaje: Number(porcentajeFinal),
+      });
 
 			const solicitudData = {
 				FKIdDependencia: formData.adscripcion!.idDependencia,
@@ -593,48 +623,47 @@ function CrearCedulaInterna() {
 			);
 			const pdfDoc = await PDFDocument.load(existingPdfBytes);
 			const form = pdfDoc.getForm();
-
-			form.getTextField("nombre").setText(formData.nombreCandidato ?? "");
-			form
-				.getTextField("edad")
-				.setText(formData.edad ? `${formData.edad} años` : "");
-			form.getTextField("hermes").setText(formData.hermesNotificacion ?? "");
-			form.getTextField("numeroPlaza").setText(formData.numPlaza ?? "");
-			form
-				.getTextField("fechaElaboracion")
-				.setText(formData.fechaElaboracionPropuesta ?? "");
-			form
-				.getTextField("educacionFormal")
-				.setText(formData.educacionFormal ?? "");
-			form.getTextField("puesto").setText(formData.puesto ?? "");
-			form
-				.getTextField("adscripcion")
-				.setText(formData.adscripcion?.nombre ?? "");
-			form.getTextField("referido").setText(formData.referidoPor ?? "");
-			form
-				.getTextField("antecedentesFamiliares")
-				.setText(formData.antecedentesFamiliaresUV ?? "");
-			form
-				.getTextField("resultadoWord")
-				.setText(formData.resultadoHabilidadesWord ?? "");
-			form
-				.getTextField("resultadoExcel")
-				.setText(formData.resultadoHabilidadesExcel ?? "");
-			form
-				.getTextField("resultadoOrtografia")
-				.setText(formData.resultadoOrtografia ?? "");
-			form
-				.getTextField("evaluacionConocimientos")
-				.setText(formData.evaluacionConocimientos ?? "");
-			form
-				.getTextField("expectativaLaboral")
-				.setText(formData.expectativaLaboral ?? "");
-			form
-				.getTextField("experienciaRelacionada")
-				.setText(formData.experienciaRelacionada ?? "");
-			form.getTextField("experiencia").setText(formData.experiencia ?? "");
-			form.getTextField("conclusiones").setText(formData.conclusiones ?? "");
-			form.getTextField("resultado").setText(formData.resultados ?? "");
+      form.getTextField("nombre").setText(String(formData.nombreCandidato) ?? "");
+      form
+        .getTextField("edad")
+        .setText(String(formData.edad) ? `${String(formData.edad)} años` : "");
+      form.getTextField("hermes").setText(String(formData.hermesNotificacion) ?? "");
+      form.getTextField("numeroPlaza").setText(String(formData.numPlaza) ?? "");
+      form
+        .getTextField("fechaElaboracion")
+        .setText(String(formData.fechaElaboracionPropuesta) ?? "");
+      form
+        .getTextField("educacionFormal")
+        .setText(String(formData.educacionFormal) ?? "");
+      form.getTextField("puesto").setText(String(formData.puesto) ?? "");
+      form
+        .getTextField("adscripcion")
+        .setText(String(formData.adscripcion?.nombre) ?? "");
+      form.getTextField("referido").setText(String(formData.referidoPor) ?? "");
+      form
+        .getTextField("antecedentesFamiliares")
+        .setText(String(formData.antecedentesFamiliaresUV) ?? "");
+      form
+        .getTextField("resultadoWord")
+        .setText(String(formData.resultadoHabilidadesWord) ?? "");
+      form
+        .getTextField("resultadoExcel")
+        .setText(String(formData.resultadoHabilidadesExcel) ?? "");
+      form
+        .getTextField("resultadoOrtografia")
+        .setText(String(formData.resultadoOrtografia) ?? "");
+      form
+        .getTextField("evaluacionConocimientos")
+        .setText(String(formData.evaluacionConocimientos) ?? "");
+      form
+        .getTextField("expectativaLaboral")
+        .setText(String(formData.expectativaLaboral) ?? "");
+      form
+        .getTextField("experienciaRelacionada")
+        .setText(String(formData.experienciaRelacionada) ?? "");
+      form.getTextField("experiencia").setText(String(formData.experiencia) ?? "");
+      form.getTextField("conclusiones").setText(String(formData.conclusiones) ?? "");
+      form.getTextField("resultado").setText(String(formData.resultados) ?? "");
 
 			// NOTE: "usuario" debe venir de un contexto/hook de autenticación
 			// form.getTextField("analista").setText(`Lic. ${usuario.nombre} ...`);
