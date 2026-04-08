@@ -478,9 +478,9 @@ function CrearCedulaInterna() {
         fechaCedulaInterna: "",
         fechaCedulaResultados: "",
         fechaElaboracionPropuesta: formData.fechaElaboracionPropuesta,
-        FKIdClasificacionCedula: cedulaFromNav?.FKIdClasificacionCedula,
+        FKIdClasificacionCedula: formData.idCedula,
         FKIdProceso: formData.FKIdProceso,
-        FKIdResultado: 0,
+        FKIdResultado: null,
         FKIdTipoCedula: formData.idCedula,
         hermesNotificacion: formData.hermesNotificacion,
         idCedula: formData.idCedula,
@@ -510,12 +510,39 @@ function CrearCedulaInterna() {
         );
       }
 
-      const idCedula = Number(responseCedula.mensaje);
+      const idCedula = (responseCedula.mensaje as any).idCedula;
+      console.log(idCedula);
       if (!idCedula)
         throw new Error("No se recibió el ID de la cédula registrada");
 
+      const psicometrias = [
+        formData.psicometriaAnalisisProblemas,
+        formData.psicometriaComunicacion,
+        formData.psicometriaControlActividades,
+        formData.psicometriaDinamismo,
+        formData.psicometriaEnfoqueCalidad,
+        formData.psicometriaEnfoqueResultados,
+        formData.psicometriaInnovacion,
+        formData.psicometriaLiderazgo,
+        formData.psicometriaNegociacion,
+        formData.psicometriaOrientacionAlServicio,
+        formData.psicometriaPensamientoEstrategico,
+        formData.psicometriaPlaneacionOrganizacion,
+        formData.psicometriaRelacionesInterpersonales,
+        formData.psicometriaSensibilidadALineamientos,
+        formData.psicometriaTomaDecisiones,
+        formData.psicometriaTrabajoEnEquipo,
+      ].map(Number);
+
+      const valoresValidos = psicometrias.filter(n => n > 0);
+      const maximo = valoresValidos.length * 10;
+      const suma = valoresValidos.reduce((acc, n) => acc + n, 0);
+      const porcentajeFinal = maximo > 0
+        ? (suma / maximo) * 100
+        : 0;
+
       await new CedulaService().postResultadoCedulaInterna({
-        FKIdCedula: formData.idCedula,
+        FKIdCedula: idCedula,
         psicometriaAnalisisProblemas: Number(
           formData.psicometriaAnalisisProblemas,
         ),
@@ -548,7 +575,7 @@ function CrearCedulaInterna() {
         ),
         psicometriaTomaDecisiones: Number(formData.psicometriaTomaDecisiones),
         psicometriaTrabajoEnEquipo: Number(formData.psicometriaTrabajoEnEquipo),
-        resultadoPorcentaje: Number(formData.resultados),
+        resultadoPorcentaje: Number(porcentajeFinal),
       });
 
       const solicitudData = {
@@ -597,47 +624,47 @@ function CrearCedulaInterna() {
       const pdfDoc = await PDFDocument.load(existingPdfBytes);
       const form = pdfDoc.getForm();
 
-      form.getTextField("nombre").setText(formData.nombreCandidato ?? "");
+      form.getTextField("nombre").setText(String(formData.nombreCandidato) ?? "");
       form
         .getTextField("edad")
-        .setText(formData.edad ? `${formData.edad} años` : "");
-      form.getTextField("hermes").setText(formData.hermesNotificacion ?? "");
-      form.getTextField("numeroPlaza").setText(formData.numPlaza ?? "");
+        .setText(String(formData.edad) ? `${String(formData.edad)} años` : "");
+      form.getTextField("hermes").setText(String(formData.hermesNotificacion) ?? "");
+      form.getTextField("numeroPlaza").setText(String(formData.numPlaza) ?? "");
       form
         .getTextField("fechaElaboracion")
-        .setText(formData.fechaElaboracionPropuesta ?? "");
+        .setText(String(formData.fechaElaboracionPropuesta) ?? "");
       form
         .getTextField("educacionFormal")
-        .setText(formData.educacionFormal ?? "");
-      form.getTextField("puesto").setText(formData.puesto ?? "");
+        .setText(String(formData.educacionFormal) ?? "");
+      form.getTextField("puesto").setText(String(formData.puesto) ?? "");
       form
         .getTextField("adscripcion")
-        .setText(formData.adscripcion?.nombre ?? "");
-      form.getTextField("referido").setText(formData.referidoPor ?? "");
+        .setText(String(formData.adscripcion?.nombre) ?? "");
+      form.getTextField("referido").setText(String(formData.referidoPor) ?? "");
       form
         .getTextField("antecedentesFamiliares")
-        .setText(formData.antecedentesFamiliaresUV ?? "");
+        .setText(String(formData.antecedentesFamiliaresUV) ?? "");
       form
         .getTextField("resultadoWord")
-        .setText(formData.resultadoHabilidadesWord ?? "");
+        .setText(String(formData.resultadoHabilidadesWord) ?? "");
       form
         .getTextField("resultadoExcel")
-        .setText(formData.resultadoHabilidadesExcel ?? "");
+        .setText(String(formData.resultadoHabilidadesExcel) ?? "");
       form
         .getTextField("resultadoOrtografia")
-        .setText(formData.resultadoOrtografia ?? "");
+        .setText(String(formData.resultadoOrtografia) ?? "");
       form
         .getTextField("evaluacionConocimientos")
-        .setText(formData.evaluacionConocimientos ?? "");
+        .setText(String(formData.evaluacionConocimientos) ?? "");
       form
         .getTextField("expectativaLaboral")
-        .setText(formData.expectativaLaboral ?? "");
+        .setText(String(formData.expectativaLaboral) ?? "");
       form
         .getTextField("experienciaRelacionada")
-        .setText(formData.experienciaRelacionada ?? "");
-      form.getTextField("experiencia").setText(formData.experiencia ?? "");
-      form.getTextField("conclusiones").setText(formData.conclusiones ?? "");
-      form.getTextField("resultado").setText(formData.resultados ?? "");
+        .setText(String(formData.experienciaRelacionada) ?? "");
+      form.getTextField("experiencia").setText(String(formData.experiencia) ?? "");
+      form.getTextField("conclusiones").setText(String(formData.conclusiones) ?? "");
+      form.getTextField("resultado").setText(String(formData.resultados) ?? "");
 
       // NOTE: "usuario" debe venir de un contexto/hook de autenticación
       // form.getTextField("analista").setText(`Lic. ${usuario.nombre} ...`);

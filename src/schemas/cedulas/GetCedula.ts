@@ -5,7 +5,7 @@ export interface ICedulaBase {
   antecedentesFamiliaresUV: string;
   aprobadoDireccion: boolean;
   aprobadoJefeOficina: boolean;
-  aprueba: string;
+  aprueba?: string;
   archivoAdjunto: boolean;
   categoriaPuestoOrigen: string;
   competenciaDesarrollar: string;
@@ -56,7 +56,7 @@ export interface ICedulaBase {
   numPlaza: string;
   observaciones: string;
   observacionesAnalista: string;
-  oficio: string;
+  oficio?: string;
   oficioAutorizacionDeOcupacion: string;
   periodoAutorizadoOficioFin: string;
   periodoAutorizadoOficioInicio: string;
@@ -89,11 +89,11 @@ export interface ICedulaBase {
   resultadoProcesoEvaluacion: string;
   resultadoReferenciasLaborales: string;
   resultadoSeguimientoEvaluacionDesempenio: string;
-  revisa: string;
+  revisa?: string;
   seguimientoEvaluacionDesempenio: string;
-  temporalidad: "1" | "2" | "";
+  temporalidad?: "1" | "2" | "";
   titularPlaza: string;
-  valida: string;
+  valida?: string;
 }
 
 export type ICedulaBasePartial = Partial<ICedulaBase>;
