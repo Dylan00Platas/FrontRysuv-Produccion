@@ -7,54 +7,54 @@ import { useToast } from "@/hooks/useToast";
 import { Toast } from "@/components/Alert/Floating/Toast";
 import ILabelValue from "@/interfaces/LabelValue";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
-import IResponseHTTP from "@/interfaces/http/Response";
+import IResponseHTTP from "@/services/connection/APIResponse";
 import AccesoService from "@/services/AccesoService";
 import {
   IGetUsuarios,
-  IUsuarioBase,
+  IUsuarioBase
 } from "@/schemas/acceso/GetUsuario";
 import MainHeader from "@/components/header/MainHeader";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IFormData {
-  analista: string;
-  avaladoPor: string;
-  citaVirtual: boolean;
-  educacionFormal: string;
-  estado: string;
-  familiaFuncional: string;
-  fechaAsignacionAnalista: string;
-  fechaEntrevista: string;
-  folio: string;
-  funcion: string;
-  hermes: string;
-  nombreCandidato: string;
-  numeroCarpeta: string;
-  observaciones: string;
-  tipo: string;
+	analista: string;
+	avaladoPor: string;
+	citaVirtual: boolean;
+	educacionFormal: string;
+	estado: string;
+	familiaFuncional: string;
+	fechaAsignacionAnalista: string;
+	fechaEntrevista: string;
+	folio: string;
+	funcion: string;
+	hermes: string;
+	nombreCandidato: string;
+	numeroCarpeta: string;
+	observaciones: string;
+	tipo: string;
 }
 const FAMILIA_KEYWORDS = {
-  "N1. Académico Administrativo": "académico administrativo",
-  "N2. Administrativo Académico": "administrativo académico",
-  "N3. Administrativo": "administrativo",
-  "N4. Normativo, jurídico, legal": "normativo jurídico legal",
-  "N5. Tics": "tics",
-  "N6. Salud": "salud",
-  "N7. Cultura": "cultura",
-  "N8. Deporte": "deporte",
-  "N9. Presupuestal-contable": "presupuestal contable",
-  "N10. Comunicación y edición": "comunicación y edición",
-  "N11. Operativo": "operativo",
+	"N1. Académico Administrativo": "académico administrativo",
+	"N2. Administrativo Académico": "administrativo académico",
+	"N3. Administrativo": "administrativo",
+	"N4. Normativo, jurídico, legal": "normativo jurídico legal",
+	"N5. Tics": "tics",
+	"N6. Salud": "salud",
+	"N7. Cultura": "cultura",
+	"N8. Deporte": "deporte",
+	"N9. Presupuestal-contable": "presupuestal contable",
+	"N10. Comunicación y edición": "comunicación y edición",
+	"N11. Operativo": "operativo",
 } as const;
 type FamiliaKeyword = keyof typeof FAMILIA_KEYWORDS;
 type CampoFamiliaKeyword = (typeof FAMILIA_KEYWORDS)[FamiliaKeyword];
 const getFamilaKeywordKey = (
-  nombre: string,
+	nombre: string,
 ): CampoFamiliaKeyword | undefined => {
-  if (nombre in FAMILIA_KEYWORDS) {
-    return FAMILIA_KEYWORDS[nombre as FamiliaKeyword];
-  }
-  return undefined;
+	if (nombre in FAMILIA_KEYWORDS) {
+		return FAMILIA_KEYWORDS[nombre as FamiliaKeyword];
+	}
+	return undefined;
 };
 
 function AsignarSolicitud() {
@@ -688,6 +688,7 @@ function AsignarSolicitud() {
       </main>
     </>
   );
+
 }
 
 export default AsignarSolicitud;

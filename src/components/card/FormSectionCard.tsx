@@ -13,7 +13,7 @@ export default function FormSectionCard({
   return (
     <div
       className={clsx(
-        "bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden",
+        "bg-white rounded-2xl shadow-sm border border-slate-100 overflow-visible",
         className,
       )}
     >
@@ -23,7 +23,7 @@ export default function FormSectionCard({
           {title || "Sin título"} {/* Fallback para debugging */}
         </h2>
       </div>
-      <div className="px-6 py-5 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-5">
+      <div className="px-6 py-5 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-5 w-full">
         {children}
       </div>
     </div>

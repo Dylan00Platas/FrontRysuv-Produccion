@@ -1,17 +1,17 @@
 export interface IUsuarioBase {
-  idAcceso: number;
-  estado: number;
-  FKIdTipoAcceso: number;
-  nombre: string;
-  primerApellido: string;
-  segundoApellido: string;
-  usuario: string;
+	estado: number;
+	FKIdTipoAcceso: number;
+	idAcceso: number;
+	nombre: string;
+	primerApellido: string;
+	segundoApellido: string;
+	usuario: string;
 }
 
 export interface IGetUsuarios {
-  usuarios: IUsuarioBase[];
+	usuarios: IUsuarioBase[];
 }
 
 export interface IGetUsuario {
-  usuario: IUsuarioBase;
+	usuario: IUsuarioBase;
 }

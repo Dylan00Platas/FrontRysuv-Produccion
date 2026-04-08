@@ -99,81 +99,81 @@ export interface ICedulaBase {
 export type ICedulaBasePartial = Partial<ICedulaBase>;
 
 export interface IGetCedula {
-  cedula: ICedulaBase[];
+	cedula: ICedulaBase[];
 }
 
 export interface IGetCedulas {
-  cedulas: ICedulaBase[];
+	cedulas: ICedulaBase[];
 }
 
 export interface ICedulaActivaBase {
-  idCedula: number;
-  antecedentesFamiliaresUV: string;
-  capacitado: boolean;
-  competenciaDesarrollar: string;
-  competenciaReforzar: string;
-  competenciasSobresaliente: string;
-  conclusiones: string;
-  descripcionDesarrollar: string;
-  descripcionReforzar: string;
-  edad: string;
-  educacionFormal: string;
-  efectoContratacion: string;
-  evaluacionConocimientos: string;
-  expectativaLaboral: string;
-  experiencia: string;
-  experienciaRelacionada: string;
-  FKIdClasificacionCedula: number;
-  FKIdProceso: number;
-  FKIdResultado: number;
-  FKIdTipoCedula: number;
-  fechaCedulaInterna: string;
-  fechaCedulaResultados: string;
-  motivoCedulaInterna: string;
-  motivoCedulaResultados: string;
-  nombreCandidato: string;
-  oficioAutorizacionDeOcupacion: string;
-  plaza: string;
-  puesto: string;
-  referidoPor: string;
-  resultado: string;
+	idCedula: number;
+	antecedentesFamiliaresUV: string;
+	capacitado: boolean;
+	competenciaDesarrollar: string;
+	competenciaReforzar: string;
+	competenciasSobresaliente: string;
+	conclusiones: string;
+	descripcionDesarrollar: string;
+	descripcionReforzar: string;
+	edad: string;
+	educacionFormal: string;
+	efectoContratacion: string;
+	evaluacionConocimientos: string;
+	expectativaLaboral: string;
+	experiencia: string;
+	experienciaRelacionada: string;
+	FKIdClasificacionCedula: number;
+	FKIdProceso: number;
+	FKIdResultado: number;
+	FKIdTipoCedula: number;
+	fechaCedulaInterna: string;
+	fechaCedulaResultados: string;
+	motivoCedulaInterna: string;
+	motivoCedulaResultados: string;
+	nombreCandidato: string;
+	oficioAutorizacionDeOcupacion: string;
+	plaza: string;
+	puesto: string;
+	referidoPor: string;
+	resultado: string;
 }
 
 export interface IGetCedulasActivas {
-  cedulas: ICedulaActivaBase[];
+	cedulas: ICedulaActivaBase[];
 }
 
 export interface ICedulaProcesoBase {
-  idCedula: number;
-  antecedentesFamiliaresUV: string;
-  competenciaDesarrollar: string;
-  competenciaReforzar: string;
-  competenciasSobresaliente: string;
-  conclusiones: string;
-  descripcionDesarrollar: string;
-  descripcionReforzar: string;
-  edad: string;
-  educacionFormal: string;
-  efectoContratacion: string;
-  evaluacionConocimientos: string;
-  expectativaLaboral: string;
-  experiencia: string;
-  experienciaRelacionada: string;
-  FKIdClasificacionCedula: number;
-  FKIdProceso: number;
-  FKIdResultado: number;
-  FKIdTipoCedula: number;
-  fechaCedulaInterna: string;
-  fechaCedulaResultados: string;
-  motivoCedulaInterna: string;
-  motivoCedulaResultados: string;
-  oficioAutorizacionDeOcupacion: string;
-  plaza: string;
-  puesto: string;
-  referidoPor: string;
-  resultado: string;
+	idCedula: number;
+	antecedentesFamiliaresUV: string;
+	competenciaDesarrollar: string;
+	competenciaReforzar: string;
+	competenciasSobresaliente: string;
+	conclusiones: string;
+	descripcionDesarrollar: string;
+	descripcionReforzar: string;
+	edad: string;
+	educacionFormal: string;
+	efectoContratacion: string;
+	evaluacionConocimientos: string;
+	expectativaLaboral: string;
+	experiencia: string;
+	experienciaRelacionada: string;
+	FKIdClasificacionCedula: number;
+	FKIdProceso: number;
+	FKIdResultado: number;
+	FKIdTipoCedula: number;
+	fechaCedulaInterna: string;
+	fechaCedulaResultados: string;
+	motivoCedulaInterna: string;
+	motivoCedulaResultados: string;
+	oficioAutorizacionDeOcupacion: string;
+	plaza: string;
+	puesto: string;
+	referidoPor: string;
+	resultado: string;
 }
 
 export interface IGetCedulaProceso {
-  cedula: ICedulaProcesoBase[];
+	cedula: ICedulaProcesoBase[];
 }

@@ -1,4 +1,4 @@
-import IResponseHTTP from "@/interfaces/http/Response";
+import IResponseHTTP from "@/services/connection/APIResponse";
 import AuthService from "@/services/AuthService";
 import { useCallback, useEffect, useState } from "react";
 
@@ -18,96 +18,96 @@ import { useCallback, useEffect, useState } from "react";
  */
 
 interface ILogin {
-  usuario: string;
-  contrasenia: string;
+	usuario: string;
+	contrasenia: string;
 }
 interface ICurrentUser {
-  tipoDeAcceso: number;
-  usuario: string;
-  idAcceso: number;
-  nombre: string;
-  primerApellido: string;
-  segundoApellido: string;
+	tipoDeAcceso: number;
+	usuario: string;
+	idAcceso: number;
+	nombre: string;
+	primerApellido: string;
+	segundoApellido: string;
 }
 export function useCookie() {
-  const [currentUser, setCurrentUser] = useState<ICurrentUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // sesión global
-  const [isLoadingLogin, setIsLoadingLogin] = useState(false); // solo en el form login
-  const [error, setError] = useState<string | null>(null);
+	const [currentUser, setCurrentUser] = useState<ICurrentUser | null>(null);
+	const [isLoading, setIsLoading] = useState(true); // sesión global
+	const [isLoadingLogin, setIsLoadingLogin] = useState(false); // solo en el form login
+	const [error, setError] = useState<string | null>(null);
 
-  // Login ---------------------------------------------------------------------
-  const login = useCallback(async (loginData: ILogin) => {
-    setIsLoadingLogin(true);
-    setError(null);
-    setCurrentUser(null);
+	// Login ---------------------------------------------------------------------
+	const login = useCallback(async (loginData: ILogin) => {
+		setIsLoadingLogin(true);
+		setError(null);
+		setCurrentUser(null);
 
-    try {
-      const responseLogin: IResponseHTTP<string> =
-        await new AuthService().login(loginData);
+		try {
+			const responseLogin: IResponseHTTP<string> =
+				await new AuthService().login(loginData);
 
-      if (responseLogin.estado >= 500) {
-        throw new Error("Error interno del servidor.");
-      } else if (responseLogin.estado === 401) {
-        throw new Error("Sesión expirada.");
-      } else if (responseLogin.estado >= 400) {
-        throw new Error("Datos incorrectos del cliente.");
-      }
+			if (responseLogin.estado >= 500) {
+				throw new Error("Error interno del servidor.");
+			} else if (responseLogin.estado === 401) {
+				throw new Error("Sesión expirada.");
+			} else if (responseLogin.estado >= 400) {
+				throw new Error("Datos incorrectos del cliente.");
+			}
 
-      await checkSession();
-    } catch (err) {
-      console.error(
-        `useCookie.ts - Error al obtener cookie de usuario \n ${err}`,
-      );
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión.");
-      setCurrentUser(null);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+			await checkSession();
+		} catch (err) {
+			console.error(
+				`useCookie.ts - Error al obtener cookie de usuario \n ${err}`,
+			);
+			setError(err instanceof Error ? err.message : "Error al iniciar sesión.");
+			setCurrentUser(null);
+			throw err;
+		} finally {
+			setIsLoading(false);
+		}
+	}, []);
 
-  // Verificar sesión activa (al montar o recargar) -------------------------------
-  const checkSession = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response: IResponseHTTP<ICurrentUser> =
-        await new AuthService().session();
-      setCurrentUser(response.error === false ? response.mensaje : null);
-    } catch {
-      setError("Error de conexión al verificar la sesión.");
-      setCurrentUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+	// Verificar sesión activa (al montar o recargar) -------------------------------
+	const checkSession = useCallback(async () => {
+		setIsLoading(true);
+		setError(null);
+		try {
+			const response: IResponseHTTP<ICurrentUser> =
+				await new AuthService().session();
+			setCurrentUser(response.error === false ? response.mensaje : null);
+		} catch {
+			setError("Error de conexión al verificar la sesión.");
+			setCurrentUser(null);
+		} finally {
+			setIsLoading(false);
+		}
+	}, []);
 
-  useEffect(() => {
-    checkSession();
-  }, [checkSession]);
+	useEffect(() => {
+		checkSession();
+	}, [checkSession]);
 
-  // Logout --------------------------------------------------------------------
-  const logout = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+	// Logout --------------------------------------------------------------------
+	const logout = useCallback(async () => {
+		setIsLoading(true);
+		setError(null);
 
-    try {
-      await new AuthService().logout();
-    } catch {
-      // Aunque falle la red, se limpia estado local
-    } finally {
-      setCurrentUser(null);
-      setIsLoading(false);
-    }
-  }, []);
+		try {
+			await new AuthService().logout();
+		} catch {
+			// Aunque falle la red, se limpia estado local
+		} finally {
+			setCurrentUser(null);
+			setIsLoading(false);
+		}
+	}, []);
 
-  return {
-    currentUser,
-    isLoading,
-    isLoadingLogin,
-    error,
-    login,
-    logout,
-    checkSession,
-  };
+	return {
+		currentUser,
+		isLoading,
+		isLoadingLogin,
+		error,
+		login,
+		logout,
+		checkSession,
+	};
 }

@@ -7,389 +7,384 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import { EventClickArg, EventDropArg } from "@fullcalendar/core/index.js";
+import { FaSave } from "react-icons/fa";
 
 import "./Agenda.css";
 import SolicitudService from "@/services/ProcesoContratacionService";
-import IResponseHTTP from "@/interfaces/http/Response";
+import IResponseHTTP from "@/services/connection/APIResponse";
 import ILabelValue from "@/interfaces/LabelValue";
-import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import MainHeader from "@/components/header/MainHeader";
+import { IProcesoContratacionBase } from "@/schemas/procesos-contratacion/GetProcesoContratacion";
 import { InputField } from "@/components/input/InputField";
-import { CheckboxField } from "@/components/input/CheckBoxField";
 import { CustomButton } from "@/components/button/CustomButton";
-import { FaSave } from "react-icons/fa";
+import { CheckboxField } from "@/components/input/CheckboxField";
 
 // Interfaces de UI -----------------------------------------------------------
 interface IEventoAgenda {
-  id: string;
-  title: string;
-  start: string;
-  allDay: boolean;
-  backgroundColor: string;
-  borderColor: string;
-  display: "block";
-  extendedProps: {
-    candidato: string;
-    citaVirtual: boolean;
-    estado: number;
-    atendioCita: boolean;
-  };
+	id: string;
+	title: string;
+	start: string;
+	allDay: boolean;
+	backgroundColor: string;
+	borderColor: string;
+	display: "block";
+	extendedProps: {
+		candidato: string;
+		citaVirtual: boolean;
+		estado: number;
+		atendioCita: boolean;
+	};
 }
 interface IEventoSeleccionado {
-  id: number;
-  title: string;
-  fecha: string;
-  candidato: string;
-  citaVirtual: boolean;
-  estado: number;
-  atendioCita: boolean;
+	id: number;
+	title: string;
+	fecha: string;
+	candidato: string;
+	citaVirtual: boolean;
+	estado: number;
+	atendioCita: boolean;
 }
 interface IPutProcesoContratacionAgenda {
-  fechaEntrevista: string;
-  FKIdEstadoProcesoContratacion: number;
-  atendioCita: boolean;
-  citaVirtual: boolean;
+	fechaEntrevista: string;
+	FKIdEstadoProcesoContratacion: number;
+	atendioCita: boolean;
+	citaVirtual: boolean;
 }
 const ESTADOS_EDITABLES: number[] = [9, 10, 11];
 const OPCIONES_ESTADO: ILabelValue[] = [
-  { value: "9", label: "Pendiente (cita)" },
-  { value: "10", label: "Entregado (cita)" },
-  { value: "11", label: "Citado" },
+	{ value: "9", label: "Pendiente (cita)" },
+	{ value: "10", label: "Entregado (cita)" },
+	{ value: "11", label: "Citado" },
 ];
 
 enum EstadoProceso {
-  Pendiente = 9,
-  EnProceso = 10,
-  Finalizado = 11,
+	Pendiente = 9,
+	EnProceso = 10,
+	Finalizado = 11,
 }
 
 const mapColorEstado = (estado: EstadoProceso): string => {
-  switch (estado) {
-    case EstadoProceso.Pendiente:
-      return "#f1c40f";
-    case EstadoProceso.EnProceso:
-      return "#e67e22";
-    case EstadoProceso.Finalizado:
-      return "#23aa12";
-    default:
-      return "#d11a2a";
-  }
+	switch (estado) {
+		case EstadoProceso.Pendiente:
+			return "#f1c40f";
+		case EstadoProceso.EnProceso:
+			return "#e67e22";
+		case EstadoProceso.Finalizado:
+			return "#23aa12";
+		default:
+			return "#d11a2a";
+	}
 };
-function resolverColor(estado: number, atendioCita: boolean): string {
-  return atendioCita ? "#d11a2a" : mapColorEstado(estado);
-}
+const resolverColor = (estado: number, atendioCita: boolean): string => {
+	return atendioCita ? "#d11a2a" : mapColorEstado(estado);
+};
 function solicitudAEvento(s): IEventoAgenda {
-  const colorBase = resolverColor(
-    s.FKIdEstadoProcesoContratacion,
-    s.atendioCita,
-  );
+	const colorBase = resolverColor(
+		s.FKIdEstadoProcesoContratacion,
+		s.atendioCita,
+	);
 
-  return {
-    id: String(s.idProceso),
-    title: s.citaVirtual
-      ? `🛜 ${s.nombreCandidato || "Sin nombre"} `
-      : s.nombreCandidato || "Sin nombre",
-    start: s.fechaEntrevista!.split("T")[0],
-    allDay: true,
-    backgroundColor: colorBase,
-    borderColor: s.citaVirtual ? "#3498db" : colorBase,
-    display: "block",
-    extendedProps: {
-      candidato: s.nombreCandidato,
-      citaVirtual: s.citaVirtual,
-      estado: s.FKIdEstadoProcesoContratacion,
-      atendioCita: s.atendioCita,
-    },
-  };
+	return {
+		id: String(s.idProceso),
+		title: s.citaVirtual
+			? `🛜 ${s.nombreCandidato || "Sin nombre"} `
+			: s.nombreCandidato || "Sin nombre",
+		start: s.fechaEntrevista!.split("T")[0],
+		allDay: true,
+		backgroundColor: colorBase,
+		borderColor: s.citaVirtual ? "#3498db" : colorBase,
+		display: "block",
+		extendedProps: {
+			candidato: s.nombreCandidato,
+			citaVirtual: s.citaVirtual,
+			estado: s.FKIdEstadoProcesoContratacion,
+			atendioCita: s.atendioCita,
+		},
+	};
 }
 
 function Agenda() {
-  // Utils ------------------------------------------------------------------
-  const fieldID = useId();
-  const [eventos, setEventos] = useState<IEventoAgenda[]>([]);
-  const [modalAbierto, setModalAbierto] = useState(false);
-  // Eventos de agenda ------------------------------------------------------
-  const [eventoSeleccionado, setEventoSeleccionado] =
-    useState<IEventoSeleccionado | null>(null);
-  useEffect(() => {
-    async function cargarEventos(): Promise<void> {
-      try {
-        const data = await new SolicitudService().getProcesosContratacion();
+	// Utils ------------------------------------------------------------------
+	const fieldID = useId();
+	const [eventos, setEventos] = useState<IEventoAgenda[]>([]);
+	const [modalAbierto, setModalAbierto] = useState(false);
+	// Eventos de agenda ------------------------------------------------------
+	const [eventoSeleccionado, setEventoSeleccionado] =
+		useState<IEventoSeleccionado | null>(null);
+	useEffect(() => {
+		async function cargarEventos(): Promise<void> {
+			try {
+				const data = await new SolicitudService().getProcesosContratacion();
 
-        if (!data) return;
+				if (!data) return;
 
-        const solicitudes = Object.values(data) as IProcesoContratacionBase[];
-        const nuevosEventos = solicitudes
-          .filter((s) => Boolean(s.fechaEntrevista))
-          .filter((s) => s.FKIdEstadoProcesoContratacion !== 7)
-          .map(solicitudAEvento);
+				const solicitudes = Object.values(data) as IProcesoContratacionBase[];
+				const nuevosEventos = solicitudes
+					.filter((s) => Boolean(s.fechaEntrevista))
+					.filter((s) => s.FKIdEstadoProcesoContratacion !== 7)
+					.map(solicitudAEvento);
 
-        setEventos(nuevosEventos);
-      } catch (err) {
-        console.error("Error al cargar eventos:", err);
-      }
-    }
-    cargarEventos();
-  }, []);
+				setEventos(nuevosEventos);
+			} catch (err) {
+				console.error("Error al cargar eventos:", err);
+			}
+		}
+		cargarEventos();
+	}, []);
 
-  // Evento click eventos ---------------------------------------------------
-  const handleEventClick = (info: EventClickArg): void => {
-    const props = info.event.extendedProps as IEventoAgenda["extendedProps"];
+	// Evento click eventos ---------------------------------------------------
+	const handleEventClick = (info: EventClickArg): void => {
+		const props = info.event.extendedProps as IEventoAgenda["extendedProps"];
 
-    setEventoSeleccionado({
-      id: Number(info.event.id), // TODO-Desarrollo: Check
-      title: info.event.title,
-      fecha: info.event.startStr,
-      candidato: props.candidato,
-      citaVirtual: props.citaVirtual,
-      estado: props.estado,
-      // CORRECCIÓN: ?? false asegura boolean aunque extendedProps lo devuelva undefined
-      atendioCita: props.atendioCita ?? false,
-    });
+		setEventoSeleccionado({
+			id: Number(info.event.id), // TODO-Desarrollo: Check
+			title: info.event.title,
+			fecha: info.event.startStr,
+			candidato: props.candidato,
+			citaVirtual: props.citaVirtual,
+			estado: props.estado,
+			// CORRECCIÓN: ?? false asegura boolean aunque extendedProps lo devuelva undefined
+			atendioCita: props.atendioCita ?? false,
+		});
 
-    setModalAbierto(true);
-  };
+		setModalAbierto(true);
+	};
 
-  const handleGuardarCambios = async (): Promise<void> => {
-    if (!eventoSeleccionado) return;
+	const handleGuardarCambios = async (): Promise<void> => {
+		if (!eventoSeleccionado) return;
 
-    try {
-      const payload: IPutProcesoContratacionAgenda = {
-        fechaEntrevista: eventoSeleccionado.fecha,
-        atendioCita: eventoSeleccionado.atendioCita,
-        citaVirtual: eventoSeleccionado.citaVirtual,
-        FKIdEstadoProcesoContratacion: eventoSeleccionado.estado,
-      };
+		try {
+			const payload: IPutProcesoContratacionAgenda = {
+				fechaEntrevista: eventoSeleccionado.fecha,
+				atendioCita: eventoSeleccionado.atendioCita,
+				citaVirtual: eventoSeleccionado.citaVirtual,
+				FKIdEstadoProcesoContratacion: eventoSeleccionado.estado,
+			};
 
-      const response: IResponseHTTP<string> =
-        await new SolicitudService().putProcesoContratacion(
-          eventoSeleccionado.id,
-          payload,
-        );
+			const response: IResponseHTTP<string> =
+				await new SolicitudService().putProcesoContratacion(
+					eventoSeleccionado.id,
+					payload,
+				);
 
-      const colorFinal = resolverColor(
-        eventoSeleccionado.estado,
-        eventoSeleccionado.atendioCita,
-      );
+			const colorFinal = resolverColor(
+				eventoSeleccionado.estado,
+				eventoSeleccionado.atendioCita,
+			);
 
-      setEventos((prev) =>
-        prev.map((ev) =>
-          ev.id === String(eventoSeleccionado.id)
-            ? {
-                ...ev,
-                start: eventoSeleccionado.fecha,
-                backgroundColor: colorFinal,
-                borderColor: eventoSeleccionado.citaVirtual
-                  ? "#3498db"
-                  : colorFinal,
-                extendedProps: {
-                  ...ev.extendedProps,
-                  estado: eventoSeleccionado.estado,
-                  citaVirtual: eventoSeleccionado.citaVirtual,
-                  atendioCita: eventoSeleccionado.atendioCita,
-                },
-              }
-            : ev,
-        ),
-      );
+			setEventos((prev) =>
+				prev.map((ev) =>
+					ev.id === String(eventoSeleccionado.id)
+						? {
+								...ev,
+								start: eventoSeleccionado.fecha,
+								backgroundColor: colorFinal,
+								borderColor: eventoSeleccionado.citaVirtual
+									? "#3498db"
+									: colorFinal,
+								extendedProps: {
+									...ev.extendedProps,
+									estado: eventoSeleccionado.estado,
+									citaVirtual: eventoSeleccionado.citaVirtual,
+									atendioCita: eventoSeleccionado.atendioCita,
+								},
+							}
+						: ev,
+				),
+			);
 
-      setModalAbierto(false);
-    } catch (error) {
-      console.error("Error al guardar cambios:", error);
-      alert("Error al guardar los cambios");
-    }
-  };
+			setModalAbierto(false);
+		} catch (error) {
+			console.error("Error al guardar cambios:", error);
+			alert("Error al guardar los cambios");
+		}
+	};
 
-  const handleEventDrop = async (info: EventDropArg): Promise<void> => {
-    const idEventoSeleccionado: string = info.event.id;
-    const nuevaFecha: string = info.event.startStr;
+	const handleEventDrop = async (info: EventDropArg): Promise<void> => {
+		const idEventoSeleccionado: string = info.event.id;
+		const nuevaFecha: string = info.event.startStr;
 
-    const eventoOriginal: IEventoAgenda | undefined = eventos.find(
-      (ev) => ev.id === idEventoSeleccionado,
-    );
-    if (!eventoOriginal) return;
+		const eventoOriginal: IEventoAgenda | undefined = eventos.find(
+			(ev) => ev.id === idEventoSeleccionado,
+		);
+		if (!eventoOriginal) return;
 
-    try {
-      const eventoOriginal = eventos.find(
-        (ev) => ev.id === idEventoSeleccionado,
-      );
+		try {
+			const eventoOriginal = eventos.find(
+				(ev) => ev.id === idEventoSeleccionado,
+			);
 
-      const payload: IPutProcesoContratacionAgenda = {
-        fechaEntrevista: nuevaFecha,
-        FKIdEstadoProcesoContratacion: eventoOriginal!!.extendedProps.estado,
-        atendioCita: eventoOriginal!!.extendedProps.atendioCita,
-        citaVirtual: eventoOriginal!!.extendedProps.citaVirtual,
-      };
+			const payload: IPutProcesoContratacionAgenda = {
+				fechaEntrevista: nuevaFecha,
+				FKIdEstadoProcesoContratacion: eventoOriginal!!.extendedProps.estado,
+				atendioCita: eventoOriginal!!.extendedProps.atendioCita,
+				citaVirtual: eventoOriginal!!.extendedProps.citaVirtual,
+			};
 
-      await new SolicitudService().putProcesoContratacion(
-        Number(idEventoSeleccionado),
-        payload,
-      );
+			await new SolicitudService().putProcesoContratacion(
+				Number(idEventoSeleccionado),
+				payload,
+			);
 
-      const colorFinal = resolverColor(
-        payload.FKIdEstadoProcesoContratacion,
-        payload.atendioCita,
-      );
+			const colorFinal = resolverColor(
+				payload.FKIdEstadoProcesoContratacion,
+				payload.atendioCita,
+			);
 
-      setEventos((prev) =>
-        prev.map((ev) =>
-          ev.id === idEventoSeleccionado
-            ? {
-                ...ev,
-                start: nuevaFecha,
-                backgroundColor: colorFinal,
-                borderColor: payload.citaVirtual ? "#3498db" : colorFinal,
-              }
-            : ev,
-        ),
-      );
-    } catch (error) {
-      console.error("❌ Error al actualizar fecha por drag & drop:", error);
-      alert("No se pudo actualizar la fecha. Se revertirá.");
-      info.revert();
-    }
-  };
+			setEventos((prev) =>
+				prev.map((ev) =>
+					ev.id === idEventoSeleccionado
+						? {
+								...ev,
+								start: nuevaFecha,
+								backgroundColor: colorFinal,
+								borderColor: payload.citaVirtual ? "#3498db" : colorFinal,
+							}
+						: ev,
+				),
+			);
+		} catch (error) {
+			console.error("❌ Error al actualizar fecha por drag & drop:", error);
+			alert("No se pudo actualizar la fecha. Se revertirá.");
+			info.revert();
+		}
+	};
 
-  return (
-    <>
-      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto">
-        <MainHeader title="Próximos eventos" subtitle="Agenda" />
+	return (
+		<>
+			<main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto">
+				<MainHeader title="Próximos eventos" subtitle="Agenda" />
 
-        <div className="bg-white p-3.75 rounded-[10px] shadow-[0_3px_8px_rgba(0,0,0,0.1)] mt-[3%]">
-          <FullCalendar
-            plugins={[
-              dayGridPlugin,
-              timeGridPlugin,
-              interactionPlugin,
-              listPlugin,
-            ]}
-            initialView="dayGridMonth"
-            eventDrop={handleEventDrop}
-            editable={true}
-            eventDurationEditable={false}
-            locale={esLocale}
-            headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
-            }}
-            events={eventos}
-            eventClick={handleEventClick}
-            height="80vh"
-          />
-        </div>
-      </main>
+				<div className="bg-white p-3.75 rounded-[10px] shadow-[0_3px_8px_rgba(0,0,0,0.1)] mt-[3%]">
+					<FullCalendar
+						plugins={[
+							dayGridPlugin,
+							timeGridPlugin,
+							interactionPlugin,
+							listPlugin,
+						]}
+						initialView="dayGridMonth"
+						eventDrop={handleEventDrop}
+						editable={true}
+						eventDurationEditable={false}
+						locale={esLocale}
+						headerToolbar={{
+							left: "prev,next today",
+							center: "title",
+							right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+						}}
+						events={eventos}
+						eventClick={handleEventClick}
+						height="80vh"
+					/>
+				</div>
+			</main>
 
-      {/* ── Modal ───────────────────────────────────────────────────────── */}
-      {modalAbierto && eventoSeleccionado && (
-        <div
-          role="presentation"
-          className="fixed inset-0 bg-black/50 flex justify-center items-center z-2000"
-          onClick={() => setModalAbierto(false)}
-          onKeyDown={() => setModalAbierto(false)}
-        >
-          <div
-            role="presentation"
-            className="bg-white p-6.25 rounded-xl w-87.5 shadow-[0_4px_12px_rgba(0,0,0,0.2)] animate-[fadeIn_0.3s_ease] font-[Kulim_Park,sans-serif]"
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-[2.5rem] font-bold text-[#18529d] mb-37.5 -mt-3.75 pb-3.75">
-              Cita
-            </h2>
+			{/* ── Modal ───────────────────────────────────────────────────────── */}
+			{modalAbierto && eventoSeleccionado && (
+				<div
+					role="presentation"
+					className="fixed inset-0 bg-black/50 flex justify-center items-center z-2000"
+					onClick={() => setModalAbierto(false)}
+					onKeyDown={() => setModalAbierto(false)}>
+					<div
+						role="presentation"
+						className="bg-white p-6.25 rounded-xl w-87.5 shadow-[0_4px_12px_rgba(0,0,0,0.2)] animate-[fadeIn_0.3s_ease] font-[Kulim_Park,sans-serif]"
+						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => e.stopPropagation()}>
+						<h2 className="text-[2.5rem] font-bold text-[#18529d] mb-37.5 -mt-3.75 pb-3.75">
+							Cita
+						</h2>
 
-            <p className="mt-2.5 font-semibold text-[#18529d]">Candidato:</p>
-            <p className="mt-1">{eventoSeleccionado.candidato}</p>
+						<p className="mt-2.5 font-semibold text-[#18529d]">Candidato:</p>
+						<p className="mt-1">{eventoSeleccionado.candidato}</p>
 
-            <InputField
-              id={`${fieldID}-date`}
-              label="Fecha:"
-              type="date"
-              value={String(eventoSeleccionado.fecha)}
-              onChange={(e) =>
-                setEventoSeleccionado({
-                  ...eventoSeleccionado,
-                  fecha: e.target.value,
-                })
-              }
-            />
+						<InputField
+							id={`${fieldID}-date`}
+							label="Fecha:"
+							type="date"
+							value={String(eventoSeleccionado.fecha)}
+							onChange={(e) =>
+								setEventoSeleccionado({
+									...eventoSeleccionado,
+									fecha: e.target.value,
+								})
+							}
+						/>
 
-            <label
-              htmlFor="agenda-estado"
-              className="mt-2.5 font-semibold text-[#18529d] block"
-            >
-              Estado:
-            </label>
-            <Select<ILabelValue>
-              inputId="agenda-estado"
-              classNamePrefix="react-select"
-              isDisabled={
-                !ESTADOS_EDITABLES.includes(Number(eventoSeleccionado.estado))
-              }
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  width: "105%",
-                  minHeight: "45px",
-                  height: "45px",
-                  opacity: !ESTADOS_EDITABLES.includes(
-                    Number(eventoSeleccionado.estado),
-                  )
-                    ? 0.6
-                    : 1,
-                }),
-              }}
-              value={
-                OPCIONES_ESTADO.find(
-                  (opt) => opt.value === String(eventoSeleccionado.estado),
-                ) ?? null
-              }
-              onChange={(opcion: SingleValue<ILabelValue>) => {
-                if (opcion) {
-                  setEventoSeleccionado({
-                    ...eventoSeleccionado,
-                    estado: Number(opcion.value),
-                  });
-                }
-              }}
-              options={OPCIONES_ESTADO}
-            />
+						<label
+							htmlFor="agenda-estado"
+							className="mt-2.5 font-semibold text-[#18529d] block">
+							Estado:
+						</label>
+						<Select<ILabelValue>
+							inputId="agenda-estado"
+							classNamePrefix="react-select"
+							isDisabled={
+								!ESTADOS_EDITABLES.includes(Number(eventoSeleccionado.estado))
+							}
+							styles={{
+								control: (base) => ({
+									...base,
+									width: "105%",
+									minHeight: "45px",
+									height: "45px",
+									opacity: !ESTADOS_EDITABLES.includes(
+										Number(eventoSeleccionado.estado),
+									)
+										? 0.6
+										: 1,
+								}),
+							}}
+							value={
+								OPCIONES_ESTADO.find(
+									(opt) => opt.value === String(eventoSeleccionado.estado),
+								) ?? null
+							}
+							onChange={(opcion: SingleValue<ILabelValue>) => {
+								if (opcion) {
+									setEventoSeleccionado({
+										...eventoSeleccionado,
+										estado: Number(opcion.value),
+									});
+								}
+							}}
+							options={OPCIONES_ESTADO}
+						/>
 
-            <div className="flex items-center mt-3 gap-2">
-              <CheckboxField
-                id={`${fieldID}-atendioCita`}
-                label="No asistió"
-                checked={eventoSeleccionado.atendioCita}
-                onChange={(e) =>
-                  setEventoSeleccionado({
-                    ...eventoSeleccionado,
-                    atendioCita: e,
-                  })
-                }
-              />
-            </div>
+						<div className="flex items-center mt-3 gap-2">
+							<CheckboxField
+								id={`${fieldID}-atendioCita`}
+								label="No asistió"
+								checked={eventoSeleccionado.atendioCita}
+								onChange={(e) =>
+									setEventoSeleccionado({
+										...eventoSeleccionado,
+										atendioCita: e,
+									})
+								}
+							/>
+						</div>
 
-            <div className="flex flex-col gap-0">
-              <CustomButton
-                variant="save"
-                icon={<FaSave />}
-                onClick={handleGuardarCambios}
-              >
-                Guardar
-              </CustomButton>
-              <CustomButton
-                variant="cancel"
-                icon={<FaSave />}
-                onClick={() => setModalAbierto(false)}
-              >
-                Cerrar
-              </CustomButton>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
+						<div className="flex flex-col gap-0">
+							<CustomButton
+								variant="save"
+								icon={<FaSave />}
+								onClick={handleGuardarCambios}>
+								Guardar
+							</CustomButton>
+							<CustomButton
+								variant="cancel"
+								icon={<FaSave />}
+								onClick={() => setModalAbierto(false)}>
+								Cerrar
+							</CustomButton>
+						</div>
+					</div>
+				</div>
+			)}
+		</>
+	);
 }
 
 export default Agenda;
