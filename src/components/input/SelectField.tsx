@@ -27,7 +27,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
   label,
   labelClassName,
   options,
-  placeholder = "Seleccionar",
+  placeholder = "Seleccione una opción",
   onChange,
   value,
   error,

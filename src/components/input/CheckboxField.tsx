@@ -171,4 +171,17 @@ export const CheckboxField: React.FC<CheckboxFieldProps> = ({
     setNotificaciones(checked);
   }}
 />
+
+<CheckboxGroup
+  label="Selecciona tus intereses"
+  options={[
+    { value: "tecnologia", label: "Tecnología" },
+    { value: "deportes", label: "Deportes", description: "Noticias deportivas" },
+    { value: "cultura", label: "Cultura" },
+    { value: "ciencia", label: "Ciencia", disabled: true }
+  ]}
+  values={intereses}
+  onChange={setIntereses}
+  error={intereses.length === 0 ? "Selecciona al menos una opción" : undefined}
+/>
  */

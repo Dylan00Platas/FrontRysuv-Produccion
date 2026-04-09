@@ -16,6 +16,7 @@ import { InputField } from "@/components/input/InputField";
 import FormSectionCard from "@/components/card/FormSectionCard";
 import { CustomButton } from "@/components/button/CustomButton";
 import { CheckboxField } from "@/components/input/CheckBoxField";
+import { ReactSelectField } from "@/components/input/ReactSelectField";
 
 // Utils ---------------------------------------------------------------------
 const selectStyles = {
@@ -347,28 +348,26 @@ function Cedulas() {
           {/* Filtros */}
           <FormSectionCard title="Filtros">
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="w-full sm:w-auto sm:flex-1">
-                <Select<ILabelValue>
-                  classNamePrefix="rs"
-                  options={CEDULA_OPTIONS}
-                  value={cedulaFiltro}
-                  onChange={setCedulaFiltro}
-                  isClearable
-                  placeholder="Tipo de cédula"
-                  styles={selectStyles}
-                />
-              </div>
-              <div className="w-full sm:w-auto sm:flex-1">
-                <Select<ILabelValue>
-                  classNamePrefix="rs"
-                  options={dependenciasUnicas}
-                  value={dependenciaFiltro}
-                  onChange={setDependenciaFiltro}
-                  isClearable
-                  placeholder="Dependencia"
-                  styles={selectStyles}
-                />
-              </div>
+              <ReactSelectField<ILabelValue>
+                options={CEDULA_OPTIONS}
+                value={cedulaFiltro}
+                onChange={setCedulaFiltro}
+                isClearable
+                placeholder="Tipo de cédula"
+                styles={selectStyles}
+                classNamePrefix="rs"
+                containerClassName="w-full sm:w-auto sm:flex-1"
+              />
+              <ReactSelectField<ILabelValue>
+                options={dependenciasUnicas}
+                value={dependenciaFiltro}
+                onChange={setDependenciaFiltro}
+                isClearable
+                placeholder="Dependencia de la cédula"
+                styles={selectStyles}
+                classNamePrefix="rs"
+                containerClassName="w-full sm:w-auto sm:flex-1"
+              />
               <InputField
                 id={`${fieldID}-searchTerm`}
                 placeholder="Buscar folio, candidato..."
@@ -379,6 +378,7 @@ function Cedulas() {
                 showSearchButton={true}
                 onSearch={() => setSearchTerm(searchTerm)}
                 searchButtonTitle="Buscar por palabra clave"
+                className="w-full sm:w-auto sm:flex-1"
               />
             </div>
           </FormSectionCard>
