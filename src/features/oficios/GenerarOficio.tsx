@@ -14,6 +14,12 @@ import IResponseHTTP from "@/services/connection/APIResponse";
 import IDatosOficio from "@/interfaces/oficios/DatosOficio";
 import MainHeader from "@/components/header/MainHeader";
 import "./GenerarOficio.css";
+import { SelectField } from "@/components/input/SelectField";
+import FormSectionCard from "@/components/card/FormSectionCard";
+import { InputField } from "@/components/input/InputField";
+import { TextAreaField } from "@/components/input/TextAreaField";
+import { CustomButton } from "@/components/button/CustomButton";
+import { FaPlus } from "react-icons/fa";
 
 interface IFormData {
 	categoriaAutorizada: string;
@@ -131,249 +137,162 @@ function GenerarOficio() {
 		<>
 			<Toast texto={toast.texto} tipo={toast.tipo} />
 
-			<main className="main-content-solicitud">
+			<main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto">
 				<MainHeader title="Generar oficio" subtitle="Gestión de oficios" />
 
-				<form
-					className="card-generar-oficio form-grid-generar-oficio"
-					onSubmit={handleSubmit}>
+				<form onSubmit={handleSubmit} className="flex flex-col gap-6">
 					{/* TIPO DE OFICIO */}
-					<div className="form-group-generar-oficio span-3">
-						<label
-							htmlFor="generar-tipo-oficio"
-							className="form-label-generar-oficio">
-							Tipo de Oficio
-						</label>
-						<select
-							id="generar-tipo-oficio"
-							className="form-input-generar-oficio"
-							value={formData.tipoOficio}
-							onChange={(e) => handleInputChange("tipoOficio", e.target.value)}>
-							<option value="">Seleccione una opción</option>
-							<option value="5.1 y 5.2">5.1 y 5.2</option>
-							<option value="4.1 y 4.2">4.1 y 4.2</option>
-							<option value="4.3 (Licencia)">4.3 (Licencia)</option>
-							<option value="4.3 (Medica)">4.3 (Médica)</option>
-							<option value="Cita">Cita</option>
-							<option value="Otros">Otros</option>
-						</select>
-					</div>
 
-					{/* DATOS DEL PROCESO */}
-					<h3 className="section-title-generar-oficio">Datos del proceso</h3>
-
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-folio"
-							className="form-label-generar-oficio">
-							Folio
-						</label>
-						<input
+					<SelectField
+						label="Tipo de oficio:"
+						id="generar-tipo-oficio"
+						value={formData.tipoOficio}
+						onChange={(e: string | number) =>
+							handleInputChange("tipoOficio", e.toString())
+						}
+						options={[
+							{ value: "5.1 y 5.2", label: "5.1 y 5.2" },
+							{ value: "4.1 y 4.2", label: "4.1 y 4.2" },
+							{ value: "4.3 (Licencia)", label: "4.3 (Licencia)" },
+							{ value: "4.3 (Licencia)", label: "4.3 (Licencia)" },
+							{ value: "4.3 (Medica)", label: "4.3 (Médica)" },
+							{ value: "Cita", label: "Cita" },
+							{ value: "Otros", label: "Otros" },
+						]}
+					/>
+					<FormSectionCard title="Datos del proceso">
+						<InputField
+							label="Folio:"
 							id="generar-folio"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.folio}
-							onChange={(e) => handleInputChange("folio", e.target.value)}
+							onChange={(
+								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+							) => handleInputChange("folio", e.target.value)}
 						/>
-					</div>
 
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-plaza"
-							className="form-label-generar-oficio">
-							Plaza
-						</label>
-						<input
+						<InputField
+							label="Plaza:"
 							id="generar-plaza"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.plaza}
-							onChange={(e) => handleInputChange("plaza", e.target.value)}
+							onChange={(
+								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+							) => handleInputChange("plaza", e.target.value)}
 						/>
-					</div>
 
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-motivo"
-							className="form-label-generar-oficio">
-							Motivo
-						</label>
-						<input
+						<InputField
+							label="Motivo:"
 							id="generar-motivo"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.motivo}
-							onChange={(e) => handleInputChange("motivo", e.target.value)}
+							onChange={(
+								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+							) => handleInputChange("motivo", e.target.value)}
 						/>
-					</div>
-
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-titular-plaza"
-							className="form-label-generar-oficio">
-							Titular de la Plaza
-						</label>
-						<input
+						<InputField
+							label="Titular de la plaza:"
 							id="generar-titular-plaza"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.titularPlaza}
-							onChange={(e) =>
-								handleInputChange("titularPlaza", e.target.value)
-							}
+							onChange={(
+								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+							) => handleInputChange("titularPlaza", e.target.value)}
 						/>
-					</div>
 
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-categoria-origen"
-							className="form-label-generar-oficio">
-							Categoría/Puesto (origen)
-						</label>
-						<input
+						<InputField
+							label="Categoría/Puesto (origen):"
 							id="generar-categoria-origen"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.categoriaOrigen}
-							onChange={(e) =>
-								handleInputChange("categoriaOrigen", e.target.value)
-							}
+							onChange={(
+								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+							) => handleInputChange("categoriaOrigen", e.target.value)}
 						/>
-					</div>
 
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-categoria-autorizada"
-							className="form-label-generar-oficio">
-							Categoría por autorizar
-						</label>
-						<input
+						<InputField
+							label="Categoría por autorizar:"
 							id="generar-categoria-autorizada"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.categoriaAutorizada}
-							onChange={(e) =>
-								handleInputChange("categoriaAutorizada", e.target.value)
-							}
+							onChange={(
+								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+							) => handleInputChange("categoriaAutorizada", e.target.value)}
 						/>
-					</div>
 
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-candidato"
-							className="form-label-generar-oficio">
-							Nombre del candidato
-						</label>
-						<input
+						<InputField
+							label="Nombre del candidato:"
 							id="generar-candidato"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.nombreCandidato}
-							onChange={(e) =>
-								handleInputChange("nombreCandidato", e.target.value)
-							}
+							onChange={(
+								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+							) => handleInputChange("nombreCandidato", e.target.value)}
 						/>
-					</div>
+					</FormSectionCard>
 
-					{/* DATOS DEL OFICIO */}
-					<h3 className="section-title-generar-oficio">Datos del oficio</h3>
-
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-folio-oficio"
-							className="form-label-generar-oficio">
-							Folio del oficio
-						</label>
-						<input
+					<FormSectionCard title="Datos del oficio">
+						<InputField
+							label="Folio del oficio:"
 							id="generar-folio-oficio"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.folio}
 							onChange={(e) => handleInputChange("folio", e.target.value)}
 						/>
-					</div>
 
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-fecha-lugar"
-							className="form-label-generar-oficio">
-							Fecha y lugar
-						</label>
-						<input
+						<InputField
+							label="Fecha y lugar"
 							id="generar-fecha-lugar"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.fecha}
 							onChange={(e) => handleInputChange("fecha", e.target.value)}
 						/>
-					</div>
 
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-dirigido"
-							className="form-label-generar-oficio">
-							Destinatario
-						</label>
-						<input
+						<InputField
+							label="Destinatario:"
 							id="generar-dirigido"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.dirigido}
 							onChange={(e) => handleInputChange("dirigido", e.target.value)}
 						/>
-					</div>
 
-					<div className="form-group-generar-oficio">
-						<label
-							htmlFor="generar-puesto-destinatario"
-							className="form-label-generar-oficio">
-							Puesto (destinatario)
-						</label>
-						<input
+						<InputField
+							label="Puesto (destinatario):"
 							id="generar-puesto-destinatario"
 							type="text"
-							className="form-input-generar-oficio"
 							value={formData.puestoDirigido}
 							onChange={(e) =>
 								handleInputChange("puestoDirigido", e.target.value)
 							}
 						/>
-					</div>
 
-					{/* TEXT AREAS */}
-					<div className="form-group-generar-oficio span-3">
-						<label
-							htmlFor="generar-cuerpo-oficio"
-							className="form-label-generar-oficio">
-							Cuerpo del Oficio
-						</label>
-						<textarea
+						<TextAreaField
+							label="Cuerpo del oficio:"
 							id="generar-cuerpo-oficio"
-							className="form-textarea-generar-oficio tall"
 							value={formData.cuerpo}
 							onChange={(e) => handleInputChange("cuerpo", e.target.value)}
 						/>
-					</div>
 
-					<div className="form-group-generar-oficio span-3">
-						<label
-							htmlFor="generar-copia-carbon"
-							className="form-label-generar-oficio">
-							Copia Carbón
-						</label>
-						<textarea
+						<TextAreaField
+							label="Copia carbón:"
 							id="generar-copia-carbon"
-							className="form-textarea-generar-oficio"
 							value={formData.copiaCarbon}
 							onChange={(e) => handleInputChange("copiaCarbon", e.target.value)}
 						/>
-					</div>
+					</FormSectionCard>
 
-					{/* BOTONES */}
-					<div className="action-buttons-generar-oficio">
-						<button type="submit" className="btn-guardar-oficio">
+					<div className="flex items-center justify-end gap-3 pb-10 max-[900px]:justify-center">
+						<CustomButton variant="cancel" onClick={() => {}}>
+							Cancelar
+						</CustomButton>
+
+						<CustomButton
+							type="submit"
+							variant="save"
+							icon={<FaPlus />}
+							onClick={() => {}}>
 							Guardar
-						</button>
+						</CustomButton>
 					</div>
 				</form>
 			</main>
