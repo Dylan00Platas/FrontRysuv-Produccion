@@ -135,11 +135,9 @@ function Panorama() {
           await new ProcesoContratacionService().getProcesosContratacion();
 
         setEvaluacionesRaw(data.mensaje.procesos);
-
         const dataFiltrada = data.mensaje.procesos.filter(
           (s) => s.FKIdAcceso !== null,
         );
-
         const adaptadas: IProcesoAdaptado[] = dataFiltrada.map((s, idx) => ({
           idProceso: s.idProceso ?? idx,
           folio: s.folio ?? "",
@@ -151,7 +149,7 @@ function Panorama() {
             ? new Date(s.fechaRecibido).toLocaleDateString("es-MX")
             : "Sin fecha",
           // TODO-Desarrollo: reemplazar con campo real de dependencia
-          dependencia: s.nombreCandidato ?? "Sin dependencia",
+          dependencia: s.nombre ?? "Sin dependencia",
         }));
 
         setEvaluaciones(adaptadas);
@@ -203,9 +201,9 @@ function Panorama() {
       const term = searchTerm.toLowerCase();
       filtradas = filtradas.filter(
         (e) =>
-          e.nombreCandidato.toLowerCase().includes(term) ||
-          e.folio.toLowerCase().includes(term) ||
-          e.puesto.toLowerCase().includes(term),
+          String(e.nombreCandidato ?? "").toLowerCase().includes(term) ||
+          String(e.folio ?? "").toLowerCase().includes(term) ||
+          String(e.puesto ?? "").toLowerCase().includes(term),
       );
     }
 
@@ -223,7 +221,6 @@ function Panorama() {
         const cedulasTipo2 = response.mensaje.cedulas.filter(
           (c) => c.FKIdTipoCedula === 2,
         );
-
         setCedulas(cedulasTipo2);
         setDependenciaCedulaOptions(
           uniqueOptions(cedulasTipo2.map((c) => c.dependencia ?? "N/A")),
@@ -290,8 +287,8 @@ function Panorama() {
       setLoadingCompetencias(true);
       const data: IResponseHTTP<IGetCedulasActivas> =
         await new CedulaService().getCedulasInternasActivas();
-
-      const adaptadas: ICompetencia[] = data.mensaje.cedulas
+      const cedulasActivas = data?.mensaje?.cedulas ?? [];
+      const adaptadas: ICompetencia[] = cedulasActivas
         .filter((c) => c.FKIdTipoCedula !== 1 && c.capacitado !== true)
         .map((c) => ({
           idProceso: c.FKIdProceso ?? null,
@@ -481,7 +478,7 @@ function Panorama() {
                     style={{ cursor: "pointer" }}
                   >
                     <td>{e.folio + "/ " + e.hermesNotificacion}</td>
-                    <td>{e.nombreCandidato}</td>{" "}
+                    <td>{e.nombreCandidato}</td>
                     {/* FIX: era e.nombre (campo inexistente) */}
                     <td>{e.puesto}</td>
                     <td>{e.fechaRecibido}</td>

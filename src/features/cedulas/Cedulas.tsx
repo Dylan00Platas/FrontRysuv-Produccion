@@ -323,7 +323,7 @@ function Cedulas() {
         Interna: "/crear-cedula-interna",
       };
 
-      const ruta = RUTAS[c.FKIdTipoCedula];
+      const ruta = RUTAS[getIdTipoCedula(c.FKIdTipoCedula)];
       if (ruta) {
         navigate(ruta, { state: { cedula: c } });
       } else {
