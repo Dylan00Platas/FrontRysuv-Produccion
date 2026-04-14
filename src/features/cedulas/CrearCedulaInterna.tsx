@@ -452,55 +452,55 @@ function CrearCedulaInterna() {
 			return;
 		}
 
-    try {
-      const Cedula:IPostCedula = {
-        adscripcion: formData.adscripcion,
-        analista: formData.analista,
-        antecedentesFamiliaresUV: formData.antecedentesFamiliaresUV,
-        aprobadoDireccion: false,
-        aprobadoJefeOficina: false,
-        archivoAdjunto: false,
-        avaladoPor: formData.avaladoPor,
-        competenciaDesarrollar: "",
-        competenciaReforzar: "",
-        competenciasSobresaliente: "",
-        conclusiones: formData.conclusiones,
-        descripcionDesarrollar: "",
-        descripcionReforzar: "",
-        edad: formData.edad,
-        educacionFormal: formData.educacionFormal,
-        efectoContratacion: "",
-        elabora: formData.elabora,
-        evaluacionConocimientos: formData.evaluacionConocimientos,
-        expectativaLaboral: formData.expectativaLaboral,
-        experiencia: formData.experiencia,
-        experienciaRelacionada: formData.experienciaRelacionada,
-        fechaCedulaInterna: "",
-        fechaCedulaResultados: "",
-        fechaElaboracionPropuesta: formData.fechaElaboracionPropuesta,
-        FKIdClasificacionCedula: formData.idCedula,
-        FKIdProceso: formData.FKIdProceso,
-        FKIdResultado: null,
-        FKIdTipoCedula: formData.idCedula,
-        hermesNotificacion: formData.hermesNotificacion,
-        idCedula: formData.idCedula,
-        motivoCedulaInterna: "",
-        motivoCedulaResultados: "",
-        nombreCandidato: formData.nombreCandidato,
-        numPlaza: formData.numPlaza,
-        oficioAutorizacionDeOcupacion: "",
-        plaza: "",
-        puesto: formData.puesto,
-        referidoPor: formData.referidoPor,
-        resultadoHabilidadesExcel: formData.resultadoHabilidadesExcel,
-        resultadoHabilidadesWord: formData.resultadoHabilidadesWord,
-        resultadoOrtografia: formData.resultadoOrtografia,
-        resultados: formData.resultados,
-        revisa: formData.revisa,
-      }
-      console.log("Cédula a registrar:", Cedula);
-      const responseCedula: IResponseHTTP<string | number> =
-        await new CedulaService().postCedulaInterna(Cedula);
+		try {
+			const Cedula: IPostCedula = {
+				adscripcion: formData.adscripcion,
+				analista: formData.analista,
+				antecedentesFamiliaresUV: formData.antecedentesFamiliaresUV,
+				aprobadoDireccion: false,
+				aprobadoJefeOficina: false,
+				archivoAdjunto: false,
+				avaladoPor: formData.avaladoPor,
+				competenciaDesarrollar: "",
+				competenciaReforzar: "",
+				competenciasSobresaliente: "",
+				conclusiones: formData.conclusiones,
+				descripcionDesarrollar: "",
+				descripcionReforzar: "",
+				edad: formData.edad,
+				educacionFormal: formData.educacionFormal,
+				efectoContratacion: "",
+				elabora: formData.elabora,
+				evaluacionConocimientos: formData.evaluacionConocimientos,
+				expectativaLaboral: formData.expectativaLaboral,
+				experiencia: formData.experiencia,
+				experienciaRelacionada: formData.experienciaRelacionada,
+				fechaCedulaInterna: "",
+				fechaCedulaResultados: "",
+				fechaElaboracionPropuesta: formData.fechaElaboracionPropuesta,
+				FKIdClasificacionCedula: formData.idCedula,
+				FKIdProceso: formData.FKIdProceso,
+				FKIdResultado: null,
+				FKIdTipoCedula: formData.idCedula,
+				hermesNotificacion: formData.hermesNotificacion,
+				idCedula: formData.idCedula,
+				motivoCedulaInterna: "",
+				motivoCedulaResultados: "",
+				nombreCandidato: formData.nombreCandidato,
+				numPlaza: formData.numPlaza,
+				oficioAutorizacionDeOcupacion: "",
+				plaza: "",
+				puesto: formData.puesto,
+				referidoPor: formData.referidoPor,
+				resultadoHabilidadesExcel: formData.resultadoHabilidadesExcel,
+				resultadoHabilidadesWord: formData.resultadoHabilidadesWord,
+				resultadoOrtografia: formData.resultadoOrtografia,
+				resultados: formData.resultados,
+				revisa: formData.revisa,
+			};
+			console.log("Cédula a registrar:", Cedula);
+			const responseCedula: IResponseHTTP<string | number> =
+				await new CedulaService().postCedulaInterna(Cedula);
 
 			if (responseCedula.error) {
 				throw new Error(
@@ -510,73 +510,71 @@ function CrearCedulaInterna() {
 				);
 			}
 
-      const idCedula = (responseCedula.mensaje as any).idCedula;
-      console.log(idCedula);
-      if (!idCedula)
-        throw new Error("No se recibió el ID de la cédula registrada");
+			const idCedula = (responseCedula.mensaje as any).idCedula;
+			console.log(idCedula);
+			if (!idCedula)
+				throw new Error("No se recibió el ID de la cédula registrada");
 
-      const psicometrias = [
-        formData.psicometriaAnalisisProblemas,
-        formData.psicometriaComunicacion,
-        formData.psicometriaControlActividades,
-        formData.psicometriaDinamismo,
-        formData.psicometriaEnfoqueCalidad,
-        formData.psicometriaEnfoqueResultados,
-        formData.psicometriaInnovacion,
-        formData.psicometriaLiderazgo,
-        formData.psicometriaNegociacion,
-        formData.psicometriaOrientacionAlServicio,
-        formData.psicometriaPensamientoEstrategico,
-        formData.psicometriaPlaneacionOrganizacion,
-        formData.psicometriaRelacionesInterpersonales,
-        formData.psicometriaSensibilidadALineamientos,
-        formData.psicometriaTomaDecisiones,
-        formData.psicometriaTrabajoEnEquipo,
-      ].map(Number);
+			const psicometrias = [
+				formData.psicometriaAnalisisProblemas,
+				formData.psicometriaComunicacion,
+				formData.psicometriaControlActividades,
+				formData.psicometriaDinamismo,
+				formData.psicometriaEnfoqueCalidad,
+				formData.psicometriaEnfoqueResultados,
+				formData.psicometriaInnovacion,
+				formData.psicometriaLiderazgo,
+				formData.psicometriaNegociacion,
+				formData.psicometriaOrientacionAlServicio,
+				formData.psicometriaPensamientoEstrategico,
+				formData.psicometriaPlaneacionOrganizacion,
+				formData.psicometriaRelacionesInterpersonales,
+				formData.psicometriaSensibilidadALineamientos,
+				formData.psicometriaTomaDecisiones,
+				formData.psicometriaTrabajoEnEquipo,
+			].map(Number);
 
-      const valoresValidos = psicometrias.filter(n => n > 0);
-      const maximo = valoresValidos.length * 10;
-      const suma = valoresValidos.reduce((acc, n) => acc + n, 0);
-      const porcentajeFinal = maximo > 0
-        ? (suma / maximo) * 100
-        : 0;
+			const valoresValidos = psicometrias.filter((n) => n > 0);
+			const maximo = valoresValidos.length * 10;
+			const suma = valoresValidos.reduce((acc, n) => acc + n, 0);
+			const porcentajeFinal = maximo > 0 ? (suma / maximo) * 100 : 0;
 
-      await new CedulaService().postResultadoCedulaInterna({
-        FKIdCedula: idCedula,
-        psicometriaAnalisisProblemas: Number(
-          formData.psicometriaAnalisisProblemas,
-        ),
-        psicometriaComunicacion: Number(formData.psicometriaComunicacion),
-        psicometriaControlActividades: Number(
-          formData.psicometriaControlActividades,
-        ),
-        psicometriaDinamismo: Number(formData.psicometriaDinamismo),
-        psicometriaEnfoqueCalidad: Number(formData.psicometriaEnfoqueCalidad),
-        psicometriaEnfoqueResultados: Number(
-          formData.psicometriaEnfoqueResultados,
-        ),
-        psicometriaInnovacion: Number(formData.psicometriaInnovacion),
-        psicometriaLiderazgo: Number(formData.psicometriaLiderazgo),
-        psicometriaNegociacion: Number(formData.psicometriaNegociacion),
-        psicometriaOrientacionAlServicio: Number(
-          formData.psicometriaOrientacionAlServicio,
-        ),
-        psicometriaPensamientoEstrategico: Number(
-          formData.psicometriaPensamientoEstrategico,
-        ),
-        psicometriaPlaneacionOrganizacion: Number(
-          formData.psicometriaPlaneacionOrganizacion,
-        ),
-        psicometriaRelacionesInterpersonales: Number(
-          formData.psicometriaRelacionesInterpersonales,
-        ),
-        psicometriaSensibilidadALineamientos: Number(
-          formData.psicometriaSensibilidadALineamientos,
-        ),
-        psicometriaTomaDecisiones: Number(formData.psicometriaTomaDecisiones),
-        psicometriaTrabajoEnEquipo: Number(formData.psicometriaTrabajoEnEquipo),
-        resultadoPorcentaje: Number(porcentajeFinal),
-      });
+			await new CedulaService().postResultadoCedulaInterna({
+				FKIdCedula: idCedula,
+				psicometriaAnalisisProblemas: Number(
+					formData.psicometriaAnalisisProblemas,
+				),
+				psicometriaComunicacion: Number(formData.psicometriaComunicacion),
+				psicometriaControlActividades: Number(
+					formData.psicometriaControlActividades,
+				),
+				psicometriaDinamismo: Number(formData.psicometriaDinamismo),
+				psicometriaEnfoqueCalidad: Number(formData.psicometriaEnfoqueCalidad),
+				psicometriaEnfoqueResultados: Number(
+					formData.psicometriaEnfoqueResultados,
+				),
+				psicometriaInnovacion: Number(formData.psicometriaInnovacion),
+				psicometriaLiderazgo: Number(formData.psicometriaLiderazgo),
+				psicometriaNegociacion: Number(formData.psicometriaNegociacion),
+				psicometriaOrientacionAlServicio: Number(
+					formData.psicometriaOrientacionAlServicio,
+				),
+				psicometriaPensamientoEstrategico: Number(
+					formData.psicometriaPensamientoEstrategico,
+				),
+				psicometriaPlaneacionOrganizacion: Number(
+					formData.psicometriaPlaneacionOrganizacion,
+				),
+				psicometriaRelacionesInterpersonales: Number(
+					formData.psicometriaRelacionesInterpersonales,
+				),
+				psicometriaSensibilidadALineamientos: Number(
+					formData.psicometriaSensibilidadALineamientos,
+				),
+				psicometriaTomaDecisiones: Number(formData.psicometriaTomaDecisiones),
+				psicometriaTrabajoEnEquipo: Number(formData.psicometriaTrabajoEnEquipo),
+				resultadoPorcentaje: Number(porcentajeFinal),
+			});
 
 			const solicitudData = {
 				FKIdDependencia: formData.adscripcion!.idDependencia,
@@ -623,47 +621,55 @@ function CrearCedulaInterna() {
 			);
 			const pdfDoc = await PDFDocument.load(existingPdfBytes);
 			const form = pdfDoc.getForm();
-      form.getTextField("nombre").setText(String(formData.nombreCandidato) ?? "");
-      form
-        .getTextField("edad")
-        .setText(String(formData.edad) ? `${String(formData.edad)} años` : "");
-      form.getTextField("hermes").setText(String(formData.hermesNotificacion) ?? "");
-      form.getTextField("numeroPlaza").setText(String(formData.numPlaza) ?? "");
-      form
-        .getTextField("fechaElaboracion")
-        .setText(String(formData.fechaElaboracionPropuesta) ?? "");
-      form
-        .getTextField("educacionFormal")
-        .setText(String(formData.educacionFormal) ?? "");
-      form.getTextField("puesto").setText(String(formData.puesto) ?? "");
-      form
-        .getTextField("adscripcion")
-        .setText(String(formData.adscripcion?.nombre) ?? "");
-      form.getTextField("referido").setText(String(formData.referidoPor) ?? "");
-      form
-        .getTextField("antecedentesFamiliares")
-        .setText(String(formData.antecedentesFamiliaresUV) ?? "");
-      form
-        .getTextField("resultadoWord")
-        .setText(String(formData.resultadoHabilidadesWord) ?? "");
-      form
-        .getTextField("resultadoExcel")
-        .setText(String(formData.resultadoHabilidadesExcel) ?? "");
-      form
-        .getTextField("resultadoOrtografia")
-        .setText(String(formData.resultadoOrtografia) ?? "");
-      form
-        .getTextField("evaluacionConocimientos")
-        .setText(String(formData.evaluacionConocimientos) ?? "");
-      form
-        .getTextField("expectativaLaboral")
-        .setText(String(formData.expectativaLaboral) ?? "");
-      form
-        .getTextField("experienciaRelacionada")
-        .setText(String(formData.experienciaRelacionada) ?? "");
-      form.getTextField("experiencia").setText(String(formData.experiencia) ?? "");
-      form.getTextField("conclusiones").setText(String(formData.conclusiones) ?? "");
-      form.getTextField("resultado").setText(String(formData.resultados) ?? "");
+			form
+				.getTextField("nombre")
+				.setText(String(formData.nombreCandidato) ?? "");
+			form
+				.getTextField("edad")
+				.setText(String(formData.edad) ? `${String(formData.edad)} años` : "");
+			form
+				.getTextField("hermes")
+				.setText(String(formData.hermesNotificacion) ?? "");
+			form.getTextField("numeroPlaza").setText(String(formData.numPlaza) ?? "");
+			form
+				.getTextField("fechaElaboracion")
+				.setText(String(formData.fechaElaboracionPropuesta) ?? "");
+			form
+				.getTextField("educacionFormal")
+				.setText(String(formData.educacionFormal) ?? "");
+			form.getTextField("puesto").setText(String(formData.puesto) ?? "");
+			form
+				.getTextField("adscripcion")
+				.setText(String(formData.adscripcion?.nombre) ?? "");
+			form.getTextField("referido").setText(String(formData.referidoPor) ?? "");
+			form
+				.getTextField("antecedentesFamiliares")
+				.setText(String(formData.antecedentesFamiliaresUV) ?? "");
+			form
+				.getTextField("resultadoWord")
+				.setText(String(formData.resultadoHabilidadesWord) ?? "");
+			form
+				.getTextField("resultadoExcel")
+				.setText(String(formData.resultadoHabilidadesExcel) ?? "");
+			form
+				.getTextField("resultadoOrtografia")
+				.setText(String(formData.resultadoOrtografia) ?? "");
+			form
+				.getTextField("evaluacionConocimientos")
+				.setText(String(formData.evaluacionConocimientos) ?? "");
+			form
+				.getTextField("expectativaLaboral")
+				.setText(String(formData.expectativaLaboral) ?? "");
+			form
+				.getTextField("experienciaRelacionada")
+				.setText(String(formData.experienciaRelacionada) ?? "");
+			form
+				.getTextField("experiencia")
+				.setText(String(formData.experiencia) ?? "");
+			form
+				.getTextField("conclusiones")
+				.setText(String(formData.conclusiones) ?? "");
+			form.getTextField("resultado").setText(String(formData.resultados) ?? "");
 
 			// NOTE: "usuario" debe venir de un contexto/hook de autenticación
 			// form.getTextField("analista").setText(`Lic. ${usuario.nombre} ...`);
@@ -738,6 +744,325 @@ function CrearCedulaInterna() {
 	return (
 		<>
 			<Toast texto={toast.texto} tipo={toast.tipo} />
+
+			<MainHeader title="Crear cédula interna" subtitle="Gestión de cédulas" />
+
+			<form onSubmit={handleSubmit} className="flex flex-col gap-6">
+				{/* ── Card: Datos generales ── */}
+				<FormSectionCard title="Datos generales">
+					{/* ID de proceso con buscador */}
+					<InputField
+						id={`${fieldID}-FKIdProceso`}
+						label="ID de proceso:"
+						type="number"
+						placeholder="ID de proceso"
+						name="FKIdProceso"
+						value={formData.FKIdProceso}
+						onChange={(e) =>
+							handleInputChange("FKIdProceso", Number(e.target.value))
+						}
+						onKeyDown={async (e) => {
+							if (e.key === "Enter") {
+								e.preventDefault();
+								await buscarIdProceso();
+							}
+						}}
+						showSearchButton={true}
+						onSearch={buscarIdProceso}
+						searchButtonTitle="Buscar proceso por ID"
+					/>
+					{/* Campos simples */}
+					{[
+						{
+							id: "hermesNotificacion",
+							label: "Hermes:",
+							type: "text",
+							placeholder: "",
+						},
+						{
+							id: "numPlaza",
+							label: "Número de Plaza",
+							type: "text",
+							placeholder: "",
+						},
+						{
+							id: "fechaElaboracionPropuesta",
+							label: "Fecha de Elaboración",
+							type: "date",
+							placeholder: "",
+						},
+						{
+							id: "nombreCandidato",
+							label: "Nombre de candidato",
+							type: "text",
+							placeholder: "",
+						},
+						{ id: "edad", label: "Edad", type: "number", placeholder: "" },
+						{
+							id: "educacionFormal",
+							label: "Educación Formal",
+							type: "text",
+							placeholder: "",
+						},
+						{
+							id: "avaladoPor",
+							label: "Avalado por",
+							type: "text",
+							placeholder: "",
+						},
+						{
+							id: "puesto",
+							label: "Puesto solicitable",
+							type: "text",
+							placeholder: "",
+						},
+						{
+							id: "referidoPor",
+							label: "Referido Por",
+							type: "text",
+							placeholder: "",
+						},
+						{
+							id: "antecedentesFamiliaresUV",
+							label: "Antecedentes Familia UV",
+							type: "text",
+							placeholder: "",
+						},
+					].map(({ id, label, type }) => (
+						<div key={id} className="flex flex-col gap-1.5">
+							<InputField
+								id={`${fieldID}-${id}-${label}`}
+								label={label}
+								labelClassName="text-xs font-semibold text-slate-500 uppercase tracking-wide"
+								type={type}
+								className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-300 transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300"
+								value={(formData[id as keyof typeof formData] as string) ?? ""}
+								onChange={(e) => {
+									const val =
+										id === "edad"
+											? e.target.value.replace(/\D/g, "").slice(0, 3)
+											: e.target.value;
+									handleInputChange(id as keyof IPostCedulaInternaForm, val);
+								}}
+							/>
+						</div>
+					))}
+
+					{/* Adscripción */}
+					<div className="flex flex-col gap-1.5">
+						<label
+							htmlFor={`${fieldID}-adscripcion`}
+							className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+							Adscripción
+						</label>
+						<Select<IDependenciaFormCedula>
+							id={`${fieldID}-adscripcion`}
+							options={
+								dataDependencias?.dependencias.map((dep) => ({
+									idDependencia: dep.idDependencia,
+									nombre: dep.nombre,
+									zona: dep.zona,
+								})) ?? []
+							}
+							getOptionLabel={(o) => o.nombre}
+							getOptionValue={(o) => String(o.idDependencia)}
+							value={formData.adscripcion}
+							onChange={(selected) =>
+								handleInputChange(
+									"adscripcion",
+									selected
+										? {
+												idDependencia: selected.idDependencia,
+												nombre: selected.nombre,
+												zona: selected.zona,
+											}
+										: null,
+								)
+							}
+							placeholder="Escribe o selecciona..."
+							isClearable
+							isSearchable
+						/>
+					</div>
+				</FormSectionCard>
+
+				{/* ── Card: Competencias ── */}
+				<FormSectionCard title="Competencias">
+					<div className="flex flex-col">
+						{/* Selector de cédula */}
+						<div className="flex flex-col gap-1.5 max-w-sm">
+							<label
+								htmlFor={`${fieldID}-idCedula`}
+								className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+								Seleccionar Cédula
+							</label>
+							<Select<ITipoCedulaBase>
+								id={`${fieldID}-idCedula`}
+								options={dataCedulaTipos?.tiposCedula ?? []}
+								getOptionLabel={(o) => o.cedula}
+								getOptionValue={(o) => String(o.idTipoCedula)}
+								value={
+									dataCedulaTipos?.tiposCedula.find(
+										(o) => o.idTipoCedula === formData.idCedula,
+									) ?? null
+								}
+								onChange={(option) =>
+									handleInputChange(
+										"idCedula",
+										option ? option.idTipoCedula : 0,
+									)
+								}
+								placeholder="Selecciona o escribe..."
+								isClearable
+								isSearchable
+							/>
+						</div>
+
+						{/* Tabla */}
+						<div className="mt-3 overflow-x-auto rounded-xl border border-slate-200">
+							<table className="w-full text-sm table-fixed">
+								<thead>
+									<tr className="bg-linear-to-r from-[#18529d] to-[#1a6abf] text-white">
+										<th className="w-1/3 px-4 py-3 text-left text-xs font-bold uppercase tracking-wider opacity-90">
+											Competencia
+										</th>
+										<th className="w-1/3 px-4 py-3 text-left text-xs font-bold uppercase tracking-wider opacity-90">
+											Perfil
+										</th>
+										<th className="w-1/3 px-4 py-3 text-left text-xs font-bold uppercase tracking-wider opacity-90">
+											Psicometría
+										</th>
+									</tr>
+								</thead>
+								<tbody className="divide-y divide-slate-100">
+									{competencias?.competencias &&
+									competencias.competencias.length > 0 ? (
+										competencias.competencias.map((item, i) => (
+											<tr
+												key={item.idCompetencia}
+												className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
+												<td className="px-4 py-3 text-slate-700 font-medium">
+													{item.idCompetencia}
+												</td>
+												<td className="px-4 py-3 text-slate-600">
+													{item.nombreCompetencia}
+												</td>
+												<td className="px-4 py-3">
+													<InputField
+														value={formData[inputKeys[i]] ?? ""}
+														onChange={(e) =>
+															handleInputChange(
+																inputKeys[i],
+																typeof formData[inputKeys[i]] === "number"
+																	? Number(e.target.value)
+																	: e.target.value,
+															)
+														}
+													/>
+												</td>
+											</tr>
+										))
+									) : (
+										<tr>
+											<td
+												colSpan={3}
+												className="text-center py-10 text-slate-400 text-sm">
+												<div className="flex flex-col items-center gap-2">
+													<span className="text-2xl opacity-30">📋</span>
+													<span>
+														Selecciona una cédula para ver sus competencias
+													</span>
+												</div>
+											</td>
+										</tr>
+									)}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</FormSectionCard>
+
+				{/* ── Card: Conocimientos específicos ── */}
+				<FormSectionCard title="Conocimientos específicos">
+					{(
+						[
+							{ label: "Word", key: "resultadoHabilidadesWord" },
+							{ label: "Excel", key: "resultadoHabilidadesExcel" },
+							{
+								label: "Ortografía y Redacción",
+								key: "resultadoOrtografia",
+							},
+							{
+								label: "Evaluación de Conocimientos",
+								key: "evaluacionConocimientos",
+							},
+						] as { label: string; key: keyof IPostCedulaInternaForm }[]
+					).map(({ label, key }) => (
+						<div key={key} className="flex flex-col gap-1.5">
+							<InputField
+								id={`${fieldID}-${key}-${label}`}
+								label={label}
+								type="text"
+								value={(formData[key] as string) ?? ""}
+								onChange={(e) =>
+									handleInputChange(
+										key,
+										e.target.value as IPostCedulaInternaForm[typeof key],
+									)
+								}
+							/>
+						</div>
+					))}
+				</FormSectionCard>
+
+				{/* ── Card: Conclusiones ── */}
+				<FormSectionCard title="Conclusiones">
+					<div className="flex flex-col">
+						{(
+							[
+								{
+									label: "Expectativas laborales y económicas",
+									key: "expectativaLaboral",
+								},
+								{
+									label: "Experiencia relacionada al puesto",
+									key: "experienciaRelacionada",
+								},
+								{
+									label: "Experiencia (Periodo, Funciones, Organización)",
+									key: "experiencia",
+								},
+								{ label: "Conclusiones", key: "conclusiones" },
+								{ label: "Resultados", key: "resultados" },
+							] as { label: string; key: keyof IPostCedulaInternaForm }[]
+						).map(({ label, key }) => (
+							<TextAreaField
+								id={`${fieldID}-${key}`}
+								key={key}
+								label={label}
+								value={(formData[key] as string) ?? ""}
+								onChange={(e) =>
+									handleInputChange(
+										key,
+										e.target.value as IPostCedulaInternaForm[typeof key],
+									)
+								}
+							/>
+						))}
+					</div>
+				</FormSectionCard>
+
+				{/* ── Botones de acción ── */}
+				<div className="flex items-center justify-end gap-3 pb-10 max-[900px]:justify-center">
+					<CustomButton variant="save" type="submit" icon={<FaSave />}>
+						Guardar
+					</CustomButton>
+					<CustomButton variant="pdf" onClick={handleGenerarPDF}>
+						Generar PDF
+					</CustomButton>
+				</div>
+			</form>
+
 			<ButtonShowModalHelp onClick={() => setShowToastHelp(true)} />
 			<ModalHelp
 				isOpen={showToastHelp}
@@ -764,335 +1089,6 @@ function CrearCedulaInterna() {
 					los datos capturados.
 				</p>
 			</ModalHelp>
-
-			<main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
-				<MainHeader
-					title="Crear cédula interna"
-					subtitle="Gestión de cédulas"
-				/>
-
-				<form onSubmit={handleSubmit} className="flex flex-col gap-6">
-					{/* ── Card: Datos generales ── */}
-					<FormSectionCard title="Datos generales">
-						{/* ID de proceso con buscador */}
-						<InputField
-							id={`${fieldID}-FKIdProceso`}
-							label="ID de proceso:"
-							type="number"
-							placeholder="ID de proceso"
-							name="FKIdProceso"
-							value={formData.FKIdProceso}
-							onChange={(e) =>
-								handleInputChange("FKIdProceso", Number(e.target.value))
-							}
-							onKeyDown={async (e) => {
-								if (e.key === "Enter") {
-									e.preventDefault();
-									await buscarIdProceso();
-								}
-							}}
-							showSearchButton={true}
-							onSearch={buscarIdProceso}
-							searchButtonTitle="Buscar proceso por ID"
-						/>
-						{/* Campos simples */}
-						{[
-							{
-								id: "hermesNotificacion",
-								label: "Hermes:",
-								type: "text",
-								placeholder: "",
-							},
-							{
-								id: "numPlaza",
-								label: "Número de Plaza",
-								type: "text",
-								placeholder: "",
-							},
-							{
-								id: "fechaElaboracionPropuesta",
-								label: "Fecha de Elaboración",
-								type: "date",
-								placeholder: "",
-							},
-							{
-								id: "nombreCandidato",
-								label: "Nombre de candidato",
-								type: "text",
-								placeholder: "",
-							},
-							{ id: "edad", label: "Edad", type: "number", placeholder: "" },
-							{
-								id: "educacionFormal",
-								label: "Educación Formal",
-								type: "text",
-								placeholder: "",
-							},
-							{
-								id: "avaladoPor",
-								label: "Avalado por",
-								type: "text",
-								placeholder: "",
-							},
-							{
-								id: "puesto",
-								label: "Puesto solicitable",
-								type: "text",
-								placeholder: "",
-							},
-							{
-								id: "referidoPor",
-								label: "Referido Por",
-								type: "text",
-								placeholder: "",
-							},
-							{
-								id: "antecedentesFamiliaresUV",
-								label: "Antecedentes Familia UV",
-								type: "text",
-								placeholder: "",
-							},
-						].map(({ id, label, type }) => (
-							<div key={id} className="flex flex-col gap-1.5">
-								<InputField
-									id={`${fieldID}-${id}-${label}`}
-									label={label}
-									labelClassName="text-xs font-semibold text-slate-500 uppercase tracking-wide"
-									type={type}
-									className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-800 placeholder:text-slate-300 transition-all duration-200 focus:outline-none focus:border-[#18529d] focus:ring-2 focus:ring-[#18529d]/10 hover:border-slate-300"
-									value={
-										(formData[id as keyof typeof formData] as string) ?? ""
-									}
-									onChange={(e) => {
-										const val =
-											id === "edad"
-												? e.target.value.replace(/\D/g, "").slice(0, 3)
-												: e.target.value;
-										handleInputChange(id as keyof IPostCedulaInternaForm, val);
-									}}
-								/>
-							</div>
-						))}
-
-						{/* Adscripción */}
-						<div className="flex flex-col gap-1.5">
-							<label
-								htmlFor={`${fieldID}-adscripcion`}
-								className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-								Adscripción
-							</label>
-							<Select<IDependenciaFormCedula>
-								id={`${fieldID}-adscripcion`}
-								options={
-									dataDependencias?.dependencias.map((dep) => ({
-										idDependencia: dep.idDependencia,
-										nombre: dep.nombre,
-										zona: dep.zona,
-									})) ?? []
-								}
-								getOptionLabel={(o) => o.nombre}
-								getOptionValue={(o) => String(o.idDependencia)}
-								value={formData.adscripcion}
-								onChange={(selected) =>
-									handleInputChange(
-										"adscripcion",
-										selected
-											? {
-													idDependencia: selected.idDependencia,
-													nombre: selected.nombre,
-													zona: selected.zona,
-												}
-											: null,
-									)
-								}
-								placeholder="Escribe o selecciona..."
-								isClearable
-								isSearchable
-							/>
-						</div>
-					</FormSectionCard>
-
-					{/* ── Card: Competencias ── */}
-					<FormSectionCard title="Competencias">
-						<div className="flex flex-col">
-							{/* Selector de cédula */}
-							<div className="flex flex-col gap-1.5 max-w-sm">
-								<label
-									htmlFor={`${fieldID}-idCedula`}
-									className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-									Seleccionar Cédula
-								</label>
-								<Select<ITipoCedulaBase>
-									id={`${fieldID}-idCedula`}
-									options={dataCedulaTipos?.tiposCedula ?? []}
-									getOptionLabel={(o) => o.cedula}
-									getOptionValue={(o) => String(o.idTipoCedula)}
-									value={
-										dataCedulaTipos?.tiposCedula.find(
-											(o) => o.idTipoCedula === formData.idCedula,
-										) ?? null
-									}
-									onChange={(option) =>
-										handleInputChange(
-											"idCedula",
-											option ? option.idTipoCedula : 0,
-										)
-									}
-									placeholder="Selecciona o escribe..."
-									isClearable
-									isSearchable
-								/>
-							</div>
-
-							{/* Tabla */}
-							<div className="mt-3 overflow-x-auto rounded-xl border border-slate-200">
-								<table className="w-full text-sm table-fixed">
-									<thead>
-										<tr className="bg-linear-to-r from-[#18529d] to-[#1a6abf] text-white">
-											<th className="w-1/3 px-4 py-3 text-left text-xs font-bold uppercase tracking-wider opacity-90">
-												Competencia
-											</th>
-											<th className="w-1/3 px-4 py-3 text-left text-xs font-bold uppercase tracking-wider opacity-90">
-												Perfil
-											</th>
-											<th className="w-1/3 px-4 py-3 text-left text-xs font-bold uppercase tracking-wider opacity-90">
-												Psicometría
-											</th>
-										</tr>
-									</thead>
-									<tbody className="divide-y divide-slate-100">
-										{competencias?.competencias &&
-										competencias.competencias.length > 0 ? (
-											competencias.competencias.map((item, i) => (
-												<tr
-													key={item.idCompetencia}
-													className={
-														i % 2 === 0 ? "bg-white" : "bg-slate-50/50"
-													}>
-													<td className="px-4 py-3 text-slate-700 font-medium">
-														{item.idCompetencia}
-													</td>
-													<td className="px-4 py-3 text-slate-600">
-														{item.nombreCompetencia}
-													</td>
-													<td className="px-4 py-3">
-														<InputField
-															value={formData[inputKeys[i]] ?? ""}
-															onChange={(e) =>
-																handleInputChange(
-																	inputKeys[i],
-																	typeof formData[inputKeys[i]] === "number"
-																		? Number(e.target.value)
-																		: e.target.value,
-																)
-															}
-														/>
-													</td>
-												</tr>
-											))
-										) : (
-											<tr>
-												<td
-													colSpan={3}
-													className="text-center py-10 text-slate-400 text-sm">
-													<div className="flex flex-col items-center gap-2">
-														<span className="text-2xl opacity-30">📋</span>
-														<span>
-															Selecciona una cédula para ver sus competencias
-														</span>
-													</div>
-												</td>
-											</tr>
-										)}
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</FormSectionCard>
-
-					{/* ── Card: Conocimientos específicos ── */}
-					<FormSectionCard title="Conocimientos específicos">
-						{(
-							[
-								{ label: "Word", key: "resultadoHabilidadesWord" },
-								{ label: "Excel", key: "resultadoHabilidadesExcel" },
-								{
-									label: "Ortografía y Redacción",
-									key: "resultadoOrtografia",
-								},
-								{
-									label: "Evaluación de Conocimientos",
-									key: "evaluacionConocimientos",
-								},
-							] as { label: string; key: keyof IPostCedulaInternaForm }[]
-						).map(({ label, key }) => (
-							<div key={key} className="flex flex-col gap-1.5">
-								<InputField
-									id={`${fieldID}-${key}-${label}`}
-									label={label}
-									type="text"
-									value={(formData[key] as string) ?? ""}
-									onChange={(e) =>
-										handleInputChange(
-											key,
-											e.target.value as IPostCedulaInternaForm[typeof key],
-										)
-									}
-								/>
-							</div>
-						))}
-					</FormSectionCard>
-
-					{/* ── Card: Conclusiones ── */}
-					<div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-						<FormSectionCard title="Conclusiones">
-							<div className="flex flex-col">
-								{(
-									[
-										{
-											label: "Expectativas laborales y económicas",
-											key: "expectativaLaboral",
-										},
-										{
-											label: "Experiencia relacionada al puesto",
-											key: "experienciaRelacionada",
-										},
-										{
-											label: "Experiencia (Periodo, Funciones, Organización)",
-											key: "experiencia",
-										},
-										{ label: "Conclusiones", key: "conclusiones" },
-										{ label: "Resultados", key: "resultados" },
-									] as { label: string; key: keyof IPostCedulaInternaForm }[]
-								).map(({ label, key }) => (
-									<TextAreaField
-										id={`${fieldID}-${key}`}
-										key={key}
-										label={label}
-										value={(formData[key] as string) ?? ""}
-										onChange={(e) =>
-											handleInputChange(
-												key,
-												e.target.value as IPostCedulaInternaForm[typeof key],
-											)
-										}
-									/>
-								))}
-							</div>
-						</FormSectionCard>
-					</div>
-
-					{/* ── Botones de acción ── */}
-					<div className="flex items-center justify-end gap-3 pb-10 max-[900px]:justify-center">
-						<CustomButton variant="save" type="submit" icon={<FaSave />}>
-							Guardar
-						</CustomButton>
-						<CustomButton variant="pdf" onClick={handleGenerarPDF}>
-							Generar PDF
-						</CustomButton>
-					</div>
-				</form>
-			</main>
 		</>
 	);
 }

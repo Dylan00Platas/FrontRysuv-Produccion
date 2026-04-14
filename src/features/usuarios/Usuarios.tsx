@@ -12,80 +12,74 @@ import MainHeader from "@/components/header/MainHeader";
 const accesoService = new AccesoService();
 
 function Usuarios() {
-  const navigate = useNavigate();
-  const { toast, mostrarToast } = useToast();
+	const navigate = useNavigate();
+	const { toast, mostrarToast } = useToast();
 
-  const [usuariosActivos, setUsuariosActivos] = useState<IUsuarioBase[]>([]);
-  const [cargando, setCargando] = useState(true);
-  const [hayError, setHayError] = useState(false);
+	const [usuariosActivos, setUsuariosActivos] = useState<IUsuarioBase[]>([]);
+	const [cargando, setCargando] = useState(true);
+	const [hayError, setHayError] = useState(false);
 
-  useEffect(() => {
-    const fetchUsuarios = async () => {
-      setHayError(false);
-      try {
-        const data = await accesoService.getUsuarios();
-        const activos = data.mensaje.usuarios.filter(
-          (usuario: IUsuarioBase) => usuario.estado === 1,
-        );
-        setUsuariosActivos(activos);
-      } catch (err) {
-        console.error("Usuarios.tsx - Error al obtener usuarios:", err);
-        mostrarToast("Error al obtener usuarios", "error");
-        setHayError(true);
-      } finally {
-        setCargando(false);
-      }
-    };
+	useEffect(() => {
+		const fetchUsuarios = async () => {
+			setHayError(false);
+			try {
+				const data = await accesoService.getUsuarios();
+				const activos = data.mensaje.usuarios.filter(
+					(usuario: IUsuarioBase) => usuario.estado === 1,
+				);
+				setUsuariosActivos(activos);
+			} catch (err) {
+				console.error("Usuarios.tsx - Error al obtener usuarios:", err);
+				mostrarToast("Error al obtener usuarios", "error");
+				setHayError(true);
+			} finally {
+				setCargando(false);
+			}
+		};
 
-    fetchUsuarios();
-  }, []);
+		fetchUsuarios();
+	}, []);
 
-  return (
-    <>
-      <Toast texto={toast.texto} tipo={toast.tipo} />
-      <main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
-        <MainHeader
-          title="Consulta de usuarios"
-          subtitle="Gestión de usuarios"
-        />
+	return (
+		<>
+			<Toast texto={toast.texto} tipo={toast.tipo} />
 
-        <div className="usuarios-header">
-          <button
-            className="btn-crearUsuario"
-            onClick={() => navigate("/crear-usuario")}
-          >
-            Crear Usuario
-          </button>
-        </div>
+			<MainHeader title="Consulta de usuarios" subtitle="Gestión de usuarios" />
 
-        {cargando && <p>Cargando usuarios...</p>}
+			<div className="usuarios-header">
+				<button
+					className="btn-crearUsuario"
+					onClick={() => navigate("/crear-usuario")}>
+					Crear Usuario
+				</button>
+			</div>
 
-        {!cargando && !hayError && (
-          <>
-            {usuariosActivos.length === 0 ? (
-              <p>No hay usuarios activos.</p>
-            ) : (
-              <ul className="usuarios-list">
-                {usuariosActivos.map((user) => (
-                  <li
-                    key={user.idAcceso}
-                    onClick={() =>
-                      navigate("/editar-usuario", { state: { usuario: user } })
-                    }
-                  >
-                    <span>
-                      {user.nombre} {user.primerApellido}{" "}
-                      {user.segundoApellido ?? ""}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-      </main>
-    </>
-  );
+			{cargando && <p>Cargando usuarios...</p>}
+
+			{!cargando && !hayError && (
+				<>
+					{usuariosActivos.length === 0 ? (
+						<p>No hay usuarios activos.</p>
+					) : (
+						<ul className="usuarios-list">
+							{usuariosActivos.map((user) => (
+								<li
+									key={user.idAcceso}
+									onClick={() =>
+										navigate("/editar-usuario", { state: { usuario: user } })
+									}>
+									<span>
+										{user.nombre} {user.primerApellido}{" "}
+										{user.segundoApellido ?? ""}
+									</span>
+								</li>
+							))}
+						</ul>
+					)}
+				</>
+			)}
+		</>
+	);
 }
 
 export default Usuarios;

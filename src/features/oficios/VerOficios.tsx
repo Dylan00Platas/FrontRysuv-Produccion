@@ -76,52 +76,51 @@ function VerOficios() {
 	return (
 		<>
 			<Toast texto={toast.texto} tipo={toast.tipo} />
-			<main className="main-content">
-				<MainHeader
-					title="Oficios relacionados a proceso"
-					subtitle="Gestión de oficios"
-				/>
 
-				<div className="filtros-bar-ver-oficios">
-					<div className="filtro-busqueda-ver-oficios">
-						<FaSearch className="search-icon-ver-oficios" />
-						<input
-							type="text"
-							placeholder="Buscar..."
-							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
-						/>
-					</div>
+			<MainHeader
+				title="Oficios relacionados a proceso"
+				subtitle="Gestión de oficios"
+			/>
+
+			<div className="filtros-bar-ver-oficios">
+				<div className="filtro-busqueda-ver-oficios">
+					<FaSearch className="search-icon-ver-oficios" />
+					<input
+						type="text"
+						placeholder="Buscar..."
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+					/>
 				</div>
+			</div>
 
-				{loading ? (
-					<p className="mensaje-cargando-ver-oficios">Cargando oficios...</p>
-				) : oficiosFiltrados.length === 0 ? (
-					<div className="mensaje-vacio-ver-oficios">
-						<h2>No hay oficios</h2>
-						<p>Este proceso no tiene oficios registrados.</p>
-					</div>
-				) : (
-					<table className="tabla-oficios">
-						<thead>
-							<tr>
-								<th>Tipo</th>
-								<th>Dirigido</th>
-								<th>Fecha</th>
+			{loading ? (
+				<p className="mensaje-cargando-ver-oficios">Cargando oficios...</p>
+			) : oficiosFiltrados.length === 0 ? (
+				<div className="mensaje-vacio-ver-oficios">
+					<h2>No hay oficios</h2>
+					<p>Este proceso no tiene oficios registrados.</p>
+				</div>
+			) : (
+				<table className="tabla-oficios">
+					<thead>
+						<tr>
+							<th>Tipo</th>
+							<th>Dirigido</th>
+							<th>Fecha</th>
+						</tr>
+					</thead>
+					<tbody>
+						{oficiosFiltrados.map((o) => (
+							<tr key={o.idOficio} onClick={() => verDetalles(o)}>
+								<td>{o.tipo}</td>
+								<td>{o.dirigido}</td>
+								<td>{o.fecha}</td>
 							</tr>
-						</thead>
-						<tbody>
-							{oficiosFiltrados.map((o) => (
-								<tr key={o.idOficio} onClick={() => verDetalles(o)}>
-									<td>{o.tipo}</td>
-									<td>{o.dirigido}</td>
-									<td>{o.fecha}</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				)}
-			</main>
+						))}
+					</tbody>
+				</table>
+			)}
 		</>
 	);
 }

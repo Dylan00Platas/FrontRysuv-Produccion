@@ -44,7 +44,7 @@ import {
 } from "@/components/Alert/Floating/ModalHelp";
 import FormSectionCard from "@/components/card/FormSectionCard";
 import { SelectField } from "@/components/input/SelectField";
-import { TextAreaField } from "@/components/input/TextareaField";
+import { TextAreaField } from "@/components/input/TextAreaField";
 import { CustomButton } from "@/components/button/CustomButton";
 
 // Interfaces de UI ---------------------------------------------------------
@@ -915,6 +915,304 @@ function CrearConstancia() {
 	return (
 		<>
 			<Toast texto={toast.texto} tipo={toast.tipo} />
+
+			<MainHeader title="Cédula de resultados" subtitle="Cédulas" />
+			<form onSubmit={handleSubmit} className="flex flex-col gap-6">
+				<FormSectionCard title="Datos de la solicitud de contratación">
+					<InputField
+						id={`${fieldID}-idProceso`}
+						label="ID del proceso"
+						value={String(formData.FKIdProceso ?? "")}
+						onChange={(e) => handleInputChange("FKIdProceso", e.target.value)}
+						showSearchButton={true}
+						onSearch={handleBuscarCedula}
+						searchButtonTitle="Buscar proceso por ID"
+					/>
+					{(
+						[
+							{ label: "Hermes:", key: "hermesNotificacion" },
+							{ label: "Plaza:", key: "plaza" },
+							{ label: "Puesto:", key: "puesto" },
+							{ label: "Titular de la plaza:", key: "titular" },
+							{ label: "Oficio de autorización:", key: "oficio" },
+						] as {
+							label: string;
+							key: keyof IFormData;
+							withButton?: boolean;
+						}[]
+					).map(({ label, key }) => (
+						<InputField
+							id={`${fieldID}-${key}-${label}`}
+							label={label}
+							key={key}
+							value={String(formData[key] ?? "")}
+							onChange={(e) =>
+								handleInputChange(key, e.target.value as IFormData[typeof key])
+							}
+						/>
+					))}
+					<SelectField
+						label="Temporalidad:"
+						options={[
+							{ value: 1, label: "Temporal" },
+							{ value: 2, label: "Definitiva" },
+						]}
+						value={formData.temporalidad}
+						onChange={(e) =>
+							handleInputChange("temporalidad", e as IFormData["temporalidad"])
+						}
+					/>
+
+					<div>
+						<label
+							htmlFor="constancia-adscripcion"
+							className="form-label-evaluacion">
+							Adscripción
+						</label>
+						<Select<IDependenciaOption>
+							inputId="constancia-adscripcion"
+							options={dependenciasOptions}
+							value={formData.adscripcion}
+							onChange={(selected) => {
+								handleInputChange("adscripcion.nombre", selected ?? null);
+								handleInputChange("adscripcion.zona", selected?.zona ?? "");
+							}}
+							placeholder="Escribe o selecciona una adscripción"
+							isClearable
+							isSearchable
+						/>
+					</div>
+					<InputField
+						id={`${fieldID}-region-constancia`}
+						label="Región:"
+						className="form-input"
+						value={formData.adscripcion?.zona}
+						readOnly
+					/>
+				</FormSectionCard>
+				<FormSectionCard title="Datos del candidato">
+					{(
+						[
+							{ label: "Nombre", key: "nombre" },
+							{ label: "Edad", key: "edad" },
+							{ label: "Educación Formal", key: "educacion" },
+							{
+								label: "Experiencia relacionada al puesto",
+								key: "experiencia",
+							},
+						] as { label: string; key: keyof IFormData }[]
+					).map(({ label, key }) => (
+						<div key={key}>
+							<InputField
+								id={`${fieldID}-${key}-${label}`}
+								label={label}
+								value={String(formData[key] ?? "")}
+								onChange={(e) => {
+									let value: string = e.target.value;
+									if (key === "edad")
+										value = value.replace(/\D/g, "").slice(0, 3);
+									handleInputChange(key, value as IFormData[typeof key]);
+								}}
+							/>
+						</div>
+					))}
+				</FormSectionCard>
+
+				<FormSectionCard title="Datos de la cédula interna">
+					{(tipoProceso <= 1 || tipoProceso === null) && (
+						<p>Por favor seleccione un ID de proceso</p>
+					)}
+
+					{/* Tipo 1: Cédula interna */}
+					{tipoProceso === 1 && (
+						<>
+							<h3 className="section-title">Competencias</h3>
+							{(
+								[
+									{ label: "Sobresaliente", key: "sobresaliente" },
+									{ label: "A Reforzar", key: "reforzar" },
+									{ label: "A Desarrollar", key: "desarrollar" },
+									{ label: "Habilidades Digitales", key: "habilidades" },
+									{
+										label: "Evaluación de conocimientos",
+										key: "evaluacion",
+									},
+									{ label: "Efectos de contratación", key: "efectos" },
+								] as { label: string; key: keyof IFormData }[]
+							).map(({ label, key }) => (
+								<TextAreaField
+									label={label}
+									key={key}
+									value={String(formData[key] ?? "")}
+									onChange={(e) =>
+										handleInputChange(
+											key,
+											e.target.value as IFormData[typeof key],
+										)
+									}
+								/>
+							))}
+
+							<SelectField
+								label="Resultado final:"
+								options={[
+									{ value: "Recomendable", label: "Recomendable" },
+									{
+										value: "Recomendable con observaciones",
+										label: "Recomendable con observaciones",
+									},
+									{ value: "No recomendable", label: "No recomendable" },
+								]}
+								value={formData.resultadoFinal}
+								onChange={(e) => handleInputChange("resultadoFinal", e)}
+							/>
+
+							<h3 className="section-title">
+								Resultados cualitativos del sistema de evaluación
+							</h3>
+							{(
+								[
+									{ label: "Reforzar", key: "cualitativoReforzar" },
+									{ label: "Desarrollar", key: "cualitativoDesarrollar" },
+								] as { label: string; key: keyof IFormData }[]
+							).map(({ label, key }) => (
+								<InputField
+									label={label}
+									key={key}
+									value={String(formData[key] ?? "")}
+									onChange={(e) =>
+										handleInputChange(
+											key,
+											e.target.value as IFormData[typeof key],
+										)
+									}
+								/>
+							))}
+
+							<div className="flex justify-center items-center gap-10 mt-5 flex-wrap">
+								<div ref={chartGaugeRef} className="w-100 h-75" />
+							</div>
+							<div className="flex justify-center items-center gap-10 mt-5 flex-wrap">
+								<div ref={chartRadarRef} className="w-100 h-75" />
+							</div>
+
+							<div className="col-[span_3] flex justify-start mt-5">
+								<CustomButton onClick={handleCrearGraficas}>
+									Crear gráficas
+								</CustomButton>
+								<CustomButton type="submit" variant="save">
+									Guardar
+								</CustomButton>
+								<CustomButton variant="pdf" onClick={handleGenerarPDF}>
+									Generar PDF
+								</CustomButton>
+							</div>
+
+							<div className="fixed top-24 right-5 flex flex-col gap-3 z-50">
+								<CustomButton
+									className={`btn-aprobacion ${aprobadoJefeOficina ? "activo" : ""}`}
+									onClick={() => setAprobadoJefeOficina((v) => !v)}
+									disabled={currentUser?.idAcceso !== 1}>
+									Jefe de Oficina
+								</CustomButton>
+								<CustomButton
+									className={`btn-aprobacion ${aprobadoDireccion ? "activo" : ""}`}
+									onClick={() => setAprobadoDireccion((v) => !v)}
+									disabled={currentUser?.idAcceso !== 4}>
+									Jefe de Departamento
+								</CustomButton>
+							</div>
+						</>
+					)}
+
+					{/* Tipo 2: Cédula externa */}
+					{tipoProceso === 2 && (
+						<div className="col-[span_3] flex justify-start mt-5">
+							<CustomButton variant="save" type="submit">
+								Guardar
+							</CustomButton>
+
+							<InputField
+								id={`${fieldID}-archivoPDF`}
+								label={nombreArchivo || "Seleccionar archivo PDF"}
+								type="file"
+								accept="application/pdf"
+								ref={fileInputRef}
+								onChange={async (e) => {
+									const archivo = e.target.files?.[0];
+									if (!archivo) return;
+									setNombreArchivo(archivo.name);
+									setFilePDF(archivo);
+									const base64: string = await ManageFiles.pdfToBase64(archivo);
+									setArchivoBase64(base64);
+								}}
+							/>
+
+							{archivoUrl && (
+								<div className="bg-[#f7f7f7] border border-solid border-[#ccc] rounded-[10px] p-4 mb-6 text-center">
+									<h3>📄 Documento adjunto: {archivoNombre}</h3>
+									<CustomButton
+										onClick={() => window.open(archivoUrl, "_blank")}>
+										Ver PDF
+									</CustomButton>
+								</div>
+							)}
+
+							{isDragging && (
+								<div className="fixed top-0 left-0 w-full h-full bg-[rgba(30,144,255,0.2)] backdrop-filter backdrop-blur-sm flex justify-center items-center animate-[fadeIn_0.3s_ease]">
+									<div className="text-[2rem] font-bold text-[#0056b3] bg-[white] border-[3px] border-dashed border-[#007bff] px-16 py-8 rounded-[20px] animate-[bounce_1s_infinite_alternate]">
+										📂 Suelta aquí
+									</div>
+								</div>
+							)}
+						</div>
+					)}
+				</FormSectionCard>
+			</form>
+
+			<FormSectionCard title="Visualización del PDF de la cédula">
+				{(tipoProceso <= 1 || tipoProceso === null) && (
+					<p>Por favor seleccione un ID de proceso</p>
+				)}
+
+				{/* Visor de PDF */}
+				{pdfVisible && archivoBase64 && (
+					<div className="mt-7.5 rounded-xl bg-[linear-gradient(145deg,#f9faff,#ffffff)] [box-shadow:0_6px_18px_rgba(0,0,0,0.12)] overflow-hidden [transition:all_0.3s_ease] animate-[fadeIn_0.4s_ease-in-out] w-full max-w-full">
+						<div className="flex justify-between items-center bg-[#18529d] px-4.5 py-2.5 text-[15px] font-semibold rounded-tl-xl rounded-tr-xl">
+							<div className="pdf-viewer-title">
+								<span>📄 {nombreArchivo}</span>
+							</div>
+							<CustomButton
+								onClick={() => {
+									const link = document.createElement("a");
+									link.href = `data:application/pdf;base64,${archivoBase64}`;
+									link.download = nombreArchivo || "Documento.pdf";
+									link.click();
+								}}
+								onMouseEnter={(e) =>
+									((
+										e.currentTarget as HTMLButtonElement
+									).style.backgroundColor = "rgba(255,255,255,0.3)")
+								}
+								onMouseLeave={(e) =>
+									((
+										e.currentTarget as HTMLButtonElement
+									).style.backgroundColor = "rgba(255,255,255,0.15)")
+								}>
+								Descargar
+							</CustomButton>
+						</div>
+						<div className="w-full h-200 border-none bg-[#fafafa] justify-between">
+							<iframe
+								src={`data:application/pdf;base64,${archivoBase64}`}
+								title="Vista previa del PDF"
+								className="w-full h-full border-none rounded-bl-xl rounded-br-xl"
+							/>
+						</div>
+					</div>
+				)}
+			</FormSectionCard>
+
 			<ButtonShowModalHelp onClick={() => setShowHelp(true)} />
 			<ModalHelp
 				isOpen={showHelp}
@@ -945,312 +1243,6 @@ function CrearConstancia() {
 					</strong>
 				</p>
 			</ModalHelp>
-
-			<main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
-				<MainHeader title="Cédula de resultados" subtitle="Cédulas" />
-				<form onSubmit={handleSubmit} className="flex flex-col gap-6">
-					<FormSectionCard title="Datos de la solicitud de contratación">
-						<InputField
-							id={`${fieldID}-idProceso`}
-							label="ID del proceso"
-							value={String(formData.FKIdProceso ?? "")}
-							onChange={(e) => handleInputChange("FKIdProceso", e.target.value)}
-							showSearchButton={true}
-							onSearch={handleBuscarCedula}
-							searchButtonTitle="Buscar proceso por ID"
-						/>
-						{(
-							[
-								{ label: "Hermes:", key: "hermesNotificacion" },
-								{ label: "Plaza:", key: "plaza" },
-								{ label: "Puesto:", key: "puesto" },
-								{ label: "Titular de la plaza:", key: "titular" },
-								{ label: "Oficio de autorización:", key: "oficio" },
-							] as {
-								label: string;
-								key: keyof IFormData;
-								withButton?: boolean;
-							}[]
-						).map(({ label, key }) => (
-							<InputField
-								id={`${fieldID}-${key}-${label}`}
-								label={label}
-								key={key}
-								value={String(formData[key] ?? "")}
-								onChange={(e) =>
-									handleInputChange(
-										key,
-										e.target.value as IFormData[typeof key],
-									)
-								}
-							/>
-						))}
-						<SelectField
-							label="Temporalidad:"
-							options={[
-								{ value: 1, label: "Temporal" },
-								{ value: 2, label: "Definitiva" },
-							]}
-							value={formData.temporalidad}
-							onChange={(e) =>
-								handleInputChange(
-									"temporalidad",
-									e as IFormData["temporalidad"],
-								)
-							}
-						/>
-
-						<div>
-							<label
-								htmlFor="constancia-adscripcion"
-								className="form-label-evaluacion">
-								Adscripción
-							</label>
-							<Select<IDependenciaOption>
-								inputId="constancia-adscripcion"
-								options={dependenciasOptions}
-								value={formData.adscripcion}
-								onChange={(selected) => {
-									handleInputChange("adscripcion.nombre", selected ?? null);
-									handleInputChange("adscripcion.zona", selected?.zona ?? "");
-								}}
-								placeholder="Escribe o selecciona una adscripción"
-								isClearable
-								isSearchable
-							/>
-						</div>
-						<InputField
-							id={`${fieldID}-region-constancia`}
-							label="Región:"
-							className="form-input"
-							value={formData.adscripcion?.zona}
-							readOnly
-						/>
-					</FormSectionCard>
-					<FormSectionCard title="Datos del candidato">
-						{(
-							[
-								{ label: "Nombre", key: "nombre" },
-								{ label: "Edad", key: "edad" },
-								{ label: "Educación Formal", key: "educacion" },
-								{
-									label: "Experiencia relacionada al puesto",
-									key: "experiencia",
-								},
-							] as { label: string; key: keyof IFormData }[]
-						).map(({ label, key }) => (
-							<div key={key}>
-								<InputField
-									id={`${fieldID}-${key}-${label}`}
-									label={label}
-									value={String(formData[key] ?? "")}
-									onChange={(e) => {
-										let value: string = e.target.value;
-										if (key === "edad")
-											value = value.replace(/\D/g, "").slice(0, 3);
-										handleInputChange(key, value as IFormData[typeof key]);
-									}}
-								/>
-							</div>
-						))}
-					</FormSectionCard>
-
-					<FormSectionCard title="Datos de la cédula interna">
-						{(tipoProceso <= 1 || tipoProceso === null) && (
-							<p>Por favor seleccione un ID de proceso</p>
-						)}
-
-						{/* Tipo 1: Cédula interna */}
-						{tipoProceso === 1 && (
-							<>
-								<h3 className="section-title">Competencias</h3>
-								{(
-									[
-										{ label: "Sobresaliente", key: "sobresaliente" },
-										{ label: "A Reforzar", key: "reforzar" },
-										{ label: "A Desarrollar", key: "desarrollar" },
-										{ label: "Habilidades Digitales", key: "habilidades" },
-										{
-											label: "Evaluación de conocimientos",
-											key: "evaluacion",
-										},
-										{ label: "Efectos de contratación", key: "efectos" },
-									] as { label: string; key: keyof IFormData }[]
-								).map(({ label, key }) => (
-									<TextAreaField
-										label={label}
-										key={key}
-										value={String(formData[key] ?? "")}
-										onChange={(e) =>
-											handleInputChange(
-												key,
-												e.target.value as IFormData[typeof key],
-											)
-										}
-									/>
-								))}
-
-								<SelectField
-									label="Resultado final:"
-									options={[
-										{ value: "Recomendable", label: "Recomendable" },
-										{
-											value: "Recomendable con observaciones",
-											label: "Recomendable con observaciones",
-										},
-										{ value: "No recomendable", label: "No recomendable" },
-									]}
-									value={formData.resultadoFinal}
-									onChange={(e) => handleInputChange("resultadoFinal", e)}
-								/>
-
-								<h3 className="section-title">
-									Resultados cualitativos del sistema de evaluación
-								</h3>
-								{(
-									[
-										{ label: "Reforzar", key: "cualitativoReforzar" },
-										{ label: "Desarrollar", key: "cualitativoDesarrollar" },
-									] as { label: string; key: keyof IFormData }[]
-								).map(({ label, key }) => (
-									<InputField
-										label={label}
-										key={key}
-										value={String(formData[key] ?? "")}
-										onChange={(e) =>
-											handleInputChange(
-												key,
-												e.target.value as IFormData[typeof key],
-											)
-										}
-									/>
-								))}
-
-								<div className="flex justify-center items-center gap-10 mt-5 flex-wrap">
-									<div ref={chartGaugeRef} className="w-100 h-75" />
-								</div>
-								<div className="flex justify-center items-center gap-10 mt-5 flex-wrap">
-									<div ref={chartRadarRef} className="w-100 h-75" />
-								</div>
-
-								<div className="col-[span_3] flex justify-start mt-5">
-									<CustomButton onClick={handleCrearGraficas}>
-										Crear gráficas
-									</CustomButton>
-									<CustomButton type="submit" variant="save">
-										Guardar
-									</CustomButton>
-									<CustomButton variant="pdf" onClick={handleGenerarPDF}>
-										Generar PDF
-									</CustomButton>
-								</div>
-
-								<div className="fixed top-24 right-5 flex flex-col gap-3 z-50">
-									<CustomButton
-										className={`btn-aprobacion ${aprobadoJefeOficina ? "activo" : ""}`}
-										onClick={() => setAprobadoJefeOficina((v) => !v)}
-										disabled={currentUser?.idAcceso !== 1}>
-										Jefe de Oficina
-									</CustomButton>
-									<CustomButton
-										className={`btn-aprobacion ${aprobadoDireccion ? "activo" : ""}`}
-										onClick={() => setAprobadoDireccion((v) => !v)}
-										disabled={currentUser?.idAcceso !== 4}>
-										Jefe de Departamento
-									</CustomButton>
-								</div>
-							</>
-						)}
-
-						{/* Tipo 2: Cédula externa */}
-						{tipoProceso === 2 && (
-							<div className="col-[span_3] flex justify-start mt-5">
-								<CustomButton variant="save" type="submit">
-									Guardar
-								</CustomButton>
-
-								<InputField
-									id={`${fieldID}-archivoPDF`}
-									label={nombreArchivo || "Seleccionar archivo PDF"}
-									type="file"
-									accept="application/pdf"
-									ref={fileInputRef}
-									onChange={async (e) => {
-										const archivo = e.target.files?.[0];
-										if (!archivo) return;
-										setNombreArchivo(archivo.name);
-										setFilePDF(archivo);
-										const base64: string =
-											await ManageFiles.pdfToBase64(archivo);
-										setArchivoBase64(base64);
-									}}
-								/>
-
-								{archivoUrl && (
-									<div className="bg-[#f7f7f7] border border-solid border-[#ccc] rounded-[10px] p-4 mb-6 text-center">
-										<h3>📄 Documento adjunto: {archivoNombre}</h3>
-										<CustomButton
-											onClick={() => window.open(archivoUrl, "_blank")}>
-											Ver PDF
-										</CustomButton>
-									</div>
-								)}
-
-								{isDragging && (
-									<div className="fixed top-0 left-0 w-full h-full bg-[rgba(30,144,255,0.2)] backdrop-filter backdrop-blur-sm flex justify-center items-center animate-[fadeIn_0.3s_ease]">
-										<div className="text-[2rem] font-bold text-[#0056b3] bg-[white] border-[3px] border-dashed border-[#007bff] px-16 py-8 rounded-[20px] animate-[bounce_1s_infinite_alternate]">
-											📂 Suelta aquí
-										</div>
-									</div>
-								)}
-							</div>
-						)}
-					</FormSectionCard>
-				</form>
-
-				<FormSectionCard title="Visualización del PDF de la cédula">
-					{(tipoProceso <= 1 || tipoProceso === null) && (
-						<p>Por favor seleccione un ID de proceso</p>
-					)}
-
-					{/* Visor de PDF */}
-					{pdfVisible && archivoBase64 && (
-						<div className="mt-7.5 rounded-xl bg-[linear-gradient(145deg,#f9faff,#ffffff)] [box-shadow:0_6px_18px_rgba(0,0,0,0.12)] overflow-hidden [transition:all_0.3s_ease] animate-[fadeIn_0.4s_ease-in-out] w-full max-w-full">
-							<div className="flex justify-between items-center bg-[#18529d] px-4.5 py-2.5 text-[15px] font-semibold rounded-tl-xl rounded-tr-xl">
-								<div className="pdf-viewer-title">
-									<span>📄 {nombreArchivo}</span>
-								</div>
-								<CustomButton
-									onClick={() => {
-										const link = document.createElement("a");
-										link.href = `data:application/pdf;base64,${archivoBase64}`;
-										link.download = nombreArchivo || "Documento.pdf";
-										link.click();
-									}}
-									onMouseEnter={(e) =>
-										((
-											e.currentTarget as HTMLButtonElement
-										).style.backgroundColor = "rgba(255,255,255,0.3)")
-									}
-									onMouseLeave={(e) =>
-										((
-											e.currentTarget as HTMLButtonElement
-										).style.backgroundColor = "rgba(255,255,255,0.15)")
-									}>
-									Descargar
-								</CustomButton>
-							</div>
-							<div className="w-full h-200 border-none bg-[#fafafa] justify-between">
-								<iframe
-									src={`data:application/pdf;base64,${archivoBase64}`}
-									title="Vista previa del PDF"
-									className="w-full h-full border-none rounded-bl-xl rounded-br-xl"
-								/>
-							</div>
-						</div>
-					)}
-				</FormSectionCard>
-			</main>
 		</>
 	);
 }

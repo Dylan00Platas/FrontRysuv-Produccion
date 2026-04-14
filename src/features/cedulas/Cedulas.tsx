@@ -339,198 +339,192 @@ function Cedulas() {
 			{/* Toast de notificación */}
 			<Toast texto={toast.texto} tipo={toast.tipo} />
 
-			<main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
-				<MainHeader title="Consulta de cédulas" subtitle="Gestión de cédulas" />
+			<MainHeader title="Consulta de cédulas" subtitle="Gestión de cédulas" />
 
-				<div className="flex flex-col gap-6">
-					{/* Filtros */}
-					<FormSectionCard title="Filtros">
-						<div className="flex flex-col sm:flex-row items-center gap-4">
-							<ReactSelectField<ILabelValue>
-								options={CEDULA_OPTIONS}
-								value={cedulaFiltro}
-								onChange={setCedulaFiltro}
-								isClearable
-								placeholder="Tipo de cédula"
-								styles={selectStyles}
-								classNamePrefix="rs"
-								containerClassName="w-full sm:w-auto sm:flex-1"
-							/>
-							<ReactSelectField<ILabelValue>
-								options={dependenciasUnicas}
-								value={dependenciaFiltro}
-								onChange={setDependenciaFiltro}
-								isClearable
-								placeholder="Dependencia de la cédula"
-								styles={selectStyles}
-								classNamePrefix="rs"
-								containerClassName="w-full sm:w-auto sm:flex-1"
-							/>
-							<InputField
-								id={`${fieldID}-searchTerm`}
-								placeholder="Buscar folio, candidato..."
-								autoComplete="on"
-								name="searchTerm"
-								value={searchTerm}
-								onChange={(e) => setSearchTerm(e.target.value)}
-								showSearchButton={true}
-								onSearch={() => setSearchTerm(searchTerm)}
-								searchButtonTitle="Buscar por palabra clave"
-								className="w-full sm:w-auto sm:flex-1"
-							/>
+			<div className="flex flex-col gap-6">
+				{/* Filtros */}
+				<FormSectionCard title="Filtros">
+					<div className="flex flex-col sm:flex-row items-center gap-4">
+						<ReactSelectField<ILabelValue>
+							options={CEDULA_OPTIONS}
+							value={cedulaFiltro}
+							onChange={setCedulaFiltro}
+							isClearable
+							placeholder="Tipo de cédula"
+							styles={selectStyles}
+							classNamePrefix="rs"
+							containerClassName="w-full sm:w-auto sm:flex-1"
+						/>
+						<ReactSelectField<ILabelValue>
+							options={dependenciasUnicas}
+							value={dependenciaFiltro}
+							onChange={setDependenciaFiltro}
+							isClearable
+							placeholder="Dependencia de la cédula"
+							styles={selectStyles}
+							classNamePrefix="rs"
+							containerClassName="w-full sm:w-auto sm:flex-1"
+						/>
+						<InputField
+							id={`${fieldID}-searchTerm`}
+							placeholder="Buscar folio, candidato..."
+							autoComplete="on"
+							name="searchTerm"
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+							showSearchButton={true}
+							onSearch={() => setSearchTerm(searchTerm)}
+							searchButtonTitle="Buscar por palabra clave"
+							className="w-full sm:w-auto sm:flex-1"
+						/>
+					</div>
+				</FormSectionCard>
+				{/* Tabla */}
+				<div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+					{cedulasLoading ? (
+						<div className="flex flex-col items-center justify-center py-20 gap-3">
+							<div className="w-8 h-8 rounded-full border-4 border-[#18529d]/20 border-t-[#18529d] animate-spin" />
+							<p className="text-sm text-slate-400 font-medium">
+								Cargando cédulas...
+							</p>
 						</div>
-					</FormSectionCard>
-					{/* Tabla */}
-					<div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-						{cedulasLoading ? (
-							<div className="flex flex-col items-center justify-center py-20 gap-3">
-								<div className="w-8 h-8 rounded-full border-4 border-[#18529d]/20 border-t-[#18529d] animate-spin" />
-								<p className="text-sm text-slate-400 font-medium">
-									Cargando cédulas...
-								</p>
-							</div>
-						) : cedulasError ? (
-							<div className="flex items-center justify-center py-20">
-								<p className="text-sm text-red-500 font-medium">
-									{cedulasError}
-								</p>
-							</div>
-						) : (
-							<table className="w-full text-sm">
-								<thead>
-									<tr className="bg-linear-to-r from-[#18529d] to-[#1a6abf] text-white">
-										{showCheckboxes && <th className="w-12 px-4 py-3.5" />}
-										<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90">
-											Folio / Hermés
-										</th>
-										<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90">
-											Candidato
-										</th>
-										<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90">
-											Dependencia
-										</th>
-										<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90 max-w-30">
-											Puesto
-										</th>
-										<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90">
-											Tipo
-										</th>
-									</tr>
-								</thead>
-								<tbody className="divide-y divide-slate-100">
-									{cedulasFiltradas.length > 0 ? (
-										cedulasFiltradas.map((c, i) => (
-											<tr
-												key={c.idCedula}
-												onClick={() => handleRowClick(c)}
-												className={`cursor-pointer transition-colors duration-150 hover:bg-blue-50/60 ${
-													i % 2 === 0 ? "bg-white" : "bg-slate-50/50"
-												}`}>
-												{showCheckboxes && (
-													<td className="px-4 py-3">
-														<CheckboxField
-															checked={selectedCedulas.includes(c.idCedula)}
-															onChange={() => toggleSelect(c.idCedula)}
-															onClick={(e) => e.stopPropagation()}
-														/>
-													</td>
-												)}
-												<td className="px-5 py-3.5 font-mono text-xs text-slate-600 font-medium">
-													{`${c.folio} / ${c.hermesNotificacion}`}
-												</td>
-												<td className="px-5 py-3.5 font-medium text-slate-800">
-													{c.nombreCandidato}
-												</td>
-												<td className="px-5 py-3.5 text-slate-600">
-													{c.dependencia}
-												</td>
-												<td className="px-5 py-3.5 text-slate-600 max-w-30 truncate">
-													{c.puesto}
-												</td>
-												<td className="px-5 py-3.5">
-													<CedulaBadge
-														tipo={getIdTipoCedula(c.FKIdTipoCedula)}
+					) : cedulasError ? (
+						<div className="flex items-center justify-center py-20">
+							<p className="text-sm text-red-500 font-medium">{cedulasError}</p>
+						</div>
+					) : (
+						<table className="w-full text-sm">
+							<thead>
+								<tr className="bg-linear-to-r from-[#18529d] to-[#1a6abf] text-white">
+									{showCheckboxes && <th className="w-12 px-4 py-3.5" />}
+									<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90">
+										Folio / Hermés
+									</th>
+									<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90">
+										Candidato
+									</th>
+									<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90">
+										Dependencia
+									</th>
+									<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90 max-w-30">
+										Puesto
+									</th>
+									<th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-wider opacity-90">
+										Tipo
+									</th>
+								</tr>
+							</thead>
+							<tbody className="divide-y divide-slate-100">
+								{cedulasFiltradas.length > 0 ? (
+									cedulasFiltradas.map((c, i) => (
+										<tr
+											key={c.idCedula}
+											onClick={() => handleRowClick(c)}
+											className={`cursor-pointer transition-colors duration-150 hover:bg-blue-50/60 ${
+												i % 2 === 0 ? "bg-white" : "bg-slate-50/50"
+											}`}>
+											{showCheckboxes && (
+												<td className="px-4 py-3">
+													<CheckboxField
+														checked={selectedCedulas.includes(c.idCedula)}
+														onChange={() => toggleSelect(c.idCedula)}
+														onClick={(e) => e.stopPropagation()}
 													/>
 												</td>
-											</tr>
-										))
-									) : (
-										<tr>
-											<td colSpan={colSpan} className="text-center py-16">
-												<div className="flex flex-col items-center gap-2 text-slate-400">
-													<FaSearch className="text-2xl opacity-30" />
-													<span className="text-sm font-medium">
-														Sin resultados
-													</span>
-													<span className="text-xs">
-														Intenta con otros filtros
-													</span>
-												</div>
+											)}
+											<td className="px-5 py-3.5 font-mono text-xs text-slate-600 font-medium">
+												{`${c.folio} / ${c.hermesNotificacion}`}
+											</td>
+											<td className="px-5 py-3.5 font-medium text-slate-800">
+												{c.nombreCandidato}
+											</td>
+											<td className="px-5 py-3.5 text-slate-600">
+												{c.dependencia}
+											</td>
+											<td className="px-5 py-3.5 text-slate-600 max-w-30 truncate">
+												{c.puesto}
+											</td>
+											<td className="px-5 py-3.5">
+												<CedulaBadge tipo={getIdTipoCedula(c.FKIdTipoCedula)} />
 											</td>
 										</tr>
-									)}
-								</tbody>
-							</table>
-						)}
+									))
+								) : (
+									<tr>
+										<td colSpan={colSpan} className="text-center py-16">
+											<div className="flex flex-col items-center gap-2 text-slate-400">
+												<FaSearch className="text-2xl opacity-30" />
+												<span className="text-sm font-medium">
+													Sin resultados
+												</span>
+												<span className="text-xs">
+													Intenta con otros filtros
+												</span>
+											</div>
+										</td>
+									</tr>
+								)}
+							</tbody>
+						</table>
+					)}
 
-						{/* Footer de tabla con conteo */}
-						{!cedulasLoading && !cedulasError && (
-							<div className="px-5 py-3 border-t border-slate-100 bg-slate-50/80">
-								<span className="text-xs text-slate-400 font-medium">
-									{cedulasFiltradas.length} resultado
-									{cedulasFiltradas.length !== 1 ? "s" : ""}
-								</span>
+					{/* Footer de tabla con conteo */}
+					{!cedulasLoading && !cedulasError && (
+						<div className="px-5 py-3 border-t border-slate-100 bg-slate-50/80">
+							<span className="text-xs text-slate-400 font-medium">
+								{cedulasFiltradas.length} resultado
+								{cedulasFiltradas.length !== 1 ? "s" : ""}
+							</span>
+						</div>
+					)}
+				</div>
+				{/* Controles */}
+				<div className="flex items-center justify-between flex-wrap gap-3">
+					<div>
+						{!showCheckboxes ? (
+							<CustomButton
+								variant="pdf"
+								onClick={() => setShowCheckboxes(true)}>
+								Archivas cédulas
+							</CustomButton>
+						) : (
+							<div className="flex items-center gap-2">
+								<CustomButton
+									variant="cancel"
+									onClick={() => {
+										setShowCheckboxes(false);
+										setSelectedCedulas([]);
+									}}>
+									Cancelar
+								</CustomButton>
+								{selectedCedulas.length > 0 && (
+									<CustomButton variant="save" onClick={archivarCedulas}>
+										Archivar{" "}
+										<span className="bg-white/20 px-1.5 py-0.5 rounded-md text-xs">
+											{selectedCedulas.length}
+										</span>
+									</CustomButton>
+								)}
 							</div>
 						)}
 					</div>
-					{/* Controles */}
-					<div className="flex items-center justify-between flex-wrap gap-3">
-						<div>
-							{!showCheckboxes ? (
-								<CustomButton
-									variant="pdf"
-									onClick={() => setShowCheckboxes(true)}>
-									Archivas cédulas
-								</CustomButton>
-							) : (
-								<div className="flex items-center gap-2">
-									<CustomButton
-										variant="cancel"
-										onClick={() => {
-											setShowCheckboxes(false);
-											setSelectedCedulas([]);
-										}}>
-										Cancelar
-									</CustomButton>
-									{selectedCedulas.length > 0 && (
-										<CustomButton variant="save" onClick={archivarCedulas}>
-											Archivar{" "}
-											<span className="bg-white/20 px-1.5 py-0.5 rounded-md text-xs">
-												{selectedCedulas.length}
-											</span>
-										</CustomButton>
-									)}
-								</div>
-							)}
-						</div>
 
-						<div className="flex items-center gap-3">
-							<CustomButton
-								variant="edit"
-								icon={<FaPlus />}
-								onClick={() => navigate("/crear-cedula-interna")}>
-								Cédula interna
-							</CustomButton>
-							<CustomButton
-								variant="save"
-								icon={<FaPlus />}
-								onClick={() => navigate("/crear-cedula")}>
-								Cédula de resultados
-							</CustomButton>
-						</div>
+					<div className="flex items-center gap-3">
+						<CustomButton
+							variant="edit"
+							icon={<FaPlus />}
+							onClick={() => navigate("/crear-cedula-interna")}>
+							Cédula interna
+						</CustomButton>
+						<CustomButton
+							variant="save"
+							icon={<FaPlus />}
+							onClick={() => navigate("/crear-cedula")}>
+							Cédula de resultados
+						</CustomButton>
 					</div>
 				</div>
-			</main>
+			</div>
 		</>
 	);
 }

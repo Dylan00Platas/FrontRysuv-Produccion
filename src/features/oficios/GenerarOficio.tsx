@@ -137,165 +137,162 @@ function GenerarOficio() {
 		<>
 			<Toast texto={toast.texto} tipo={toast.tipo} />
 
-			<main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto">
-				<MainHeader title="Generar oficio" subtitle="Gestión de oficios" />
+			<MainHeader title="Generar oficio" subtitle="Gestión de oficios" />
 
-				<form onSubmit={handleSubmit} className="flex flex-col gap-6">
-					{/* TIPO DE OFICIO */}
-
-					<SelectField
-						label="Tipo de oficio:"
-						id="generar-tipo-oficio"
-						value={formData.tipoOficio}
-						onChange={(e: string | number) =>
-							handleInputChange("tipoOficio", e.toString())
-						}
-						options={[
-							{ value: "5.1 y 5.2", label: "5.1 y 5.2" },
-							{ value: "4.1 y 4.2", label: "4.1 y 4.2" },
-							{ value: "4.3 (Licencia)", label: "4.3 (Licencia)" },
-							{ value: "4.3 (Licencia)", label: "4.3 (Licencia)" },
-							{ value: "4.3 (Medica)", label: "4.3 (Médica)" },
-							{ value: "Cita", label: "Cita" },
-							{ value: "Otros", label: "Otros" },
-						]}
+			<form onSubmit={handleSubmit} className="flex flex-col gap-6">
+				{/* TIPO DE OFICIO */}
+				<SelectField
+					label="Tipo de oficio:"
+					id="generar-tipo-oficio"
+					value={formData.tipoOficio}
+					onChange={(e: string | number) =>
+						handleInputChange("tipoOficio", e.toString())
+					}
+					options={[
+						{ value: "5.1 y 5.2", label: "5.1 y 5.2" },
+						{ value: "4.1 y 4.2", label: "4.1 y 4.2" },
+						{ value: "4.3 (Licencia)", label: "4.3 (Licencia)" },
+						{ value: "4.3 (Licencia)", label: "4.3 (Licencia)" },
+						{ value: "4.3 (Medica)", label: "4.3 (Médica)" },
+						{ value: "Cita", label: "Cita" },
+						{ value: "Otros", label: "Otros" },
+					]}
+				/>
+				<FormSectionCard title="Datos del proceso">
+					<InputField
+						label="Folio:"
+						id="generar-folio"
+						type="text"
+						value={formData.folio}
+						onChange={(
+							e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+						) => handleInputChange("folio", e.target.value)}
 					/>
-					<FormSectionCard title="Datos del proceso">
-						<InputField
-							label="Folio:"
-							id="generar-folio"
-							type="text"
-							value={formData.folio}
-							onChange={(
-								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
-							) => handleInputChange("folio", e.target.value)}
-						/>
 
-						<InputField
-							label="Plaza:"
-							id="generar-plaza"
-							type="text"
-							value={formData.plaza}
-							onChange={(
-								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
-							) => handleInputChange("plaza", e.target.value)}
-						/>
+					<InputField
+						label="Plaza:"
+						id="generar-plaza"
+						type="text"
+						value={formData.plaza}
+						onChange={(
+							e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+						) => handleInputChange("plaza", e.target.value)}
+					/>
 
-						<InputField
-							label="Motivo:"
-							id="generar-motivo"
-							type="text"
-							value={formData.motivo}
-							onChange={(
-								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
-							) => handleInputChange("motivo", e.target.value)}
-						/>
-						<InputField
-							label="Titular de la plaza:"
-							id="generar-titular-plaza"
-							type="text"
-							value={formData.titularPlaza}
-							onChange={(
-								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
-							) => handleInputChange("titularPlaza", e.target.value)}
-						/>
+					<InputField
+						label="Motivo:"
+						id="generar-motivo"
+						type="text"
+						value={formData.motivo}
+						onChange={(
+							e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+						) => handleInputChange("motivo", e.target.value)}
+					/>
+					<InputField
+						label="Titular de la plaza:"
+						id="generar-titular-plaza"
+						type="text"
+						value={formData.titularPlaza}
+						onChange={(
+							e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+						) => handleInputChange("titularPlaza", e.target.value)}
+					/>
 
-						<InputField
-							label="Categoría/Puesto (origen):"
-							id="generar-categoria-origen"
-							type="text"
-							value={formData.categoriaOrigen}
-							onChange={(
-								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
-							) => handleInputChange("categoriaOrigen", e.target.value)}
-						/>
+					<InputField
+						label="Categoría/Puesto (origen):"
+						id="generar-categoria-origen"
+						type="text"
+						value={formData.categoriaOrigen}
+						onChange={(
+							e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+						) => handleInputChange("categoriaOrigen", e.target.value)}
+					/>
 
-						<InputField
-							label="Categoría por autorizar:"
-							id="generar-categoria-autorizada"
-							type="text"
-							value={formData.categoriaAutorizada}
-							onChange={(
-								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
-							) => handleInputChange("categoriaAutorizada", e.target.value)}
-						/>
+					<InputField
+						label="Categoría por autorizar:"
+						id="generar-categoria-autorizada"
+						type="text"
+						value={formData.categoriaAutorizada}
+						onChange={(
+							e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+						) => handleInputChange("categoriaAutorizada", e.target.value)}
+					/>
 
-						<InputField
-							label="Nombre del candidato:"
-							id="generar-candidato"
-							type="text"
-							value={formData.nombreCandidato}
-							onChange={(
-								e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
-							) => handleInputChange("nombreCandidato", e.target.value)}
-						/>
-					</FormSectionCard>
+					<InputField
+						label="Nombre del candidato:"
+						id="generar-candidato"
+						type="text"
+						value={formData.nombreCandidato}
+						onChange={(
+							e: React.ChangeEvent<HTMLInputElement, HTMLInputElement>,
+						) => handleInputChange("nombreCandidato", e.target.value)}
+					/>
+				</FormSectionCard>
 
-					<FormSectionCard title="Datos del oficio">
-						<InputField
-							label="Folio del oficio:"
-							id="generar-folio-oficio"
-							type="text"
-							value={formData.folio}
-							onChange={(e) => handleInputChange("folio", e.target.value)}
-						/>
+				<FormSectionCard title="Datos del oficio">
+					<InputField
+						label="Folio del oficio:"
+						id="generar-folio-oficio"
+						type="text"
+						value={formData.folio}
+						onChange={(e) => handleInputChange("folio", e.target.value)}
+					/>
 
-						<InputField
-							label="Fecha y lugar"
-							id="generar-fecha-lugar"
-							type="text"
-							value={formData.fecha}
-							onChange={(e) => handleInputChange("fecha", e.target.value)}
-						/>
+					<InputField
+						label="Fecha y lugar"
+						id="generar-fecha-lugar"
+						type="text"
+						value={formData.fecha}
+						onChange={(e) => handleInputChange("fecha", e.target.value)}
+					/>
 
-						<InputField
-							label="Destinatario:"
-							id="generar-dirigido"
-							type="text"
-							value={formData.dirigido}
-							onChange={(e) => handleInputChange("dirigido", e.target.value)}
-						/>
+					<InputField
+						label="Destinatario:"
+						id="generar-dirigido"
+						type="text"
+						value={formData.dirigido}
+						onChange={(e) => handleInputChange("dirigido", e.target.value)}
+					/>
 
-						<InputField
-							label="Puesto (destinatario):"
-							id="generar-puesto-destinatario"
-							type="text"
-							value={formData.puestoDirigido}
-							onChange={(e) =>
-								handleInputChange("puestoDirigido", e.target.value)
-							}
-						/>
+					<InputField
+						label="Puesto (destinatario):"
+						id="generar-puesto-destinatario"
+						type="text"
+						value={formData.puestoDirigido}
+						onChange={(e) =>
+							handleInputChange("puestoDirigido", e.target.value)
+						}
+					/>
 
-						<TextAreaField
-							label="Cuerpo del oficio:"
-							id="generar-cuerpo-oficio"
-							value={formData.cuerpo}
-							onChange={(e) => handleInputChange("cuerpo", e.target.value)}
-						/>
+					<TextAreaField
+						label="Cuerpo del oficio:"
+						id="generar-cuerpo-oficio"
+						value={formData.cuerpo}
+						onChange={(e) => handleInputChange("cuerpo", e.target.value)}
+					/>
 
-						<TextAreaField
-							label="Copia carbón:"
-							id="generar-copia-carbon"
-							value={formData.copiaCarbon}
-							onChange={(e) => handleInputChange("copiaCarbon", e.target.value)}
-						/>
-					</FormSectionCard>
+					<TextAreaField
+						label="Copia carbón:"
+						id="generar-copia-carbon"
+						value={formData.copiaCarbon}
+						onChange={(e) => handleInputChange("copiaCarbon", e.target.value)}
+					/>
+				</FormSectionCard>
 
-					<div className="flex items-center justify-end gap-3 pb-10 max-[900px]:justify-center">
-						<CustomButton variant="cancel" onClick={() => {}}>
-							Cancelar
-						</CustomButton>
+				<div className="flex items-center justify-end gap-3 pb-10 max-[900px]:justify-center">
+					<CustomButton variant="cancel" onClick={() => {}}>
+						Cancelar
+					</CustomButton>
 
-						<CustomButton
-							type="submit"
-							variant="save"
-							icon={<FaPlus />}
-							onClick={() => {}}>
-							Guardar
-						</CustomButton>
-					</div>
-				</form>
-			</main>
+					<CustomButton
+						type="submit"
+						variant="save"
+						icon={<FaPlus />}
+						onClick={() => {}}>
+						Guardar
+					</CustomButton>
+				</div>
+			</form>
 		</>
 	);
 }

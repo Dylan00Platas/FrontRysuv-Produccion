@@ -503,418 +503,410 @@ function Estadisticas() {
 		<>
 			<Toast texto={toast.texto} tipo={toast.tipo} />
 
-			<main className="ml-65 w-[calc(100%-260px)] px-[4%] py-[2%] overflow-y-auto min-h-screen bg-slate-50">
-				<MainHeader title="Datos de procesos" subtitle="Estadísticas" />
+			<MainHeader title="Datos de procesos" subtitle="Estadísticas" />
 
-				{/* Selector de gráfica */}
-				<div className="w-125 mb-5 mx-auto border-[1.5px] border-[#18529]">
-					<Select<ILabelValue>
-						options={GRAFICAS_OPTIONS}
-						value={graficaSeleccionada}
-						onChange={(v) => v && setGraficaSeleccionada(v)}
-						placeholder="Selecciona una gráfica..."
-						isClearable={false}
-					/>
-				</div>
+			{/* Selector de gráfica */}
+			<div className="w-125 mb-5 mx-auto border-[1.5px] border-[#18529]">
+				<Select<ILabelValue>
+					options={GRAFICAS_OPTIONS}
+					value={graficaSeleccionada}
+					onChange={(v) => v && setGraficaSeleccionada(v)}
+					placeholder="Selecciona una gráfica..."
+					isClearable={false}
+				/>
+			</div>
 
-				<div className="contenido-cedula-inner">
-					{/* Solicitudes */}
-					{mostrarGrafica("solicitudes") && (
-						<section className="stats-section">
-							<h1 className="section-title">
-								📌 {totalSolicitudes} Solicitudes Activas
-							</h1>
-							<p className="stats-label">
-								{contadores.pendientes} Pendientes (cita),{" "}
-								{contadores.entregadas} Entregadas (cita),{" "}
-								{contadores.notificadas} Citadas
-							</p>
-							<div className="chart-container">
-								<ResponsiveContainer width="100%" height={300}>
-									<PieChart>
-										<Pie
-											data={dataSolicitudesChart}
-											cx="50%"
-											cy="50%"
-											labelLine={false}
-											outerRadius={108}
-											dataKey="value"
-											label>
-											{dataSolicitudesChart.map((entry, index) => (
-												<Cell
-													key={entry.name}
-													fill={COLORS_PIE[index % COLORS_PIE.length]}
-												/>
-											))}
-										</Pie>
-										<Tooltip />
-										<Legend />
-									</PieChart>
-								</ResponsiveContainer>
-							</div>
-						</section>
-					)}
-
-					{/* Procesos */}
-					{mostrarGrafica("procesos") && (
-						<section className="stats-section">
-							<h1 className="section-title">
-								⚙️ {totalProcesos} Procesos Activos
-							</h1>
-							<p className="stats-label">
-								{contadores.citado} Citado, {contadores.evaluado} Evaluado,{" "}
-								{contadores.procesamiento} En procesamiento,{" "}
-								{contadores.revision} En revisión, {contadores.firma} En firma,{" "}
-								{contadores.notificadoProceso} Notificado,{" "}
-								{contadores.cancelado} Cancelado, {contadores.terminado}{" "}
-								Terminado
-							</p>
-							<div className="chart-container">
-								<ResponsiveContainer width="100%" height={320}>
-									<PieChart>
-										<Pie
-											data={dataProcesosChart}
-											cx="50%"
-											cy="50%"
-											labelLine={false}
-											outerRadius={120}
-											dataKey="value"
-											label>
-											{dataProcesosChart.map((entry, index) => (
-												<Cell
-													key={entry.name}
-													fill={COLORS_PIE2[index % COLORS_PIE2.length]}
-												/>
-											))}
-										</Pie>
-										<Tooltip />
-										<Legend />
-									</PieChart>
-								</ResponsiveContainer>
-							</div>
-						</section>
-					)}
-
-					{/* Actividad mensual */}
-					{mostrarGrafica("mensual") && (
-						<section className="stats-section">
-							<h1 className="section-title">
-								📉 Actividades Registradas al mes
-							</h1>
-							<ResponsiveContainer width="100%" height={300}>
-								<AreaChart data={dataMensual ?? []}>
-									<defs>
-										<linearGradient
-											id="colorSolicitudes"
-											x1="0"
-											y1="0"
-											x2="0"
-											y2="1">
-											<stop offset="5%" stopColor="#18529D" stopOpacity={0.8} />
-											<stop offset="95%" stopColor="#18529D" stopOpacity={0} />
-										</linearGradient>
-									</defs>
-									<XAxis dataKey="mes" />
-									<YAxis />
-									<Tooltip />
-									<Area
-										type="monotone"
-										dataKey="solicitudes"
-										stroke="#18529D"
-										fillOpacity={1}
-										fill="url(#colorSolicitudes)"
-									/>
-								</AreaChart>
-							</ResponsiveContainer>
-						</section>
-					)}
-
-					{/* Procesos por analista */}
-					{mostrarGrafica("porAnalista") && (
-						<section className="stats-section">
-							<div className="flex justify-between items-center">
-								<h1 className="section-title">⚙️ Procesos por analista</h1>
-								<div className="w-62.5">
-									<Select<ILabelValue>
-										options={analistaOptions}
-										value={analistaFiltro}
-										onChange={(v) => setAnalistaFiltro(v ?? OPCION_TODOS)}
-										placeholder="Selecciona un analista"
-										isClearable
-									/>
-								</div>
-							</div>
-
-							<p className="stats-label">
-								{totalAnalistaChart} Procesos —{" "}
-								{dataAnalistaChart
-									.map((d) => `${d.value} ${d.name}`)
-									.join(", ")}
-							</p>
-							<div className="chart-container">
-								<ResponsiveContainer width="100%" height={320}>
-									<PieChart>
-										<Pie
-											data={dataAnalistaChart}
-											cx="50%"
-											cy="50%"
-											labelLine={false}
-											outerRadius={108}
-											dataKey="value"
-											label>
-											{dataAnalistaChart.map((entry, index) => (
-												<Cell
-													key={entry.name}
-													fill={COLORS_PIE2[index % COLORS_PIE2.length]}
-												/>
-											))}
-										</Pie>
-										<Tooltip />
-										<Legend />
-									</PieChart>
-								</ResponsiveContainer>
-							</div>
-						</section>
-					)}
-
-					{/* Resultados de evaluación */}
-					{mostrarGrafica("evaluacion") && (
-						<section className="stats-section">
-							<h1 className="section-title">📈 Resultados de evaluación</h1>
-
-							<div className="flex gap-4 mb-4">
-								<div className="w-62.5">
-									<Select<ILabelValue>
-										options={[
-											OPCION_TODOS_ANALISTAS,
-											...analistas.map((a) => ({
-												value: String(a.idAcceso),
-												label:
-													`${a.nombre} ${a.primerApellido} ${a.segundoApellido ?? ""}`.trim(),
-											})),
-										]}
-										value={analistaFiltroEval}
-										onChange={(v) =>
-											setAnalistaFiltroEval(v ?? OPCION_TODOS_ANALISTAS)
-										}
-										placeholder="Selecciona un analista"
-										isClearable
-									/>
-								</div>
-
-								<div className="w-62.5">
-									<Select<ILabelValue>
-										options={mesesOptions}
-										value={mesFiltroEval}
-										onChange={(v) => setMesFiltroEval(v ?? null)}
-										placeholder="Selecciona un mes"
-										isClearable
-									/>
-								</div>
-							</div>
-
-							<p className="stats-label">
-								Mostrando {dataEvaluacionChart.total} procesos con resultado de
-								evaluación{" "}
-								{mesFiltroEval
-									? `en ${mesFiltroEval.label}`
-									: "de los últimos meses"}{" "}
-								{analistaFiltroEval.value === "Todos"
-									? "de todos los analistas"
-									: `de ${analistaFiltroEval.label}`}
-							</p>
-
-							<div className="chart-container">
-								<ResponsiveContainer width="100%" height={350}>
-									<BarChart
-										data={dataEvaluacionChart.data}
-										margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
-										<CartesianGrid strokeDasharray="3 3" />
-										<XAxis dataKey="name" />
-										<YAxis allowDecimals={false} />
-										<Tooltip />
-										<Bar dataKey="value" barSize={45}>
-											{dataEvaluacionChart.data.map((entry, index) => (
-												<Cell
-													key={entry.name}
-													fill={COLORS_BAR[index % COLORS_BAR.length]}
-												/>
-											))}
-										</Bar>
-									</BarChart>
-								</ResponsiveContainer>
-							</div>
-
-							<div className="flex wrap-normal justify-center gap-4 mt-4">
-								{dataEvaluacionChart.data.map((entry, index) => (
-									<div
-										key={entry.name}
-										className="flex items-center gap-2 text-[0.9rem]">
-										<div
-											style={{
-												backgroundColor: COLORS_BAR[index % COLORS_BAR.length],
-											}}
-											className="w-4 h-4 border rounded-[3px]"
-										/>
-										<span>{entry.name}</span>
-									</div>
-								))}
-							</div>
-						</section>
-					)}
-
-					{/* Tabla de procesos */}
+			<div className="contenido-cedula-inner">
+				{/* Solicitudes */}
+				{mostrarGrafica("solicitudes") && (
 					<section className="stats-section">
-						<h1 className="section-title">⚙️ Procesos</h1>
+						<h1 className="section-title">
+							📌 {totalSolicitudes} Solicitudes Activas
+						</h1>
+						<p className="stats-label">
+							{contadores.pendientes} Pendientes (cita), {contadores.entregadas}{" "}
+							Entregadas (cita), {contadores.notificadas} Citadas
+						</p>
+						<div className="chart-container">
+							<ResponsiveContainer width="100%" height={300}>
+								<PieChart>
+									<Pie
+										data={dataSolicitudesChart}
+										cx="50%"
+										cy="50%"
+										labelLine={false}
+										outerRadius={108}
+										dataKey="value"
+										label>
+										{dataSolicitudesChart.map((entry, index) => (
+											<Cell
+												key={entry.name}
+												fill={COLORS_PIE[index % COLORS_PIE.length]}
+											/>
+										))}
+									</Pie>
+									<Tooltip />
+									<Legend />
+								</PieChart>
+							</ResponsiveContainer>
+						</div>
+					</section>
+				)}
 
-						<div className="filtros-combobox">
-							<div>
-								<p>Estado</p>
-								<Select<ILabelValue>
-									options={ESTADO_OPTIONS}
-									value={filtrosProcesos.estado}
-									onChange={(v) =>
-										setFiltrosProcesos((prev) => ({ ...prev, estado: v }))
-									}
-									isClearable
+				{/* Procesos */}
+				{mostrarGrafica("procesos") && (
+					<section className="stats-section">
+						<h1 className="section-title">
+							⚙️ {totalProcesos} Procesos Activos
+						</h1>
+						<p className="stats-label">
+							{contadores.citado} Citado, {contadores.evaluado} Evaluado,{" "}
+							{contadores.procesamiento} En procesamiento, {contadores.revision}{" "}
+							En revisión, {contadores.firma} En firma,{" "}
+							{contadores.notificadoProceso} Notificado, {contadores.cancelado}{" "}
+							Cancelado, {contadores.terminado} Terminado
+						</p>
+						<div className="chart-container">
+							<ResponsiveContainer width="100%" height={320}>
+								<PieChart>
+									<Pie
+										data={dataProcesosChart}
+										cx="50%"
+										cy="50%"
+										labelLine={false}
+										outerRadius={120}
+										dataKey="value"
+										label>
+										{dataProcesosChart.map((entry, index) => (
+											<Cell
+												key={entry.name}
+												fill={COLORS_PIE2[index % COLORS_PIE2.length]}
+											/>
+										))}
+									</Pie>
+									<Tooltip />
+									<Legend />
+								</PieChart>
+							</ResponsiveContainer>
+						</div>
+					</section>
+				)}
+
+				{/* Actividad mensual */}
+				{mostrarGrafica("mensual") && (
+					<section className="stats-section">
+						<h1 className="section-title">📉 Actividades Registradas al mes</h1>
+						<ResponsiveContainer width="100%" height={300}>
+							<AreaChart data={dataMensual ?? []}>
+								<defs>
+									<linearGradient
+										id="colorSolicitudes"
+										x1="0"
+										y1="0"
+										x2="0"
+										y2="1">
+										<stop offset="5%" stopColor="#18529D" stopOpacity={0.8} />
+										<stop offset="95%" stopColor="#18529D" stopOpacity={0} />
+									</linearGradient>
+								</defs>
+								<XAxis dataKey="mes" />
+								<YAxis />
+								<Tooltip />
+								<Area
+									type="monotone"
+									dataKey="solicitudes"
+									stroke="#18529D"
+									fillOpacity={1}
+									fill="url(#colorSolicitudes)"
 								/>
-							</div>
-							<div>
-								<p>Analista</p>
+							</AreaChart>
+						</ResponsiveContainer>
+					</section>
+				)}
+
+				{/* Procesos por analista */}
+				{mostrarGrafica("porAnalista") && (
+					<section className="stats-section">
+						<div className="flex justify-between items-center">
+							<h1 className="section-title">⚙️ Procesos por analista</h1>
+							<div className="w-62.5">
 								<Select<ILabelValue>
 									options={analistaOptions}
-									value={filtrosProcesos.analista}
-									onChange={(v) =>
-										setFiltrosProcesos((prev) => ({ ...prev, analista: v }))
-									}
+									value={analistaFiltro}
+									onChange={(v) => setAnalistaFiltro(v ?? OPCION_TODOS)}
+									placeholder="Selecciona un analista"
 									isClearable
-								/>
-							</div>
-							<div>
-								<p>Dependencia</p>
-								<Select<ILabelValue>
-									options={dependenciaOptions}
-									value={filtrosProcesos.dependencia}
-									onChange={(v) =>
-										setFiltrosProcesos((prev) => ({ ...prev, dependencia: v }))
-									}
-									isClearable
-								/>
-							</div>
-							<div className="filtro-busqueda mt-[2.8%]">
-								<FaSearch className="search-icon" />
-								<InputField
-									placeholder="Buscar..."
-									value={searchTerm}
-									onChange={(e) => setSearchTerm(e.target.value)}
 								/>
 							</div>
 						</div>
 
-						{loadingProcesos ? (
-							<p>Cargando procesos...</p>
-						) : (
-							<table className="tabla-candidatos">
-								<thead>
-									<tr>
-										<th>Folio/Hermés</th>
-										<th>Nombre</th>
-										<th>Analista</th>
-										<th>Estado</th>
-										<th>Dependencia</th>
-									</tr>
-								</thead>
-								<tbody>
-									{procesosFiltrados.length === 0 ? (
-										<tr>
-											<td colSpan={5} className="text-center">
-												No hay procesos con los filtros seleccionados.
-											</td>
-										</tr>
-									) : (
-										procesosFiltrados.map((p) => {
-											const procesoOriginal = procesosRaw.find(
-												(r) => r.idProceso === p.id,
-											);
-											return (
-												<tr
-													key={p.id}
-													onDoubleClick={() =>
-														navigate("/evaluacion", { state: procesoOriginal })
-													}
-													className="cursor-pointer"
-													title="Doble clic para abrir en evaluación">
-													<td>{p.folio}</td>
-													<td>{p.nombre}</td>
-													<td>{p.analista}</td>
-													<td>{p.estado}</td>
-													<td>{p.dependencia}</td>
-												</tr>
-											);
-										})
-									)}
-								</tbody>
-							</table>
-						)}
+						<p className="stats-label">
+							{totalAnalistaChart} Procesos —{" "}
+							{dataAnalistaChart.map((d) => `${d.value} ${d.name}`).join(", ")}
+						</p>
+						<div className="chart-container">
+							<ResponsiveContainer width="100%" height={320}>
+								<PieChart>
+									<Pie
+										data={dataAnalistaChart}
+										cx="50%"
+										cy="50%"
+										labelLine={false}
+										outerRadius={108}
+										dataKey="value"
+										label>
+										{dataAnalistaChart.map((entry, index) => (
+											<Cell
+												key={entry.name}
+												fill={COLORS_PIE2[index % COLORS_PIE2.length]}
+											/>
+										))}
+									</Pie>
+									<Tooltip />
+									<Legend />
+								</PieChart>
+							</ResponsiveContainer>
+						</div>
 					</section>
+				)}
 
-					{/* Tabla de solicitudes */}
+				{/* Resultados de evaluación */}
+				{mostrarGrafica("evaluacion") && (
 					<section className="stats-section">
-						<h1 className="section-title">📑 Solicitudes</h1>
+						<h1 className="section-title">📈 Resultados de evaluación</h1>
 
-						<div className="filtros-bar">
-							<div className="filtro-estado">
+						<div className="flex gap-4 mb-4">
+							<div className="w-62.5">
 								<Select<ILabelValue>
-									options={ESTADO_SOLICITUD_OPTIONS}
-									value={estadoFiltroSolicitud}
-									onChange={(v) => v && setEstadoFiltroSolicitud(v)}
-									isClearable={false}
+									options={[
+										OPCION_TODOS_ANALISTAS,
+										...analistas.map((a) => ({
+											value: String(a.idAcceso),
+											label:
+												`${a.nombre} ${a.primerApellido} ${a.segundoApellido ?? ""}`.trim(),
+										})),
+									]}
+									value={analistaFiltroEval}
+									onChange={(v) =>
+										setAnalistaFiltroEval(v ?? OPCION_TODOS_ANALISTAS)
+									}
+									placeholder="Selecciona un analista"
+									isClearable
 								/>
 							</div>
-							<div className="filtro-busqueda">
-								<FaSearch className="search-icon" />
-								<InputField
-									placeholder="Buscar..."
-									value={searchTermSolicitudes}
-									onChange={(e) => setSearchTermSolicitudes(e.target.value)}
+
+							<div className="w-62.5">
+								<Select<ILabelValue>
+									options={mesesOptions}
+									value={mesFiltroEval}
+									onChange={(v) => setMesFiltroEval(v ?? null)}
+									placeholder="Selecciona un mes"
+									isClearable
 								/>
 							</div>
 						</div>
 
-						{loadingProcesos ? (
-							<p className="mensaje-info">Cargando solicitudes...</p>
-						) : solicitudesFiltradas.length === 0 ? (
-							<div className="mensaje-vacio-container">
-								<h2>Todo en orden</h2>
-								<p>No hay solicitudes pendientes en este momento.</p>
-							</div>
-						) : (
-							<table className="tabla-candidatos">
-								<thead>
-									<tr>
-										<th>Folio/Hermés</th>
-										<th>Puesto</th>
-										<th>Estado</th>
-									</tr>
-								</thead>
-								<tbody>
-									{solicitudesFiltradas.map((s) => (
-										<tr
-											key={s.id}
-											onDoubleClick={() => handleEditarSolicitud(s)}
-											className="cursor-pointer"
-											title="Doble clic para asignar solicitud">
-											<td>{s.folio}</td>
-											<td>{s.puesto}</td>
-											<td>{s.estado}</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						)}
+						<p className="stats-label">
+							Mostrando {dataEvaluacionChart.total} procesos con resultado de
+							evaluación{" "}
+							{mesFiltroEval
+								? `en ${mesFiltroEval.label}`
+								: "de los últimos meses"}{" "}
+							{analistaFiltroEval.value === "Todos"
+								? "de todos los analistas"
+								: `de ${analistaFiltroEval.label}`}
+						</p>
+
+						<div className="chart-container">
+							<ResponsiveContainer width="100%" height={350}>
+								<BarChart
+									data={dataEvaluacionChart.data}
+									margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
+									<CartesianGrid strokeDasharray="3 3" />
+									<XAxis dataKey="name" />
+									<YAxis allowDecimals={false} />
+									<Tooltip />
+									<Bar dataKey="value" barSize={45}>
+										{dataEvaluacionChart.data.map((entry, index) => (
+											<Cell
+												key={entry.name}
+												fill={COLORS_BAR[index % COLORS_BAR.length]}
+											/>
+										))}
+									</Bar>
+								</BarChart>
+							</ResponsiveContainer>
+						</div>
+
+						<div className="flex wrap-normal justify-center gap-4 mt-4">
+							{dataEvaluacionChart.data.map((entry, index) => (
+								<div
+									key={entry.name}
+									className="flex items-center gap-2 text-[0.9rem]">
+									<div
+										style={{
+											backgroundColor: COLORS_BAR[index % COLORS_BAR.length],
+										}}
+										className="w-4 h-4 border rounded-[3px]"
+									/>
+									<span>{entry.name}</span>
+								</div>
+							))}
+						</div>
 					</section>
-				</div>
-			</main>
+				)}
+
+				{/* Tabla de procesos */}
+				<section className="stats-section">
+					<h1 className="section-title">⚙️ Procesos</h1>
+
+					<div className="filtros-combobox">
+						<div>
+							<p>Estado</p>
+							<Select<ILabelValue>
+								options={ESTADO_OPTIONS}
+								value={filtrosProcesos.estado}
+								onChange={(v) =>
+									setFiltrosProcesos((prev) => ({ ...prev, estado: v }))
+								}
+								isClearable
+							/>
+						</div>
+						<div>
+							<p>Analista</p>
+							<Select<ILabelValue>
+								options={analistaOptions}
+								value={filtrosProcesos.analista}
+								onChange={(v) =>
+									setFiltrosProcesos((prev) => ({ ...prev, analista: v }))
+								}
+								isClearable
+							/>
+						</div>
+						<div>
+							<p>Dependencia</p>
+							<Select<ILabelValue>
+								options={dependenciaOptions}
+								value={filtrosProcesos.dependencia}
+								onChange={(v) =>
+									setFiltrosProcesos((prev) => ({ ...prev, dependencia: v }))
+								}
+								isClearable
+							/>
+						</div>
+						<div className="filtro-busqueda mt-[2.8%]">
+							<FaSearch className="search-icon" />
+							<InputField
+								placeholder="Buscar..."
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
+							/>
+						</div>
+					</div>
+
+					{loadingProcesos ? (
+						<p>Cargando procesos...</p>
+					) : (
+						<table className="tabla-candidatos">
+							<thead>
+								<tr>
+									<th>Folio/Hermés</th>
+									<th>Nombre</th>
+									<th>Analista</th>
+									<th>Estado</th>
+									<th>Dependencia</th>
+								</tr>
+							</thead>
+							<tbody>
+								{procesosFiltrados.length === 0 ? (
+									<tr>
+										<td colSpan={5} className="text-center">
+											No hay procesos con los filtros seleccionados.
+										</td>
+									</tr>
+								) : (
+									procesosFiltrados.map((p) => {
+										const procesoOriginal = procesosRaw.find(
+											(r) => r.idProceso === p.id,
+										);
+										return (
+											<tr
+												key={p.id}
+												onDoubleClick={() =>
+													navigate("/evaluacion", { state: procesoOriginal })
+												}
+												className="cursor-pointer"
+												title="Doble clic para abrir en evaluación">
+												<td>{p.folio}</td>
+												<td>{p.nombre}</td>
+												<td>{p.analista}</td>
+												<td>{p.estado}</td>
+												<td>{p.dependencia}</td>
+											</tr>
+										);
+									})
+								)}
+							</tbody>
+						</table>
+					)}
+				</section>
+
+				{/* Tabla de solicitudes */}
+				<section className="stats-section">
+					<h1 className="section-title">📑 Solicitudes</h1>
+
+					<div className="filtros-bar">
+						<div className="filtro-estado">
+							<Select<ILabelValue>
+								options={ESTADO_SOLICITUD_OPTIONS}
+								value={estadoFiltroSolicitud}
+								onChange={(v) => v && setEstadoFiltroSolicitud(v)}
+								isClearable={false}
+							/>
+						</div>
+						<div className="filtro-busqueda">
+							<FaSearch className="search-icon" />
+							<InputField
+								placeholder="Buscar..."
+								value={searchTermSolicitudes}
+								onChange={(e) => setSearchTermSolicitudes(e.target.value)}
+							/>
+						</div>
+					</div>
+
+					{loadingProcesos ? (
+						<p className="mensaje-info">Cargando solicitudes...</p>
+					) : solicitudesFiltradas.length === 0 ? (
+						<div className="mensaje-vacio-container">
+							<h2>Todo en orden</h2>
+							<p>No hay solicitudes pendientes en este momento.</p>
+						</div>
+					) : (
+						<table className="tabla-candidatos">
+							<thead>
+								<tr>
+									<th>Folio/Hermés</th>
+									<th>Puesto</th>
+									<th>Estado</th>
+								</tr>
+							</thead>
+							<tbody>
+								{solicitudesFiltradas.map((s) => (
+									<tr
+										key={s.id}
+										onDoubleClick={() => handleEditarSolicitud(s)}
+										className="cursor-pointer"
+										title="Doble clic para asignar solicitud">
+										<td>{s.folio}</td>
+										<td>{s.puesto}</td>
+										<td>{s.estado}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					)}
+				</section>
+			</div>
 		</>
 	);
 }

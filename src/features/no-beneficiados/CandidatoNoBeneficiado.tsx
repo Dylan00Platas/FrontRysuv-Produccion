@@ -2,125 +2,101 @@ import { useId } from "react";
 import { useLocation } from "react-router-dom";
 
 import "./CandidatoNoBeneficiado.css";
-import { Toast } from "@/components/Alert/Floating/Toast";
 import MainHeader from "@/components/header/MainHeader";
+import { InputField } from "@/components/input/InputField";
 
 // Interfaces de UI ---------------------------------------------------------
 interface ICandidatoNoBeneficiado {
-  nombre: string;
-  profesion: string;
-  region: string;
-  resultado: string;
-  fechaEvaluacion: string;
-  numCarpeta: string;
+	nombre: string;
+	profesion: string;
+	region: string;
+	resultado: string;
+	fechaEvaluacion: string;
+	numCarpeta: string;
 }
 const CANDIDATO_VACIO: ICandidatoNoBeneficiado = {
-  nombre: "",
-  profesion: "",
-  region: "",
-  resultado: "",
-  fechaEvaluacion: "",
-  numCarpeta: "",
+	nombre: "",
+	profesion: "",
+	region: "",
+	resultado: "",
+	fechaEvaluacion: "",
+	numCarpeta: "",
 };
 
 function CandidatoNoBeneficiado() {
-  const fieldID = useId();
-  const location = useLocation();
+	const fieldID = useId();
+	const location = useLocation();
 
-  // Obtencion de datos de query ----------------------------------------------
-  const candidato: ICandidatoNoBeneficiado = location.state?.candidato
-    ? {
-        nombre: location.state.candidato.nombre ?? "",
-        profesion: location.state.candidato.profesion ?? "",
-        region: location.state.candidato.region ?? "",
-        resultado: location.state.candidato.resultado ?? "",
-        fechaEvaluacion: location.state.candidato.fechaEvaluacion ?? "",
-        numCarpeta: location.state.candidato.numCarpeta ?? "",
-      }
-    : CANDIDATO_VACIO;
+	// Obtencion de datos de query ----------------------------------------------
+	const candidato: ICandidatoNoBeneficiado = location.state?.candidato
+		? {
+				nombre: location.state.candidato.nombre ?? "",
+				profesion: location.state.candidato.profesion ?? "",
+				region: location.state.candidato.region ?? "",
+				resultado: location.state.candidato.resultado ?? "",
+				fechaEvaluacion: location.state.candidato.fechaEvaluacion ?? "",
+				numCarpeta: location.state.candidato.numCarpeta ?? "",
+			}
+		: CANDIDATO_VACIO;
 
-  return (
-    <>
-      <main className="main-content">
-        <MainHeader title="Candidatos" subtitle="Gestión de candidatos" />
+	return (
+		<>
+			<MainHeader title="Candidatos" subtitle="Gestión de candidatos" />
 
-        <div className="contenido-cedula-inner">
-          {/* Sin onSubmit: formulario de solo lectura, no envía datos */}
-          <form className="form-grid">
-            <div className="form-group">
-              <label htmlFor={`${fieldID}-nombre`}>Nombre</label>
-              <input
-                id={`${fieldID}-nombre`}
-                type="text"
-                className="form-input"
-                defaultValue={candidato.nombre}
-                readOnly
-              />
-            </div>
+			<div className="contenido-cedula-inner">
+				{/* Sin onSubmit: formulario de solo lectura, no envía datos */}
+				<form className="form-grid">
+					<InputField
+						label="Nombre:"
+						id={`${fieldID}-nombre`}
+						type="text"
+						defaultValue={candidato.nombre}
+						readOnly
+					/>
 
-            <div className="form-group">
-              <label htmlFor={`${fieldID}-profesion`}>Profesión</label>
-              <input
-                id={`${fieldID}-profesion`}
-                type="text"
-                className="form-input"
-                defaultValue={candidato.profesion}
-                readOnly
-              />
-            </div>
+					<InputField
+						label="Profesión:"
+						id={`${fieldID}-profesion`}
+						type="text"
+						defaultValue={candidato.profesion}
+						readOnly
+					/>
 
-            <div className="form-group">
-              <label htmlFor={`${fieldID}-region`}>Región</label>
-              <input
-                id={`${fieldID}-region`}
-                type="text"
-                className="form-input"
-                defaultValue={candidato.region}
-                readOnly
-              />
-            </div>
+					<InputField
+						label="Región:"
+						id={`${fieldID}-region`}
+						type="text"
+						defaultValue={candidato.region}
+						readOnly
+					/>
 
-            <div className="form-group">
-              <label htmlFor={`${fieldID}-resultado`}>Resultado</label>
-              <input
-                id={`${fieldID}-resultado`}
-                type="text"
-                className="form-input"
-                defaultValue={candidato.resultado}
-                readOnly
-              />
-            </div>
+					<InputField
+						label="Resultado:"
+						id={`${fieldID}-resultado`}
+						type="text"
+						defaultValue={candidato.resultado}
+						readOnly
+					/>
 
-            <div className="form-group">
-              <label htmlFor={`${fieldID}-fechaEvaluacion`}>
-                Fecha de Evaluación de Competencias
-              </label>
-              <input
-                id={`${fieldID}-fechaEvaluacion`}
-                type="date"
-                className="form-input"
-                defaultValue={candidato.fechaEvaluacion}
-                readOnly
-              />
-            </div>
+					<InputField
+						label="Fecha de evaluación de competencias:"
+						id={`${fieldID}-fechaEvaluacion`}
+						type="date"
+						defaultValue={candidato.fechaEvaluacion}
+						readOnly
+					/>
 
-            <div className="form-group">
-              <label htmlFor={`${fieldID}-numCarpeta`}>
-                N. Carpeta Digital
-              </label>
-              <input
-                id={`${fieldID}-numCarpeta`}
-                type="text"
-                className="form-input"
-                defaultValue={String(candidato.numCarpeta)}
-                readOnly
-              />
-            </div>
-          </form>
-        </div>
-      </main>
-    </>
-  );
+					<InputField
+						label="N° carpeta digital:"
+						id={`${fieldID}-numCarpeta`}
+						type="text"
+						defaultValue={String(candidato.numCarpeta)}
+						readOnly
+					/>
+				</form>
+			</div>
+		</>
+	);
 }
 
 export default CandidatoNoBeneficiado;

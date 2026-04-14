@@ -6,6 +6,11 @@ import fontkit from "@pdf-lib/fontkit";
 import { PDFTextField } from "pdf-lib";
 import ManageFiles from "@/utils/ManageFiles";
 import MainHeader from "@/components/header/MainHeader";
+import { InputField } from "@/components/input/InputField";
+import FormSectionCard from "@/components/card/FormSectionCard";
+import { TextAreaField } from "@/components/input/TextAreaField";
+import { CustomButton } from "@/components/button/CustomButton";
+import { FaSave } from "react-icons/fa";
 
 function VerDetallesOficio() {
 	const datos = JSON.parse(sessionStorage.getItem("detallesOficio") || "{}");
@@ -215,294 +220,88 @@ function VerDetallesOficio() {
 
 	return (
 		<>
-			<main className="main-content-solicitud">
-				<MainHeader title="Detalles de oficio" subtitle="Gestión de oficios" />
+			<MainHeader title="Detalles de oficio" subtitle="Gestión de oficios" />
 
-				<form className="form-grid">
-					<h3 className="section-title">Datos del oficio</h3>
+			<form className="flex flex-col gap-6">
+				<FormSectionCard title="Datos del oficio:">
+					<div className="flex flex-col gap-6">
+						{/* Fila 1: Folio + Fecha */}
+						<div className="flex flex-col sm:flex-row gap-6">
+							<InputField
+								label="Folio del oficio:"
+								id="ver-folio-oficio"
+								type="text"
+								value={formData.folioOficio}
+								readOnly
+								className="cursor-not-allowed"
+							/>
+							<InputField
+								label="Fecha del oficio:"
+								id="ver-fecha-oficio"
+								type="text"
+								value={formData.fechaOficio}
+								readOnly
+								className="cursor-not-allowed"
+							/>
+						</div>
 
-					{/* Folio */}
-					<div className="flex flex-col gap-1.5">
-						<label
-							htmlFor="ver-folio-oficio"
-							style={{
-								fontSize: "0.78rem",
-								fontWeight: 600,
-								color: "#374151",
-								letterSpacing: "0.01em",
-							}}>
-							Folio del oficio
-						</label>
-						<input
-							id="ver-folio-oficio"
-							type="text"
-							value={formData.folioOficio}
-							readOnly
-							style={{
-								height: "38px",
-								padding: "0 0.75rem",
-								border: "1px solid #d1d5db",
-								borderRadius: "6px",
-								fontSize: "0.875rem",
-								color: "#111827",
-								backgroundColor: "#f9fafb",
-								outline: "none",
-								width: "100%",
-								boxSizing: "border-box",
-								cursor: "not-allowed",
-							}}
-						/>
+						{/* Fila 2: Destinatario + Puesto */}
+						<div className="flex flex-col sm:flex-row gap-6 w-full">
+							<InputField
+								label="Destinatario:"
+								id="ver-destinatario"
+								type="text"
+								value={formData.destinatario}
+								readOnly
+								className="cursor-not-allowed w-full"
+							/>
+							<InputField
+								label="Puesto (destinatario):"
+								id="ver-puesto-destinatario"
+								type="text"
+								value={formData.puestoDestinatario}
+								readOnly
+								className="cursor-not-allowed"
+							/>
+						</div>
+
+						{/* Fila 3: Textareas */}
+						<div className="flex flex-col gap-6">
+							<TextAreaField
+								label="Cuerpo del oficio:"
+								id="ver-cuerpo-oficio"
+								value={formData.cuerpo}
+								readOnly
+								className="cursor-not-allowed"
+							/>
+							<TextAreaField
+								label="Copia carbón:"
+								id="ver-copia-carbon"
+								value={formData.copiaCarbon}
+								readOnly
+								className="cursor-not-allowed"
+							/>
+						</div>
 					</div>
+				</FormSectionCard>
 
-					{/* Fecha */}
-					<div
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							gap: "0.35rem",
-						}}>
-						<label
-							htmlFor="ver-fecha-oficio"
-							style={{
-								fontSize: "0.78rem",
-								fontWeight: 600,
-								color: "#374151",
-								letterSpacing: "0.01em",
-							}}>
-							Fecha del oficio
-						</label>
-						<input
-							id="ver-fecha-oficio"
-							type="text"
-							value={formData.fechaOficio}
-							readOnly
-							style={{
-								height: "38px",
-								padding: "0 0.75rem",
-								border: "1px solid #d1d5db",
-								borderRadius: "6px",
-								fontSize: "0.875rem",
-								color: "#111827",
-								backgroundColor: "#f9fafb",
-								outline: "none",
-								width: "100%",
-								boxSizing: "border-box",
-								cursor: "not-allowed",
-							}}
-						/>
-					</div>
-
-					{/* Destinatario */}
-					<div
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							gap: "0.35rem",
-						}}>
-						<label
-							htmlFor="ver-destinatario"
-							style={{
-								fontSize: "0.78rem",
-								fontWeight: 600,
-								color: "#374151",
-								letterSpacing: "0.01em",
-							}}>
-							Destinatario
-						</label>
-						<input
-							id="ver-destinatario"
-							type="text"
-							value={formData.destinatario}
-							readOnly
-							style={{
-								height: "38px",
-								padding: "0 0.75rem",
-								border: "1px solid #d1d5db",
-								borderRadius: "6px",
-								fontSize: "0.875rem",
-								color: "#111827",
-								backgroundColor: "#f9fafb",
-								outline: "none",
-								width: "100%",
-								boxSizing: "border-box",
-								cursor: "not-allowed",
-							}}
-						/>
-					</div>
-
-					{/* Puesto destinatario */}
-					<div
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							gap: "0.35rem",
-						}}>
-						<label
-							htmlFor="ver-puesto-destinatario"
-							style={{
-								fontSize: "0.78rem",
-								fontWeight: 600,
-								color: "#374151",
-								letterSpacing: "0.01em",
-							}}>
-							Puesto (destinatario)
-						</label>
-						<input
-							id="ver-puesto-destinatario"
-							type="text"
-							value={formData.puestoDestinatario}
-							readOnly
-							style={{
-								height: "38px",
-								padding: "0 0.75rem",
-								border: "1px solid #d1d5db",
-								borderRadius: "6px",
-								fontSize: "0.875rem",
-								color: "#111827",
-								backgroundColor: "#f9fafb",
-								outline: "none",
-								width: "100%",
-								boxSizing: "border-box",
-								cursor: "not-allowed",
-							}}
-						/>
-					</div>
-
-					{/* Cuerpo */}
-					<div
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							gap: "0.35rem",
-							gridColumn: "span 3",
-						}}>
-						<label
-							htmlFor="ver-cuerpo-oficio"
-							style={{
-								fontSize: "0.78rem",
-								fontWeight: 600,
-								color: "#374151",
-								letterSpacing: "0.01em",
-							}}>
-							Cuerpo del Oficio
-						</label>
-						<textarea
-							id="ver-cuerpo-oficio"
-							value={formData.cuerpo}
-							readOnly
-							style={{
-								padding: "0.65rem 0.75rem",
-								border: "1px solid #d1d5db",
-								borderRadius: "6px",
-								fontSize: "0.875rem",
-								color: "#111827",
-								backgroundColor: "#f9fafb",
-								resize: "vertical",
-								minHeight: "220px",
-								lineHeight: 1.6,
-								outline: "none",
-								width: "100%",
-								boxSizing: "border-box",
-								fontFamily: "inherit",
-								cursor: "not-allowed",
-							}}
-						/>
-					</div>
-
-					{/* Copia carbón */}
-					<div
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							gap: "0.35rem",
-							gridColumn: "span 3",
-						}}>
-						<label
-							htmlFor="ver-copia-carbon"
-							style={{
-								fontSize: "0.78rem",
-								fontWeight: 600,
-								color: "#374151",
-								letterSpacing: "0.01em",
-							}}>
-							Copia Carbón
-						</label>
-						<textarea
-							id="ver-copia-carbon"
-							value={formData.copiaCarbon}
-							readOnly
-							style={{
-								padding: "0.65rem 0.75rem",
-								border: "1px solid #d1d5db",
-								borderRadius: "6px",
-								fontSize: "0.875rem",
-								color: "#111827",
-								backgroundColor: "#f9fafb",
-								resize: "vertical",
-								minHeight: "90px",
-								lineHeight: 1.6,
-								outline: "none",
-								width: "100%",
-								boxSizing: "border-box",
-								fontFamily: "inherit",
-								cursor: "not-allowed",
-							}}
-						/>
-					</div>
-
-					{/* Botones */}
-					<div className="col-span-3 flex justify-center gap-4 mt-3">
-						<button
-							type="button"
-							onClick={handleGenerarPDF}
-							onMouseEnter={(e) => {
-								(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-									"#14234a";
-								(e.currentTarget as HTMLButtonElement).style.transform =
-									"translateY(-1px)";
-							}}
-							onMouseLeave={(e) => {
-								(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-									"#1a2e5a";
-								(e.currentTarget as HTMLButtonElement).style.transform =
-									"translateY(0)";
-							}}
-							style={{
-								padding: "0.55rem 1.75rem",
-								backgroundColor: "#1a2e5a",
-								color: "#ffffff",
-								border: "none",
-								borderRadius: "6px",
-								fontSize: "0.875rem",
-								fontWeight: 600,
-								cursor: "pointer",
-								transition: "background-color 0.15s, transform 0.1s",
-							}}
-							className="px-[0.55rem] py-7 bg-[#1a2e5a] text-white border-none rounded-md text-sm font-semibold cursor-pointer transition duration-150 hover:bg-[#15803d] hover:translate-y-">
-							Generar PDF
-						</button>
-
-						<button
-							type="button"
-							onClick={handleGenerarWord}
-							onMouseEnter={(e) => {
-								(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-									"#15803d";
-								(e.currentTarget as HTMLButtonElement).style.transform =
-									"translateY(-1px)";
-							}}
-							onMouseLeave={(e) => {
-								(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-									"#16a34a";
-								(e.currentTarget as HTMLButtonElement).style.transform =
-									"translateY(0)";
-							}}
-							className="px-[0.55rem] py-7 bg-[#16a34a] text-white border-none rounded-md text-sm font-semibold cursor-pointer transition duration-150 hover:bg-[#15803d] hover:translate-y-">
-							Descargar Word
-						</button>
-					</div>
-				</form>
-			</main>
+				{/* Botones de acción */}
+				<div className="flex items-center gap-3 pb-10 sm:justify-end justify-center">
+					<CustomButton
+						variant="pdf"
+						type="button"
+						icon={<FaSave />}
+						onClick={handleGenerarPDF}>
+						Obtener{"\n"}.pdf
+					</CustomButton>
+					<CustomButton
+						variant="edit"
+						type="button"
+						onClick={handleGenerarWord}>
+						Obtener{"\n"}.word
+					</CustomButton>
+				</div>
+			</form>
 		</>
 	);
 }

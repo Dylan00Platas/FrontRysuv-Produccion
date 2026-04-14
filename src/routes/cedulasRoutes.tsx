@@ -1,41 +1,41 @@
 import { RouteObject } from "react-router-dom";
 import { lazy } from "react";
-import MainLayout from "@/layout/main-layout/main-layout";
+import MainLayout from "@/layout/MainLayout";
 
 const Cedulas = lazy(() => import("@/features/cedulas/Cedulas"));
 const CrearCedulaInterna = lazy(
-  () => import("@/features/cedulas/CrearCedulaInterna"),
+	() => import("@/features/cedulas/CrearCedulaInterna"),
 );
 const CrearConstancia = lazy(
-  () => import("@/features/cedulas/CrearConstancia"),
+	() => import("@/features/cedulas/CrearConstancia"),
 );
 
 const cedulasRoutes: RouteObject[] = [
-  {
-    path: "/cedulas",
-    element: (
-      <MainLayout>
-        <Cedulas />
-      </MainLayout>
-    ),
-  },
-  {
-    // TODO-Desarrollo: Verificar el tema de la página
-    path: "/crear-cedula",
-    element: (
-      <MainLayout>
-        <CrearConstancia />
-      </MainLayout>
-    ),
-  },
-  {
-    path: "/crear-cedula-interna",
-    element: (
-      <MainLayout>
-        <CrearCedulaInterna />
-      </MainLayout>
-    ),
-  },
+	{
+		path: "/cedulas",
+		element: (
+			<MainLayout>
+				<Cedulas />
+			</MainLayout>
+		),
+	},
+	{
+		// TODO-Desarrollo: Verificar el tema de la página
+		path: "/crear-cedula",
+		element: (
+			<MainLayout>
+				<CrearConstancia />
+			</MainLayout>
+		),
+	},
+	{
+		path: "/crear-cedula-interna",
+		element: (
+			<MainLayout>
+				<CrearCedulaInterna />
+			</MainLayout>
+		),
+	},
 ];
 
 export default cedulasRoutes;
