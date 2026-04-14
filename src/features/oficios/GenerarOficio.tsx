@@ -10,7 +10,6 @@ import {
 import { Toast } from "@/components/Alert/Floating/Toast";
 import { useToast } from "@/hooks/useToast";
 import ProcesoContratacionService from "@/services/ProcesoContratacionService";
-import IResponseHTTP from "@/services/connection/APIResponse";
 import IDatosOficio from "@/interfaces/oficios/DatosOficio";
 import MainHeader from "@/components/header/MainHeader";
 import "./GenerarOficio.css";
@@ -118,7 +117,6 @@ function GenerarOficio() {
 				machote: formData.cuerpo,
 				piePagina: formData.copiaCarbon,
 				tipo: formData.tipoOficio,
-				idOficio: 1,
 			});
 			mostrarToast("Oficio guardado correctamente", "exito");
 		} catch (error) {

@@ -94,12 +94,18 @@ export interface ICedulaBase {
   temporalidad?: "1" | "2" | "";
   titularPlaza: string;
   valida?: string;
+  idDependencia?: number;
+  nombreDependencia?: string;
+  zonaDependencia?: string;
+  subzonaDependencia?: string;
+  areaDependencia?: string;
+  numDependencia?: string;
 }
 
 export type ICedulaBasePartial = Partial<ICedulaBase>;
 
 export interface IGetCedula {
-	cedula: ICedulaBase[];
+	cedula: ICedulaBase;
 }
 
 export interface IGetCedulas {

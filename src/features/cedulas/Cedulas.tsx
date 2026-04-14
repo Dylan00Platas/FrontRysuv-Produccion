@@ -15,7 +15,7 @@ import MainHeader from "@/components/header/MainHeader";
 import { InputField } from "@/components/input/InputField";
 import FormSectionCard from "@/components/card/FormSectionCard";
 import { CustomButton } from "@/components/button/CustomButton";
-import { CheckboxField } from "@/components/input/CheckBoxField";
+import { CheckboxField } from "@/components/input/CheckboxField";
 import { ReactSelectField } from "@/components/input/ReactSelectField";
 
 // Utils ---------------------------------------------------------------------

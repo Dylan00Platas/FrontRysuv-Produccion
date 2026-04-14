@@ -44,8 +44,10 @@ import {
 } from "@/components/Alert/Floating/ModalHelp";
 import FormSectionCard from "@/components/card/FormSectionCard";
 import { SelectField } from "@/components/input/SelectField";
-import { TextAreaField } from "@/components/input/TextareaField";
+import { TextAreaField } from  "@/components/input/TextAreaField";
 import { CustomButton } from "@/components/button/CustomButton";
+import IPostCedula from "@/schemas/cedulas/PostCedula";
+import { IPostResultadoCedula } from "@/schemas/cedulas/ResultadoCedula";
 
 // Interfaces de UI ---------------------------------------------------------
 interface IDependenciaOption {
@@ -186,7 +188,9 @@ function CrearConstancia() {
 	const { currentUser, checkSession } = useCookie();
 	const fieldID = useId();
 	useEffect(() => {
-		checkSession();
+		if(currentUser === null){
+			checkSession();
+		}
 	}, [currentUser]);
 
 	const [showHelp, setShowHelp] = useState(false);
@@ -532,13 +536,17 @@ function CrearConstancia() {
 				return;
 			}
 
-			const cedulaData: ICedulaBase = response.mensaje?.cedula[0];
-
-			const dep =
-				dataDependencias?.dependencias.find(
-					(d) => d.idDependencia === cedulaData.adscripcion?.idDepndencia,
+			const cedulaData: ICedulaBase = response.mensaje?.cedula;
+			const dep = dataDependencias?.dependencias.find(
+					(d) => d.idDependencia === cedulaData.idDependencia,
 				) ?? null;
-
+			cedulaData.adscripcion = dep
+			? {
+				idDepndencia: dep.idDependencia,
+				nombre: dep.nombre,
+				zona: dep.zona,
+			}
+			: null;
 			setFormData((prev) => ({
 				...prev,
 				adscripcion: dep
@@ -568,7 +576,7 @@ function CrearConstancia() {
 				resultadoFinal: cedulaData.resultadoProcesoEvaluacion ?? "",
 				revisa: cedulaData.revisa ?? "",
 				sobresaliente: cedulaData.competenciasSobresaliente ?? "",
-				temporalidad: cedulaData.temporalidad,
+				temporalidad: cedulaData.temporalidad ?? "",
 				titular: cedulaData.titularPlaza ?? "",
 				valida: cedulaData.valida ?? "",
 			}));
@@ -874,8 +882,30 @@ function CrearConstancia() {
 				puesto: formData.puesto,
 				resultadoProcesoEvaluacion: formData.resultadoFinal,
 			};
-			const response: IResponseHTTP<string> =
-				await new CedulaService().postResultadoCedulaInterna(cedulaResultados);
+
+			const PostCedula :IPostCedula = {
+				aprobadoDireccion: cedulaResultados.aprobadoDireccion,
+				aprobadoJefeOficina: cedulaResultados.aprobadoJefeOficina,
+				competenciaDesarrollar: cedulaResultados.competenciaDesarrollar,
+				competenciaReforzar: cedulaResultados.competenciaReforzar,
+				competenciasSobresaliente: cedulaResultados.competenciasSobresaliente,
+				descripcionDesarrollar: cedulaResultados.descripcionDesarrollar,
+				edad: cedulaResultados.edad,
+				efectoContratacion: cedulaResultados.efectoContratacion,
+				educacionFormal: cedulaResultados.educacionFormal,
+				evaluacionConocimientos: cedulaResultados.evaluacionConocimientos,
+				experienciaRelacionada: cedulaResultados.experienciaRelacionada,
+				FKIdProceso: parseInt(cedulaResultados.FKIdProceso as string),
+				FKIdTipoCedula: cedulaResultados.FKIdTipoCedula,
+				oficioAutorizacionDeOcupacion: cedulaResultados.oficioAutorizacionDeOcupacion,
+				plaza: cedulaResultados.plaza,
+				puesto: cedulaResultados.puesto,
+				resultados: cedulaResultados.resultadoProcesoEvaluacion,
+				hermesNotificacion: formData.hermesNotificacion,
+				adscripcion: formData.adscripcion,
+			} 
+			
+			const response = await new CedulaService().postCedulaInterna(PostCedula);
 
 			if (!response.error) {
 				const solicitudData = mapFormDataToSolicitud(formData);
@@ -895,7 +925,6 @@ function CrearConstancia() {
 							archivo: archivoBase64,
 						});
 					}
-
 					setTimeout(() => navigate(-1), 2000);
 				} else {
 					mostrarToast(
@@ -1009,9 +1038,11 @@ function CrearConstancia() {
 							<Select<IDependenciaOption>
 								inputId="constancia-adscripcion"
 								options={dependenciasOptions}
-								value={formData.adscripcion}
+								value={formData.adscripcion ?? null}
+								getOptionLabel={(op) => op.nombre}   
+								getOptionValue={(op) => String(op.idDependencia)} 
 								onChange={(selected) => {
-									handleInputChange("adscripcion.nombre", selected ?? null);
+									handleInputChange("adscripcion", selected ?? null); 
 									handleInputChange("adscripcion.zona", selected?.zona ?? "");
 								}}
 								placeholder="Escribe o selecciona una adscripción"
@@ -1148,14 +1179,14 @@ function CrearConstancia() {
 								<div className="fixed top-24 right-5 flex flex-col gap-3 z-50">
 									<CustomButton
 										className={`btn-aprobacion ${aprobadoJefeOficina ? "activo" : ""}`}
-										onClick={() => setAprobadoJefeOficina((v) => !v)}
-										disabled={currentUser?.idAcceso !== 1}>
+										onClick={() => {setAprobadoJefeOficina((v) => !v); console.log("Aprobado Jefe de Oficina:", aprobadoJefeOficina); console.log(currentUser?.idAcceso), console.log(Number(currentUser?.idAcceso) !== 1)}}
+										disabled={Number(currentUser?.idAcceso) !== 1}>
 										Jefe de Oficina
 									</CustomButton>
 									<CustomButton
 										className={`btn-aprobacion ${aprobadoDireccion ? "activo" : ""}`}
 										onClick={() => setAprobadoDireccion((v) => !v)}
-										disabled={currentUser?.idAcceso !== 4}>
+										disabled={Number(currentUser?.idAcceso) !== 4}>
 										Jefe de Departamento
 									</CustomButton>
 								</div>
