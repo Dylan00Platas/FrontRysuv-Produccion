@@ -50,6 +50,7 @@ export default interface IPutProcesoContratacion {
   resultadoSeguimientoEvaluacionDesempenio?: string;
   seguimientoEvaluacionDesempenio?: boolean;
   titularPlaza?: string;
+  candidato?: boolean
 }
 
 export type IPutProcesoContratacionCedula = Pick<

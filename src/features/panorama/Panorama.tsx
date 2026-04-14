@@ -136,21 +136,21 @@ function Panorama() {
 
         setEvaluacionesRaw(data.mensaje.procesos);
         const dataFiltrada = data.mensaje.procesos.filter(
-          (s) => s.FKIdAcceso !== null,
-        );
-        const adaptadas: IProcesoAdaptado[] = dataFiltrada.map((s, idx) => ({
-          idProceso: s.idProceso ?? idx,
-          folio: s.folio ?? "",
-          hermesNotificacion: s.hermesNotificacion ?? "",
-          nombreCandidato: s.nombreCandidato ?? "Sin candidato",
-          puesto: s.categoriaPuestoOrigen ?? "Sin puesto",
-          estado: mapEstado(s.FKIdEstadoProcesoContratacion),
-          fechaRecibido: s.fechaRecibido
-            ? new Date(s.fechaRecibido).toLocaleDateString("es-MX")
-            : "Sin fecha",
-          // TODO-Desarrollo: reemplazar con campo real de dependencia
-          dependencia: s.nombre ?? "Sin dependencia",
-        }));
+			(s) => s.FKIdAcceso !== null,
+			);
+			const adaptadas: IProcesoAdaptado[] = dataFiltrada.map((s, idx) => ({
+			idProceso: s.idProceso ?? idx,
+			folio: s.folio ?? "",
+			hermesNotificacion: s.hermesNotificacion ?? "",
+			nombreCandidato: s.nombreCandidato ?? "Sin candidato",
+			puesto: s.categoriaPuestoOrigen ?? "Sin puesto",
+			estado: mapEstado(s.FKIdEstadoProcesoContratacion),
+			fechaRecibido: s.fechaRecibido
+				? new Date(s.fechaRecibido).toLocaleDateString("es-MX")
+				: "Sin fecha",
+			// TODO-Desarrollo: reemplazar con campo real de dependencia
+			dependencia: s.nombre ?? "Sin dependencia",
+			}));
 
 				setEvaluaciones(adaptadas);
 				setEvaluacionesFiltradas(
@@ -313,7 +313,6 @@ function Panorama() {
 	const handleGuardarCapacitados = async () => {
 		try {
 			const seleccionados = competencias.filter((c) => c.capacitado);
-
 			for (const candidato of seleccionados) {
 				if (candidato.idProceso !== null) {
 					await new ProcesoContratacionService().putProcesoContratacion(
@@ -449,52 +448,52 @@ function Panorama() {
 						</div>
 					</div>
 
-          {loading ? (
-            <p>Cargando evaluaciones...</p>
-          ) : (
-            <table className="tabla-candidatos">
-              <thead>
-                <tr>
-                  <th>Folio/Hermés</th>
-                  <th>Nombre</th>
-                  <th>Puesto</th>
-                  <th>Fecha recibido</th>
-                  <th>Dependencia</th>
-                  <th style={{ width: "15%" }}>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {evaluacionesFiltradas.map((e) => (
-                  <tr
-                    key={e.idProceso} // FIX: era e.id (campo inexistente)
-                    title="Doble clic para abrir en evaluación"
-                    onDoubleClick={() => {
-                      const procesoOriginal = evaluacionesRaw.find(
-                        (s) => s.idProceso === e.idProceso, // FIX: era e.id
-                      );
-                      navigate("/evaluacion", { state: procesoOriginal });
-                    }}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <td>{e.folio + "/ " + e.hermesNotificacion}</td>
-                    <td>{e.nombreCandidato}</td>
-                    {/* FIX: era e.nombre (campo inexistente) */}
-                    <td>{e.puesto}</td>
-                    <td>{e.fechaRecibido}</td>
-                    <td>{e.dependencia}</td>
-                    <td>
-                      <span
-                        className={`estado-badge ${e.estado.toLowerCase().replace(/\s/g, "")}`}
-                      >
-                        {e.estado}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
+			{loading ? (
+				<p>Cargando evaluaciones...</p>
+			) : (
+				<table className="tabla-candidatos">
+				<thead>
+					<tr>
+					<th>Folio/Hermés</th>
+					<th>Nombre</th>
+					<th>Puesto</th>
+					<th>Fecha recibido</th>
+					<th>Dependencia</th>
+					<th style={{ width: "15%" }}>Estado</th>
+					</tr>
+				</thead>
+				<tbody>
+					{evaluacionesFiltradas.map((e) => (
+					<tr
+						key={e.idProceso} // FIX: era e.id (campo inexistente)
+						title="Doble clic para abrir en evaluación"
+						onDoubleClick={() => {
+						const procesoOriginal = evaluacionesRaw.find(
+							(s) => s.idProceso === e.idProceso, // FIX: era e.id
+						);
+						navigate("/evaluacion", { state: procesoOriginal });
+						}}
+						style={{ cursor: "pointer" }}
+					>
+						<td>{e.folio + "/ " + e.hermesNotificacion}</td>
+						<td>{e.nombreCandidato}</td>
+						{/* FIX: era e.nombre (campo inexistente) */}
+						<td>{e.puesto}</td>
+						<td>{e.fechaRecibido}</td>
+						<td>{e.dependencia}</td>
+						<td>
+						<span
+							className={`estado-badge ${e.estado.toLowerCase().replace(/\s/g, "")}`}
+						>
+							{e.estado}
+						</span>
+						</td>
+					</tr>
+					))}
+				</tbody>
+				</table>
+			)}
+			</section>
 
 				<hr className="section-divider" />
 
